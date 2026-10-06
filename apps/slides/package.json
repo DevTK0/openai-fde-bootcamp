@@ -1,0 +1,33 @@
+{
+  "name": "@workspace/slides",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm generate && node scripts/dev.mjs",
+    "generate": "node scripts/generate-evidence.mjs",
+    "build": "pnpm generate && open-slide build",
+    "start": "node scripts/dev.mjs",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "preview": "open-slide preview --host 127.0.0.1 --port 3004"
+  },
+  "dependencies": {
+    "@open-slide/core": "2.0.1",
+    "@workspace/ui": "workspace:*",
+    "lucide-react": "^1.52.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^19",
+    "@types/react-dom": "^19.3.0",
+    "@workspace/eslint-config": "workspace:*",
+    "eslint": "^10",
+    "typescript": "^5",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}

@@ -1,0 +1,83 @@
+[
+  {
+    "id": "scheduling",
+    "title": "Scheduling",
+    "pages": [
+      ["service-reliability", 1],
+      ["service-reliability", 2],
+      ["service-reliability", 3],
+      ["service-reliability", 4],
+      ["workshop-scheduling", 1],
+      ["workshop-scheduling", 2],
+      ["workshop-scheduling", 3],
+      ["workshop-scheduling", 4],
+      ["festival-allocation", 1],
+      ["festival-allocation", 2],
+      ["festival-allocation", 3],
+      ["incident-relief", 1],
+      ["incident-relief", 2],
+      ["incident-relief", 3],
+      ["service-reliability", 5],
+      ["service-reliability", 6],
+      ["service-reliability", 7],
+      ["service-reliability", 8],
+      ["workshop-scheduling", 6],
+      ["workshop-scheduling", 7],
+      ["festival-allocation", 6],
+      ["festival-allocation", 7],
+      ["incident-relief", 6],
+      ["incident-relief", 7],
+      ["festival-allocation", 8]
+    ]
+  },
+  {
+    "id": "maintenance",
+    "title": "Maintenance",
+    "pages": [
+      ["investment-options", 1],
+      ["investment-options", 2],
+      ["investment-options", 3],
+      ["repair-spend", 2],
+      ["repair-spend", 3],
+      ["repair-spend", 4],
+      ["investment-options", 4],
+      ["fleet-availability", 1],
+      ["fleet-availability", 2],
+      ["fleet-availability", 3],
+      ["hvac-comfort", 1],
+      ["hvac-comfort", 2],
+      ["hvac-comfort", 3],
+      ["hvac-comfort", 4],
+      ["investment-options", 5],
+      ["investment-options", 6],
+      ["investment-options", 7],
+      ["investment-options", 8],
+      ["fleet-availability", 6],
+      ["fleet-availability", 7],
+      ["fleet-availability", 8],
+      ["hvac-comfort", 6],
+      ["hvac-comfort", 7],
+      ["investment-options", 9]
+    ]
+  },
+  {
+    "id": "ridership",
+    "title": "Ridership",
+    "pages": [
+      ["crowding", 1],
+      ["crowding", 2],
+      ["crowding", 3],
+      ["capacity-use", 2],
+      ["capacity-use", 4],
+      ["crowding", 4],
+      ["customer-growth", 1],
+      ["customer-growth", 2],
+      ["customer-growth", 4],
+      ["crowding", 5],
+      ["capacity-use", 6],
+      ["capacity-use", 7],
+      ["customer-growth", 7],
+      ["customer-growth", 8]
+    ]
+  }
+]

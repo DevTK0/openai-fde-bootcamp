@@ -24,6 +24,25 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "@workspace/slides#build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/web/lib/fleet-data.json",
+        "$TURBO_ROOT$/apps/web/data/operations/summary.json.gz",
+        "$TURBO_ROOT$/apps/web/lib/boarding-history.json"
+      ],
+      "outputs": ["dist/**"]
+    },
+    "@workspace/slides#test": {
+      "dependsOn": ["^test"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/web/lib/fleet-data.json",
+        "$TURBO_ROOT$/apps/web/data/operations/summary.json.gz",
+        "$TURBO_ROOT$/apps/web/lib/boarding-history.json"
+      ]
     }
   }
 }

@@ -2,43 +2,86 @@
 
 # openai-fde
 
-Turborepo + pnpm monorepo with Next.js, Tailwind CSS v4, and shadcn/ui.
+A fleet dashboard, stakeholder presentations, and a software factory for shipping
+changes with Codex.
 
-## Structure
+The **LionLink dashboard** lets you explore fleet history, maintenance, incidents,
+and operating costs. The **slide decks** turn that data into stakeholder
+presentations. Both use fictional sample data.
 
-- `apps/web` – Next.js app
-- `packages/ui` – shared shadcn/ui components (`@workspace/ui`)
-- `packages/eslint-config` – shared ESLint config
-- `packages/typescript-config` – shared TypeScript config
+## Run it locally
 
-## Commands
+You'll need **Node.js 20.9+** and **pnpm 12.9.1**. From the repository root:
 
 ```bash
 pnpm install
-pnpm dev        # turbo dev
-pnpm build      # turbo build
-pnpm lint
-pnpm typecheck
+pnpm dev
 ```
 
+Then open:
 
-## Adding components
+- [Fleet dashboard](http://localhost:3000/dashboard)
+- [Slide decks](http://127.0.0.1:3001/slides/)
 
-To add components to your app, run the following command at the root of your `web` app:
+If port 3000 is occupied, use the web address printed in the terminal.
+To start just one app, use `pnpm --filter web dev` or
+`pnpm --filter @workspace/slides dev`.
+
+## Ship changes with Codex
+
+Open this checkout in Codex and type **`$pstack`** to select the entrypoint. The
+skills are registered for this checkout; no separate installation is needed.
+In Codex CLI or the IDE extension, you can also select it from `/skills`.
+
+Our **`/pstack`** prompt alias works when the client passes it to the agent; it
+doesn't register a custom slash command in the client. If skills are missing,
+restart Codex in this checkout. You can always ask directly:
+`Read skills/pstack/SKILL.md and use it for this task.`
+
+Choose a workflow based on where your work stands:
+
+| I want to… | Ask Codex |
+| --- | --- |
+| Open a PR for my changes | `$pstack opening-a-pr: verify this change, commit it, and open a PR.` |
+| Get a PR ready to merge | `$pstack babysit PR 123: address feedback and failing checks.` |
+| Verify and merge existing PRs | `$pstack shipping: verify and land PRs 123 and 124 in order.` |
+| Build a queue of tasks for human review | `$pstack autopilot-stack: build this task queue and open a stack of PRs: …` |
+| Build and merge a queue of tasks | `$pstack autopilot-full: build this task queue and merge verified PRs: …` |
+
+For a task queue, describe each change and what counts as done. **Autopilot-stack
+leaves merging to you. Autopilot-full can merge when you authorize it.** Both use
+independent agents to check the work and run only while the Codex session is active.
+
+Before your first autopilot run, ask Codex to use `create-verification-skill` to
+set up repeatable checks for the app. That app-specific skill isn't set up yet.
+The [skill catalog](skills/README.md) has the full workflow details and explains
+how this collection adapts the original pstack.
+
+## Make a change
+
+The main places to work are:
+
+| Location | What's there |
+| --- | --- |
+| [apps/web](apps/web) | Dashboard pages and app components |
+| [apps/slides](apps/slides) | Presentations and supporting evidence |
+| [packages/ui](packages/ui) | Shared shadcn/ui components and theme |
+| [skills](skills) | Codex workflows and principles |
+| [Data](Data) | Sample workbooks, CSVs, and source documentation |
+
+Use the shared components for UI work. To add a missing shadcn component, run
+`pnpm dlx shadcn@latest add <component> -c apps/web` from the repo root.
+
+Before submitting a change:
 
 ```bash
-pnpm dlx shadcn@latest add button -c apps/web
+pnpm check       # lint, TypeScript checks, and tests
+pnpm build       # build the apps
 ```
 
-This will place the ui components in the `packages/ui/src/components` directory.
-
-## Using components
-
-To use the components in your app, import them from the `ui` package.
-
-```tsx
-import { Button } from "@workspace/ui/components/button";
-```
+You can also run `pnpm lint`, `pnpm typecheck`, or `pnpm test` individually.
+Repository conventions and instructions for coding agents live in
+[AGENTS.md](AGENTS.md).
 
 ## LionLink dashboards
 
@@ -55,7 +98,7 @@ The dashboard combines two sources with different coverage:
   Its explorer supports search, column sorting, pagination, and filtered CSV export.
 - The separate `lionlink-operations-source` directory supplies 21 operations CSV tables:
   172 operating vehicles, 24 services, 6,900 trips, and 252,380 stop calls. Departures
-  cover 06:00–11:59 on ten weekdays from 5–16 October 2026, with complete downstream
+  cover 06:00 to 11:59 on ten weekdays from 5 to 16 October 2026, with complete downstream
   calls retained. Its explorer provides search, 25-row pagination, and downloads of
   complete original CSV files compressed with gzip. Reliability and crowding reports
   can be filtered by service and date; workshop resources are shown separately.
@@ -66,26 +109,25 @@ and checksums. Running the app does not require the external source directory.
 Rebuilding the snapshot requires that directory's `data/schema.json`, CSV files,
 and source documentation.
 
-After changing either source, regenerate in this order from the repository root,
-replacing the operations path with the location of your source directory:
+## Update the sample data
+
+The apps read generated snapshots. After changing either source, run these commands
+in order. Replace the operations path with your source directory:
 
 ```bash
 python3 scripts/import-data.py
 python3 scripts/import-operations.py /path/to/lionlink-operations-source
+pnpm --filter @workspace/slides generate
 pnpm check
 ```
 
-The importers use Python's standard library. The handout importer preserves missing
-values and Excel date formats. The operations importer checks passenger accounting,
-rebuilds `apps/web/lib/operations-passengers.json`, and automatically runs
-`scripts/build-boarding-history.py` to regenerate `apps/web/lib/boarding-history.json`.
-These support six matched passenger reports and the ten-day comparison of the 07:15
-service 238 departure, including mornings with nobody left waiting.
+Python's standard library is enough; no extra Python packages are needed.
+Review the authored slide figures and conclusions after a refresh. They do not
+update automatically. Restart the dashboard to clear its cached reports, and
+rebuild it for production deployment. Dates use Singapore local time and costs are SGD excluding tax.
 
-The dashboard uses the monthly CSV as its canonical historical ledger; Excel views,
-annual summaries, and selected visits overlap and are not added again. The broader
-operations cohort, selected October extracts, and future plans are separate scopes.
-Snapshots are static: source edits require re-importing. Restart the app after
-regeneration to clear process caches, and rebuild it for production deployment.
-This app has no authentication; keep this exercise data deployment private if
-replacing the fixtures with sensitive information.
+The dashboard has no authentication, so keep deployments private if you replace
+the fictional records with sensitive data.
+
+For the deck list, data caveats, and slide deployment instructions, see the
+[slides README](apps/slides/README.md).

@@ -1,0 +1,934 @@
+{
+  "boarding": [
+    {
+      "date": "2026-10-05",
+      "waiting": 124,
+      "boarded": 85,
+      "remaining": 39,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-06",
+      "waiting": 115,
+      "boarded": 85,
+      "remaining": 30,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-07",
+      "waiting": 113,
+      "boarded": 85,
+      "remaining": 28,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-08",
+      "waiting": 109,
+      "boarded": 85,
+      "remaining": 24,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-09",
+      "waiting": 18,
+      "boarded": 18,
+      "remaining": 0,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-12",
+      "waiting": 114,
+      "boarded": 85,
+      "remaining": 29,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-13",
+      "waiting": 118,
+      "boarded": 85,
+      "remaining": 33,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-14",
+      "waiting": 116,
+      "boarded": 85,
+      "remaining": 31,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-15",
+      "waiting": 114,
+      "boarded": 85,
+      "remaining": 29,
+      "capacity": 85
+    },
+    {
+      "date": "2026-10-16",
+      "waiting": 26,
+      "boarded": 26,
+      "remaining": 0,
+      "capacity": 85
+    }
+  ],
+  "coolingJobs": [
+    {
+      "date": "2026-09-28",
+      "cost": 450,
+      "hours": 2.8333333333333335
+    },
+    {
+      "date": "2026-10-05",
+      "cost": 280,
+      "hours": 3
+    },
+    {
+      "date": "2026-10-12",
+      "cost": 390,
+      "hours": 3.8333333333333335
+    }
+  ],
+  "festival": {
+    "capacityByRoute": [
+      {
+        "route": "EXT-E1",
+        "spaces": 255,
+        "departures": [
+          "21:00",
+          "21:30",
+          "22:30"
+        ]
+      },
+      {
+        "route": "EXT-E2",
+        "spaces": 596,
+        "departures": [
+          "21:00",
+          "21:30",
+          "21:30",
+          "22:15",
+          "22:45",
+          "22:45"
+        ]
+      }
+    ],
+    "routes": [
+      {
+        "Route ID": "EXT-E1",
+        "Origin location ID": "EXT-ARENA",
+        "Origin name": "Harbour Arena (fictional venue)",
+        "Transfer stop ID": "52009",
+        "Destination location ID": "52009",
+        "Cycle minutes": 90,
+        "Outward ride minutes": 35,
+        "Planning basis": "Temporary event shuttle; cycle includes all driving, terminal dwell and boarding. Planning times are fictional, not measured public-route travel times.",
+        "Issued at": "2026-10-16 16:00:00"
+      },
+      {
+        "Route ID": "EXT-E2",
+        "Origin location ID": "52009",
+        "Origin name": "Toa Payoh Int event bay (fictional allocation)",
+        "Transfer stop ID": "52009",
+        "Destination location ID": "53009",
+        "Cycle minutes": 75,
+        "Outward ride minutes": 25,
+        "Planning basis": "Temporary onward event connector; cycle includes return positioning, dwell and boarding. This does not assert a public route or accessible station transfer.",
+        "Issued at": "2026-10-16 16:00:00"
+      }
+    ]
+  },
+  "plannedTrips": 8,
+  "history": {
+    "rows": 192,
+    "vehicles": [
+      {
+        "id": "NW-V020",
+        "km": 51970,
+        "repair": 10280,
+        "holds": 125.22999999999999,
+        "preventive": 500,
+        "servicing": 19320,
+        "jobs": 26,
+        "plannedHolds": 189.75
+      },
+      {
+        "id": "NW-V005",
+        "km": 44230,
+        "repair": 8735,
+        "holds": 96.38999999999999,
+        "preventive": 750,
+        "servicing": 16170,
+        "jobs": 20,
+        "plannedHolds": 161.5
+      },
+      {
+        "id": "NW-V001",
+        "km": 34120,
+        "repair": 6575,
+        "holds": 55.87,
+        "preventive": 460,
+        "servicing": 9735,
+        "jobs": 9,
+        "plannedHolds": 117.75
+      },
+      {
+        "id": "NW-V140",
+        "km": 18800,
+        "repair": 3950,
+        "holds": 29.77,
+        "preventive": 460,
+        "servicing": 8580,
+        "jobs": 5,
+        "plannedHolds": 106
+      },
+      {
+        "id": "NW-V039",
+        "km": 30280,
+        "repair": 2940,
+        "holds": 36.660000000000004,
+        "preventive": 575,
+        "servicing": 8745,
+        "jobs": 11,
+        "plannedHolds": 114
+      },
+      {
+        "id": "NW-V002",
+        "km": 21160,
+        "repair": 2185,
+        "holds": 29.849999999999998,
+        "preventive": 1380,
+        "servicing": 8580,
+        "jobs": 6,
+        "plannedHolds": 115.75
+      },
+      {
+        "id": "NW-V009",
+        "km": 55650,
+        "repair": 1965,
+        "holds": 17.86,
+        "preventive": 3500,
+        "servicing": 20580,
+        "jobs": 4,
+        "plannedHolds": 219
+      },
+      {
+        "id": "NW-V050",
+        "km": 21960,
+        "repair": 1875,
+        "holds": 24.660000000000004,
+        "preventive": 460,
+        "servicing": 8580,
+        "jobs": 5,
+        "plannedHolds": 107.25
+      }
+    ],
+    "earlier": {
+      "km": 131600,
+      "repair": 13625,
+      "holds": 151.03000000000003,
+      "preventive": 4110,
+      "servicing": 47310,
+      "jobs": 31,
+      "plannedHolds": 537.25
+    },
+    "latest": {
+      "km": 146570,
+      "repair": 24880,
+      "holds": 265.26000000000005,
+      "preventive": 3975,
+      "servicing": 52980,
+      "jobs": 55,
+      "plannedHolds": 593.75
+    }
+  },
+  "operations": {
+    "trips": 6900,
+    "calls": 252380,
+    "boardings": 2048591,
+    "late": 48,
+    "arrivalLate": 100,
+    "completed": 6900,
+    "meanOccupancy": 36.42381582481833,
+    "queuedCalls": 22210,
+    "remaining": 2050,
+    "dates": [
+      "2026-10-05",
+      "2026-10-06",
+      "2026-10-07",
+      "2026-10-08",
+      "2026-10-09",
+      "2026-10-12",
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16"
+    ],
+    "byService": [
+      {
+        "id": "130",
+        "trips": 350,
+        "late": 0,
+        "queuedCalls": 1499,
+        "calls": 13980,
+        "remaining": 57
+      },
+      {
+        "id": "132",
+        "trips": 280,
+        "late": 17,
+        "queuedCalls": 3206,
+        "calls": 15400,
+        "remaining": 453
+      },
+      {
+        "id": "133",
+        "trips": 440,
+        "late": 0,
+        "queuedCalls": 446,
+        "calls": 18700,
+        "remaining": 11
+      },
+      {
+        "id": "141",
+        "trips": 360,
+        "late": 0,
+        "queuedCalls": 565,
+        "calls": 9540,
+        "remaining": 23
+      },
+      {
+        "id": "159",
+        "trips": 280,
+        "late": 24,
+        "queuedCalls": 2750,
+        "calls": 11340,
+        "remaining": 374
+      },
+      {
+        "id": "162",
+        "trips": 220,
+        "late": 0,
+        "queuedCalls": 422,
+        "calls": 12540,
+        "remaining": 6
+      },
+      {
+        "id": "163",
+        "trips": 350,
+        "late": 0,
+        "queuedCalls": 2108,
+        "calls": 17310,
+        "remaining": 88
+      },
+      {
+        "id": "22",
+        "trips": 440,
+        "late": 0,
+        "queuedCalls": 263,
+        "calls": 14740,
+        "remaining": 2
+      },
+      {
+        "id": "231",
+        "trips": 180,
+        "late": 0,
+        "queuedCalls": 105,
+        "calls": 3240,
+        "remaining": 7
+      },
+      {
+        "id": "232",
+        "trips": 280,
+        "late": 0,
+        "queuedCalls": 33,
+        "calls": 5600,
+        "remaining": 2
+      },
+      {
+        "id": "235",
+        "trips": 220,
+        "late": 7,
+        "queuedCalls": 129,
+        "calls": 5500,
+        "remaining": 2
+      },
+      {
+        "id": "238",
+        "trips": 180,
+        "late": 0,
+        "queuedCalls": 273,
+        "calls": 3600,
+        "remaining": 11
+      },
+      {
+        "id": "261",
+        "trips": 280,
+        "late": 0,
+        "queuedCalls": 5,
+        "calls": 3920,
+        "remaining": 0
+      },
+      {
+        "id": "262",
+        "trips": 220,
+        "late": 0,
+        "queuedCalls": 116,
+        "calls": 5280,
+        "remaining": 1
+      },
+      {
+        "id": "265",
+        "trips": 140,
+        "late": 0,
+        "queuedCalls": 1431,
+        "calls": 5740,
+        "remaining": 295
+      },
+      {
+        "id": "269",
+        "trips": 280,
+        "late": 0,
+        "queuedCalls": 22,
+        "calls": 6160,
+        "remaining": 0
+      },
+      {
+        "id": "410G",
+        "trips": 220,
+        "late": 0,
+        "queuedCalls": 92,
+        "calls": 5280,
+        "remaining": 0
+      },
+      {
+        "id": "410W",
+        "trips": 170,
+        "late": 0,
+        "queuedCalls": 268,
+        "calls": 3740,
+        "remaining": 15
+      },
+      {
+        "id": "54",
+        "trips": 350,
+        "late": 0,
+        "queuedCalls": 1424,
+        "calls": 15030,
+        "remaining": 59
+      },
+      {
+        "id": "56",
+        "trips": 280,
+        "late": 0,
+        "queuedCalls": 1635,
+        "calls": 7420,
+        "remaining": 276
+      },
+      {
+        "id": "57",
+        "trips": 440,
+        "late": 0,
+        "queuedCalls": 627,
+        "calls": 21560,
+        "remaining": 15
+      },
+      {
+        "id": "70",
+        "trips": 360,
+        "late": 0,
+        "queuedCalls": 2417,
+        "calls": 20160,
+        "remaining": 99
+      },
+      {
+        "id": "73",
+        "trips": 140,
+        "late": 0,
+        "queuedCalls": 1780,
+        "calls": 8120,
+        "remaining": 242
+      },
+      {
+        "id": "76",
+        "trips": 440,
+        "late": 0,
+        "queuedCalls": 594,
+        "calls": 18480,
+        "remaining": 12
+      }
+    ]
+  },
+  "workshop": [
+    {
+      "work_order_id": "NW-WO0001",
+      "vehicle_id": "NW-W001",
+      "opened_at": "2026-10-02T08:10:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS01",
+      "fault_summary": "Door mechanism inspection",
+      "work_status": "In repair",
+      "expected_completion_at": "2026-10-06T12:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0002",
+      "vehicle_id": "NW-W002",
+      "opened_at": "2026-10-02T08:20:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS01",
+      "fault_summary": "Cooling system leak",
+      "work_status": "Awaiting parts",
+      "expected_completion_at": "2026-10-08T14:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0003",
+      "vehicle_id": "NW-W003",
+      "opened_at": "2026-10-02T08:30:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS01",
+      "fault_summary": "Air system leak",
+      "work_status": "In repair",
+      "expected_completion_at": "2026-10-09T12:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0004",
+      "vehicle_id": "NW-W004",
+      "opened_at": "2026-10-02T09:00:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS01",
+      "fault_summary": "Suspension inspection",
+      "work_status": "Inspection pending",
+      "expected_completion_at": "2026-10-12T16:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0005",
+      "vehicle_id": "NW-W005",
+      "opened_at": "2026-10-02T09:10:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS02",
+      "fault_summary": "Battery charging fault",
+      "work_status": "Awaiting parts",
+      "expected_completion_at": "2026-10-13T12:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0006",
+      "vehicle_id": "NW-W006",
+      "opened_at": "2026-10-02T09:20:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS02",
+      "fault_summary": "Electrical diagnostics",
+      "work_status": "In repair",
+      "expected_completion_at": "2026-10-14T15:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0007",
+      "vehicle_id": "NW-W007",
+      "opened_at": "2026-10-02T09:30:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS02",
+      "fault_summary": "Wiper motor replacement",
+      "work_status": "Awaiting parts",
+      "expected_completion_at": "2026-10-15T12:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    },
+    {
+      "work_order_id": "NW-WO0008",
+      "vehicle_id": "NW-W008",
+      "opened_at": "2026-10-02T10:00:00+08:00",
+      "updated_at": "2026-10-02T16:00:00+08:00",
+      "facility_id": "NW-WS02",
+      "fault_summary": "Scheduled brake inspection",
+      "work_status": "Inspection pending",
+      "expected_completion_at": "2026-10-16T14:00:00+08:00",
+      "confirmed_release_at": null,
+      "release_status": "held",
+      "workshop_note": "Estimated completion only. Vehicle remains held until an explicit engineering release is recorded. No release record is supplied."
+    }
+  ],
+  "options": [
+    {
+      "Option ID": "NW-OPT001",
+      "Vehicle ID": "NW-V020",
+      "Option": "Targeted HVAC review",
+      "Scope": "Review repeated comfort reports, inspect refrigerant circuit and electrical fan operation",
+      "Quoted price SGD": 480,
+      "Visits": 1,
+      "Issued at": "2026-10-16 15:00:00",
+      "Valid from": "2026-10-19",
+      "Valid through": "2026-11-16",
+      "Commercial scope": "Diagnostic scope; parts and corrective work quoted separately",
+      "Evidence limit": "No guaranteed fault or complaint reduction",
+      "Cost basis": "New fictional proposed quote; SGD excluding tax; not incurred cost"
+    },
+    {
+      "Option ID": "NW-OPT002",
+      "Vehicle ID": "NW-V020",
+      "Option": "Cooling cleaning programme",
+      "Scope": "Four planned filter and condenser clean/check visits over eight weeks",
+      "Quoted price SGD": 720,
+      "Visits": 4,
+      "Issued at": "2026-10-16 15:00:00",
+      "Valid from": "2026-10-19",
+      "Valid through": "2026-11-16",
+      "Commercial scope": "Alternative preventive package; overlaps cleaning included in routine service",
+      "Evidence limit": "No measured preventive-effect estimate supplied",
+      "Cost basis": "New fictional proposed quote; SGD excluding tax; not incurred cost"
+    },
+    {
+      "Option ID": "NW-OPT003",
+      "Vehicle ID": "NW-V020",
+      "Option": "Condenser fan assembly replacement",
+      "Scope": "Replace one assembly, electrical test and engineering release checks",
+      "Quoted price SGD": 1850,
+      "Visits": 1,
+      "Issued at": "2026-10-16 15:00:00",
+      "Valid from": "2026-10-19",
+      "Valid through": "2026-11-16",
+      "Commercial scope": "Only if Engineering establishes that assembly replacement is justified; not additive to overlapping repair scope",
+      "Evidence limit": "No root cause or savings established",
+      "Cost basis": "New fictional proposed quote; SGD excluding tax; not incurred cost"
+    },
+    {
+      "Option ID": "NW-OPT004",
+      "Vehicle ID": "NW-V020",
+      "Option": "Fleet replacement option",
+      "Scope": "Indicative new double-deck vehicle with exercise capacity matching current register",
+      "Quoted price SGD": 510000,
+      "Visits": 1,
+      "Issued at": "2026-10-16 15:00:00",
+      "Valid from": "2026-10-19",
+      "Valid through": "2026-11-16",
+      "Commercial scope": "Indicative capital quote; 10-month lead time; excludes infrastructure, finance, resale and transition costs",
+      "Evidence limit": "Does not prove age causes failures or replacement is economical",
+      "Cost basis": "New fictional proposed quote; SGD excluding tax; not incurred cost"
+    },
+    {
+      "Option ID": "NW-OPT005",
+      "Vehicle ID": "NW-V009",
+      "Option": "Comparable scheduled inspection",
+      "Scope": "One planned HVAC inspection and cleaning visit for a same-service comparison vehicle",
+      "Quoted price SGD": 180,
+      "Visits": 1,
+      "Issued at": "2026-10-16 15:00:00",
+      "Valid from": "2026-10-19",
+      "Valid through": "2026-11-16",
+      "Commercial scope": "Inspection option for comparison, not a requirement to repair a healthy vehicle",
+      "Evidence limit": "Selected histories are not a controlled experiment",
+      "Cost basis": "New fictional proposed quote; SGD excluding tax; not incurred cost"
+    }
+  ],
+  "passengers": [
+    {
+      "Case ID": "PC01",
+      "Reported at": "2026-10-05 10:15:00",
+      "Journey window start": "2026-10-05 07:40:00",
+      "Journey window end": "2026-10-05 07:50:00",
+      "Journey time basis": "Observed departure",
+      "Reported service no": "132",
+      "Reported vehicle ID": null,
+      "Reported stop ID": "64009",
+      "Channel": "call",
+      "Passenger report": "I boarded the 132 at Hougang Interchange around 7:45 this morning. The bus felt very hot and the air from the vents was weak. The ride was uncomfortable."
+    },
+    {
+      "Case ID": "PC02",
+      "Reported at": "2026-10-12 10:05:00",
+      "Journey window start": "2026-10-12 07:40:00",
+      "Journey window end": "2026-10-12 07:50:00",
+      "Journey time basis": "Observed departure",
+      "Reported service no": null,
+      "Reported vehicle ID": "NW-V020",
+      "Reported stop ID": "64009",
+      "Channel": "web",
+      "Passenger report": "I noted fleet number NW-V020 when I boarded at Hougang Interchange around 7:45. I cannot remember the service number. It felt hot inside and there was hardly any cool air."
+    },
+    {
+      "Case ID": "PC03",
+      "Reported at": "2026-10-07 08:30:00",
+      "Journey window start": "2026-10-07 06:18:00",
+      "Journey window end": "2026-10-07 06:22:00",
+      "Journey time basis": "Expected departure",
+      "Reported service no": "235",
+      "Reported vehicle ID": null,
+      "Reported stop ID": "52009",
+      "Channel": "web",
+      "Passenger report": "I was expecting the 06:20 service 235 from Toa Payoh Interchange. It did not leave then. I gave up and made other arrangements before it came. I needed clearer information about the wait."
+    },
+    {
+      "Case ID": "PC04",
+      "Reported at": "2026-10-14 08:40:00",
+      "Journey window start": "2026-10-14 06:18:00",
+      "Journey window end": "2026-10-14 06:22:00",
+      "Journey time basis": "Expected departure",
+      "Reported service no": "235",
+      "Reported vehicle ID": "NW-V039",
+      "Reported stop ID": "52009",
+      "Channel": "call",
+      "Passenger report": "I waited for the 06:20 service 235 at Toa Payoh Interchange. The bus I boarded, fleet number NW-V039, left closer to 06:40. The wait made me late for work."
+    },
+    {
+      "Case ID": "PC05",
+      "Reported at": "2026-10-14 07:10:00",
+      "Journey window start": "2026-10-14 05:58:00",
+      "Journey window end": "2026-10-14 06:02:00",
+      "Journey time basis": "Observed departure",
+      "Reported service no": null,
+      "Reported vehicle ID": "NW-V039",
+      "Reported stop ID": "52009",
+      "Channel": "web",
+      "Passenger report": "The bus at Toa Payoh Interchange was fleet number NW-V039, different from the one I usually see. It left at 06:00 and my journey went as expected. I wanted to check whether the different bus was planned."
+    },
+    {
+      "Case ID": "PC07",
+      "Reported at": "2026-10-06 09:05:00",
+      "Journey window start": "2026-10-06 07:13:00",
+      "Journey window end": "2026-10-06 07:17:00",
+      "Journey time basis": "Expected departure",
+      "Reported service no": "238",
+      "Reported vehicle ID": null,
+      "Reported stop ID": "52009",
+      "Channel": "web",
+      "Passenger report": "I could not get on the 07:15 service 238 at Toa Payoh Interchange. There were still people waiting when it left. I got on the next bus around 07:30. The extra wait disrupted my morning."
+    }
+  ],
+  "requests": [
+    {
+      "Maintenance request ID": "EXT-MP01",
+      "Vehicle ID": "NW-V020",
+      "Issued at": "2026-10-16 16:00:00",
+      "Proposed start": "2026-10-19 09:00:00",
+      "Proposed end": "2026-10-19 13:00:00",
+      "Required bays": 1,
+      "Required technicians": 2,
+      "Work requested": "Cooling diagnosis under representative load and condition inspection",
+      "Latest completion": "2026-10-19 17:00:00",
+      "Status": "Tentative request; scope, cover and Engineering release require confirmation"
+    },
+    {
+      "Maintenance request ID": "EXT-MP02",
+      "Vehicle ID": "NW-V009",
+      "Issued at": "2026-10-16 16:00:00",
+      "Proposed start": "2026-10-19 09:00:00",
+      "Proposed end": "2026-10-19 11:00:00",
+      "Required bays": 1,
+      "Required technicians": 1,
+      "Work requested": "Planned preventive service and cooling condition check",
+      "Latest completion": "2026-10-19 17:00:00",
+      "Status": "Tentative request; bay, cover and Engineering release require confirmation"
+    }
+  ],
+  "capacity": [
+    {
+      "Workshop window ID": "EXT-BW01",
+      "Issued at": "2026-10-16 16:00:00",
+      "Window start": "2026-10-19 09:00:00",
+      "Window end": "2026-10-19 17:00:00",
+      "Available bays": 1,
+      "Available technicians": 2,
+      "Location": "Fictional mobile workshop at Hougang staging area, stop 64009",
+      "Capacity basis": "Continuous bay availability; technicians are staffed in separate shifts with relief. No extra bay or technician is assumed."
+    }
+  ],
+  "allocations": [
+    {
+      "Allocation ID": "EXT-FA01",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V001",
+      "Crew ID": "EXT-FC01",
+      "Route ID": "EXT-E1",
+      "Proposed departure times local": "21:00|22:30",
+      "Planning limit per departure": 85,
+      "Wheelchair spaces": 1,
+      "Cycle minutes": 90,
+      "Allocation status": "protected regular",
+      "Staging stop ID": "52009",
+      "Staging available from local": "20:00",
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA02",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V039",
+      "Crew ID": "EXT-FC02",
+      "Route ID": "EXT-E1",
+      "Proposed departure times local": "21:30",
+      "Planning limit per departure": 85,
+      "Wheelchair spaces": 1,
+      "Cycle minutes": 90,
+      "Allocation status": "protected regular",
+      "Staging stop ID": "52009",
+      "Staging available from local": "20:00",
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA03",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V002",
+      "Crew ID": "EXT-FC03",
+      "Route ID": "EXT-E2",
+      "Proposed departure times local": "21:00|22:15",
+      "Planning limit per departure": 85,
+      "Wheelchair spaces": 1,
+      "Cycle minutes": 75,
+      "Allocation status": "protected regular",
+      "Staging stop ID": "52009",
+      "Staging available from local": "20:00",
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA04",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V140",
+      "Crew ID": "EXT-FC04",
+      "Route ID": "EXT-E2",
+      "Proposed departure times local": "21:30|22:45",
+      "Planning limit per departure": 85,
+      "Wheelchair spaces": 1,
+      "Cycle minutes": 75,
+      "Allocation status": "protected regular",
+      "Staging stop ID": "52009",
+      "Staging available from local": "20:00",
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA05",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V020",
+      "Crew ID": "EXT-FC05",
+      "Route ID": "EXT-E2",
+      "Proposed departure times local": "21:30|22:45",
+      "Planning limit per departure": 128,
+      "Wheelchair spaces": 2,
+      "Cycle minutes": 75,
+      "Allocation status": "provisional additional; allocation may be reviewed",
+      "Staging stop ID": "52009",
+      "Staging available from local": "20:00",
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA06",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V005",
+      "Crew ID": "EXT-FC06",
+      "Route ID": null,
+      "Proposed departure times local": null,
+      "Planning limit per departure": 128,
+      "Wheelchair spaces": 2,
+      "Cycle minutes": null,
+      "Allocation status": "named additional pool; no departures allocated",
+      "Staging stop ID": "52009",
+      "Staging available from local": "20:20",
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA07",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V009",
+      "Crew ID": "EXT-FC07",
+      "Route ID": null,
+      "Proposed departure times local": null,
+      "Planning limit per departure": 128,
+      "Wheelchair spaces": 2,
+      "Cycle minutes": null,
+      "Allocation status": "unavailable: other protected booking 20:00–00:30",
+      "Staging stop ID": "52009",
+      "Staging available from local": null,
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    },
+    {
+      "Allocation ID": "EXT-FA08",
+      "Event ID": "EV04",
+      "Issued at": "2026-10-16 16:00:00",
+      "Planning review date": "2026-10-19",
+      "Service date": "2026-11-09",
+      "Vehicle ID": "NW-V050",
+      "Crew ID": "EXT-FC08",
+      "Route ID": null,
+      "Proposed departure times local": null,
+      "Planning limit per departure": 85,
+      "Wheelchair spaces": 1,
+      "Cycle minutes": null,
+      "Allocation status": "unavailable: other protected booking 20:00–00:30",
+      "Staging stop ID": "52009",
+      "Staging available from local": null,
+      "Staging required back by": "2026-11-10 00:30:00",
+      "Engineering condition": "Future conditional allocation. Daily Engineering release, servicing and defect closure must be confirmed; no 16 October release is reused."
+    }
+  ],
+  "incident": {
+    "requirements": {
+      "Incident ID": "INC01",
+      "Relief route ID": "RR1",
+      "Issued at": "2026-10-16 17:00:00",
+      "Origin stop ID": "53009",
+      "Destination stop ID": "54009",
+      "Staging stop ID": "52009",
+      "Initial waiting people": 112,
+      "Initial waiting wheelchair users": 1,
+      "Positioning each way minutes": 20,
+      "First boarding minutes": 5,
+      "Minimum driver takeover minutes": 5,
+      "Takeover rule": "Named relief crew may complete stationary takeover briefing while the bus remains held; briefing does not permit dispatch before release.",
+      "Cycle minutes": 40,
+      "Capacity basis": "Use actual allocated vehicle capacity; NW-V050 has 85 people and 1 wheelchair space",
+      "Planning horizon end": "2026-10-16 19:00:00",
+      "Queue rule": "FIFO; uniformly distributed arrivals within each supplied 30-minute window; accessible boarding; no abandonment or route switching",
+      "Comparison assumption": "For this bounded comparison assume no confirmed rail service restoration through 19:00. This is not a forecast or observed outcome.",
+      "Crew and vehicle return by": "2026-10-16 20:00:00"
+    },
+    "arrivals": 180,
+    "baselineCapacity": 170
+  },
+  "provenance": {
+    "boarding": "cdfad09148ccf495917763db148774e61a714854a0979aa9612a701c83d01d76",
+    "fleet": "04dad1d130f8502dff1b54695aec43b70a9ff51c670aece5eb853a9b798b67f0",
+    "operations": "1893dc037c5ee8e2bc4987ea7f398aa5aae6719db8afdcdc9f513fb21e8edc64"
+  }
+}

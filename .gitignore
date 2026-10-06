@@ -24,6 +24,11 @@ dist
 # turbo
 .turbo
 
+# local agent decision and worker logs
+/decisions.tsv
+/children.tsv
+/.audit/
+
 # misc
 .DS_Store
 *.pem
@@ -43,3 +48,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+apps/slides/.editor-data/
