@@ -43,7 +43,9 @@ export default defineConfig({
           items: [
             {
               label: "Problems and solutions",
-              autogenerate: { directory: "explanations/opportunities" },
+              items: [
+                { autogenerate: { directory: "explanations/opportunities" } },
+              ],
             },
             {
               label: "Repair spending and distance",
