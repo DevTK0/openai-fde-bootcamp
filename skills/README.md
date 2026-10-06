@@ -75,7 +75,8 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
 
 - Renamed `poteto-mode` to `pstack` and trimmed its routing to the bundled subset.
 - Preserved the principles with focused corrections to nonnegative-duration
-  modeling and test-assertion guidance. Removed Explain the Number's link to the
+  modeling and test-assertion guidance. TypeScript examples also preserve tuple
+  invariants with immutable copies. Removed Explain the Number's link to the
   excluded benchmark skill. Removed Cursor-specific frontmatter
   from skill files; retained standard `name` and `description` fields.
 - Replaced Cursor tool APIs, pinned model identifiers, model-rule paths, loop

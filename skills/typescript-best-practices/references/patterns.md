@@ -42,33 +42,33 @@ Pick one discriminant name (`kind`, `type`, `tag`) and stick to it.
 
 Build the type from parts that are all legal instead of restricting a loose type with runtime checks.
 
-Non-empty, via a variadic tuple:
+Non-empty, via a readonly variadic tuple:
 
 ```ts
-type NonEmpty<T> = [T, ...T[]];
+type NonEmpty<T> = readonly [T, ...T[]];
 
-// Don't: T[] plus a length check every caller must repeat
-function pickWinner(entries: string[]): string {
-  if (entries.length === 0) throw new Error("no entries");
-  return entries[Math.floor(Math.random() * entries.length)];
-}
-
-// Do: an empty value of the type can't exist
-function pickWinner(entries: NonEmpty<string>): string {
-  return entries[Math.floor(Math.random() * entries.length)];
+function firstEntry<T>(entries: NonEmpty<T>): T {
+  return entries[0];
 }
 ```
 
-Where a plain `T[]` arrives, narrow once with a guard. The fact then travels in the type:
+Readonly prevents mutation through this type, but cannot stop mutation through another alias. At the boundary, copy and freeze a caller-owned array before retaining it:
 
 ```ts
-const isNonEmpty = <T>(arr: T[]): arr is NonEmpty<T> => arr.length > 0;
+function parseNonEmpty<T>(values: readonly T[]): NonEmpty<T> {
+  const snapshot = [...values];
+  const isNonEmpty = (arr: readonly T[]): arr is NonEmpty<T> => arr.length > 0;
+  if (!isNonEmpty(snapshot)) throw new Error("no entries");
+  return Object.freeze(snapshot);
+}
 ```
+
+This freezes array membership, not the elements. Validate element values separately when the domain requires it.
 
 Even length, as pairs:
 
 ```ts
-type Pairs<T> = [T, T][];
+type Pairs<T> = readonly (readonly [T, T])[];
 ```
 
 A time range, as start plus duration:

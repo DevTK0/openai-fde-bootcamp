@@ -11,7 +11,7 @@ Apply the **type-system-discipline** principle skill first.
 |------|---------|
 | Discriminated unions | Model variants with a `kind` literal discriminant so impossible states can't be represented. No optional-field bags. |
 | Branded types | Brand primitives with `& { readonly __brand: "X" }` so they can't be mixed up. Validate once at the boundary. |
-| Constructive modeling | Build the shape so the illegal value can't be constructed. `[T, ...T[]]` for non-empty, `[T, T][]` for even length, `start` plus a validated nonnegative duration for a range. Parse external values once at the boundary. |
+| Constructive modeling | Build the shape so the illegal value can't be constructed. `readonly [T, ...T[]]` for non-empty, readonly pairs for even length, `start` plus a validated nonnegative duration for a range. Parse external values once at the boundary; copy caller-owned arrays to avoid mutable aliases. |
 | Simplest total type | Keep `T[]` while every operation on it stays total. Strengthen to `NonEmpty<T>` only where the loose type forces `!`, a cast, or a "should never happen" throw. |
 | `unknown` over `any` | External data is `unknown`. |
 | Schemas before guards | Before hand-writing a property-by-property type guard, use the repository's runtime schema library and infer the type from the schema, such as `z.infer`. |
