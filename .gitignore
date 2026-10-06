@@ -53,3 +53,6 @@ apps/slides/.editor-data/
 
 # Astro generated types
 .astro/
+
+# Uploaded immutable evidence revisions
+apps/web/data/evidence/

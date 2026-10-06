@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "name": "Fresh service review example",
+  "description": "A small fictional bundle for upload verification.",
+  "sources": [
+    {
+      "id": "demo",
+      "title": "Synthetic import example",
+      "kind": "synthetic",
+      "reference": "example fixture, September and October 2026",
+      "caveats": [
+        "Synthetic example, not actual operator data. Repair costs and delays do not establish a causal relationship."
+      ],
+      "text": "Inspect repeated cooling faults before attributing missed departures to maintenance. Matched work orders and dispatch records are missing."
+    }
+  ],
+  "tables": [
+    {
+      "id": "maintenance",
+      "title": "Maintenance",
+      "sourceId": "demo",
+      "kind": "maintenance",
+      "columns": [
+        "month",
+        "vehicle_id",
+        "recorded_km",
+        "repair_count",
+        "repair_cost_sgd",
+        "repair_unavailable_hours"
+      ],
+      "rows": [
+        {
+          "id": "row-1",
+          "values": {
+            "month": "2026-09",
+            "vehicle_id": "DEMO-V001",
+            "recorded_km": 1000,
+            "repair_count": 2,
+            "repair_cost_sgd": 500,
+            "repair_unavailable_hours": 10
+          }
+        }
+      ],
+      "caveats": []
+    },
+    {
+      "id": "operations",
+      "title": "Operations",
+      "sourceId": "demo",
+      "kind": "operations",
+      "columns": [
+        "date",
+        "service",
+        "trips",
+        "completed",
+        "boardings",
+        "calls",
+        "queued_calls",
+        "on_time_departures",
+        "departure_samples"
+      ],
+      "rows": [
+        {
+          "id": "row-1",
+          "values": {
+            "date": "2026-10-05",
+            "service": "DEMO-1",
+            "trips": 10,
+            "completed": 8,
+            "boardings": 200,
+            "calls": 100,
+            "queued_calls": 20,
+            "on_time_departures": 6,
+            "departure_samples": 8
+          }
+        }
+      ],
+      "caveats": []
+    }
+  ]
+}
