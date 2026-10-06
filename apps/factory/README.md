@@ -4,7 +4,7 @@ The factory runs separately from `apps/web` on port 3002. It stores conversation
 
 ## Run locally
 
-Use Node 22.12 or newer and pnpm 12.9.1. Run `pnpm install` from the repository root.
+Use Linux with Bubblewrap, Node 22.12 or newer, and pnpm 12.9.1. Run `pnpm install` from the repository root.
 
 Set the same absolute `FACTORY_DATA_DIR` in both processes. Generate an access token of at least 24 characters and set `FACTORY_ACCESS_TOKEN` in the app process. This shared token grants access to all conversations and controls the worker queue. Use a private deployment for trusted employees. Speaker labels are not verified identities.
 
@@ -14,7 +14,7 @@ export FACTORY_ACCESS_TOKEN=your-random-secret-with-at-least-24-characters
 pnpm --filter factory dev
 ```
 
-In a second terminal, configure the worker. Use a dedicated VM or container with a trusted repository. Dependency preparation and repository validation execute repository code. A git worktree prevents accidental source overlap; it is not a security boundary for hostile code. The worker's Codex process uses the workspace-write sandbox and cannot request approval to escape it.
+In a second terminal, configure the worker. Use a dedicated VM or container with a trusted repository. Dependency preparation executes trusted repository code. Validation of agent changes runs inside Bubblewrap with no network, a private PID namespace, a cleared environment, and only system binaries and the attempt worktree mounted. Host home directories and agent credentials are unavailable. A missing or unusable sandbox fails validation; there is no unconfined fallback. Checks that require external services must be adapted to an offline test configuration. A git worktree prevents accidental source overlap; it is not a security boundary for hostile code. The worker's Codex process uses a named permissions profile that allows only minimal system reads and writes inside its worktree, with command network access disabled. Generated commands inherit no environment variables except an explicit system PATH and cannot request approval. Model authentication remains in the Codex host process. Keep unrelated secrets out of the trusted repository itself.
 
 ```bash
 export FACTORY_DATA_DIR=/absolute/private/factory-data
@@ -26,9 +26,9 @@ pnpm --filter factory worker
 
 The worker checks Codex authentication before claiming work. Missing credentials or configuration appear as blocked in the API. An absent or stale worker appears offline. Do not run multiple hosts against the same database. The worker ownership check uses local process IDs.
 
-By default, each fresh worktree runs `pnpm install --frozen-lockfile --prod=false`, then Codex, then `pnpm check`. Server operators can change these commands through `FACTORY_PREPARE_COMMAND` and `FACTORY_CHECK_COMMAND`. Values are JSON objects with `command` and `args` fields, never shell strings. Set `FACTORY_PREPARE_COMMAND=null` for repositories without a preparation step. `FACTORY_CODEX_BIN` selects the installed executable. `FACTORY_TIMEOUT_MS` sets the per-process deadline, default 20 minutes. Commands and repository paths cannot be supplied through the API.
+By default, each fresh worktree runs `pnpm install --frozen-lockfile --prod=false`, then Codex, then `pnpm check`. Server operators can change these commands through `FACTORY_PREPARE_COMMAND` and `FACTORY_CHECK_COMMAND`. Values are JSON objects with `command` and `args` fields, never shell strings. Set `FACTORY_PREPARE_COMMAND=null` for repositories without a preparation step. `FACTORY_CODEX_BIN` selects the installed executable. `FACTORY_TIMEOUT_MS` sets the per-process deadline, default 20 minutes. Validation commands run at `/workspace` with `/usr/bin:/bin` as PATH. Commands and repository paths cannot be supplied through the API.
 
-The worker uses documented `codex exec` flags from CLI version 0.159.0. It ignores user config, uses the default model, and reads auth from the worker's Codex environment. Each execution can incur model charges. Verification below uses a controlled executable fixture and incurs no model charges.
+The worker uses documented `codex exec` flags from CLI version 0.159.0. Its permission and child-environment policy follows [Codex permission profiles](https://learn.chatgpt.com/docs/permissions) and the [configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference). Run `pnpm --filter factory verify:policy` to probe the installed Codex sandbox without a model call. It ignores user config, uses the default model, and reads auth from the worker's Codex environment. Each execution can incur model charges. Verification below uses a controlled executable fixture and incurs no model charges.
 
 ## Intake API
 

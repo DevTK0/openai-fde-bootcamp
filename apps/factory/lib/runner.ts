@@ -4,6 +4,7 @@ import { join } from "node:path"
 import { z } from "zod"
 import type { RunnerConfig } from "./config"
 import type { Store } from "./store"
+import { agentPolicyArgs } from "./agent-policy"
 
 const agentResultSchema = z.discriminatedUnion("kind", [
   z.object({
@@ -50,6 +51,7 @@ export function execute(
   options: {
     input?: string
     credentials?: boolean
+    stdoutOnly?: boolean
     signal?: AbortSignal
     timeoutMs?: number
     childChanged?: (pid: number | null) => void
@@ -70,7 +72,9 @@ export function execute(
       output = next.slice(-OUTPUT_LIMIT)
     }
     child.stdout.on("data", append)
-    child.stderr.on("data", append)
+    child.stderr.on("data", (data: Buffer) => {
+      if (!options.stdoutOnly) append(data)
+    })
     child.stdin.on("error", () => {})
     child.stdin.end(options.input)
     const kill = () => {
@@ -112,6 +116,9 @@ export async function preflight(config: RunnerConfig) {
   )
   if (git.exitCode !== 0)
     throw new Error("FACTORY_REPO is not an accessible Git repository.")
+  const sandbox = await execute("bwrap", ["--version"], config.repo)
+  if (sandbox.exitCode !== 0)
+    throw new Error("Install bubblewrap for isolated validation.")
   const login = await execute(config.codex, ["login", "status"], config.repo, {
     credentials: true,
   })
@@ -146,11 +153,13 @@ export async function runOnce(
     command: string,
     args: string[],
     cwd: string,
-    input?: string
+    input?: string,
+    stdoutOnly = false
   ) => {
     if (abort.signal.aborted) throw new Error("Implementation interrupted.")
     const result = await execute(command, args, cwd, {
       input,
+      stdoutOnly,
       credentials: command === config.codex,
       signal: abort.signal,
       timeoutMs: config.timeoutMs,
@@ -194,10 +203,8 @@ export async function runOnce(
       [
         "exec",
         "--ignore-user-config",
-        "-c",
-        'approval_policy="never"',
-        "--sandbox",
-        "workspace-write",
+        "--strict-config",
+        ...agentPolicyArgs(),
         "--cd",
         worktree,
         "--output-schema",
@@ -221,7 +228,51 @@ export async function runOnce(
       store.finish(request.id, request.attempt, result)
       return true
     }
-    const checks = await run(config.check.command, config.check.args, worktree)
+    const checks = await run(
+      "bwrap",
+      [
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/bin",
+        "/bin",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind-try",
+        "/lib64",
+        "/lib64",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        worktree,
+        "/workspace",
+        "--chdir",
+        "/workspace",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "HOME",
+        "/tmp",
+        "--setenv",
+        "CI",
+        "1",
+        "--",
+        config.check.command,
+        ...config.check.args,
+      ],
+      worktree
+    )
     await writeFile(join(runDir, "checks.log"), checks.output)
     const staged = await run("git", ["add", "-A"], worktree)
     if (staged.exitCode !== 0)
@@ -229,7 +280,9 @@ export async function runOnce(
     const diff = await run(
       "git",
       ["diff", baseSha, "--no-ext-diff", "--no-color"],
-      worktree
+      worktree,
+      undefined,
+      true
     )
     await writeFile(join(runDir, "change.diff"), diff.output)
     if (diff.truncated || checks.truncated)

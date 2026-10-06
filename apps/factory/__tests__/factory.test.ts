@@ -150,6 +150,28 @@ describe("durable factory", () => {
       reason: "Codex exited with code -1. Inspect the attempt log.",
     })
   })
+  it("keeps host files and credentials outside generated-code validation", async () => {
+    const { store, submit, config, directory } = await setup()
+    const secret = join(directory, "operator-secret")
+    await writeFile(secret, "must not be readable")
+    process.env.OPENAI_API_KEY = "fixture-secret"
+    process.env.CODEX_API_KEY = "fixture-secret"
+    submit(MAGIC_PHRASE)
+    await runOnce(
+      {
+        ...config,
+        check: {
+          command: "/usr/bin/node",
+          args: [
+            "-e",
+            `const fs=require('node:fs'); if (fs.existsSync(${JSON.stringify(secret)}) || process.env.OPENAI_API_KEY || process.env.CODEX_API_KEY || process.env.CODEX_HOME || process.env.HOME !== '/tmp') process.exit(9);`,
+          ],
+        },
+      },
+      store
+    )
+    expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
+  })
   it("persists clarification and uses the answer in a fresh implementation attempt", async () => {
     const { store, submit, config } = await setup("clarify")
     submit(MAGIC_PHRASE)

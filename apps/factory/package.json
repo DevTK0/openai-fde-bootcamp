@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "worker": "tsx scripts/worker.ts",
-    "verify": "vitest run __tests__/factory.test.ts"
+    "verify": "vitest run __tests__/factory.test.ts",
+    "verify:policy": "tsx scripts/verify-policy.ts"
   },
   "dependencies": {
     "@workspace/ui": "workspace:*",

@@ -2,7 +2,9 @@ import { resolve } from "node:path"
 import { z } from "zod"
 
 export function dataDirectory() {
-  return resolve(process.env.FACTORY_DATA_DIR || ".factory")
+  return resolve(
+    /* turbopackIgnore: true */ process.env.FACTORY_DATA_DIR || ".factory"
+  )
 }
 export const runnerConfigSchema = z.object({
   repo: z.string().min(1),
