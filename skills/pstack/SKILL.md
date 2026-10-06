@@ -5,7 +5,7 @@ description: "Pstack shipping workflow for Codex. Use for /pstack, opening PRs, 
 
 # Pstack
 
-This port runs in Codex. Follow the repository's `AGENTS.md` and the user's requested scope. Resolve named skills from `skills/<name>/SKILL.md`, principle shorthand from `skills/principle-<name>/SKILL.md`, and playbooks relative to this file's directory. Read the source files behind discovery symlinks.
+This port runs in Codex. Follow the repository's `AGENTS.md` and the user's requested scope. Resolve repository-owned skills from `skills/<name>/SKILL.md`, principle shorthand from `skills/principle-<name>/SKILL.md`, and playbooks relative to this file's directory. Read the source files behind discovery symlinks. The `skill-creator` dependency is a Codex system skill: resolve it from the session's available-skills catalog, not from this repository.
 
 Use Codex's file, shell, planning, and delegation tools. Use the available Codex browser tools for browser verification. Run `pnpm check` and task-specific verification before handing off repository changes. For PR creation, commit the work, push the task branch, and open a PR automatically unless the user explicitly sets a different stopping point. PR status checks remain read-only. Merging follows Shipping or an explicitly executed Autopilot-full queue with landing authority. Autopilot-stack never merges.
 
@@ -68,7 +68,7 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 - **Prove It Works** (**principle-prove-it-works**). After a task, before declaring done. Verify against the real artifact, not a proxy or "it compiles".
 - **Fix Root Causes** (**principle-fix-root-causes**). Debugging. Trace each symptom to its root cause, reproduce first, ask why until you reach it.
 - **Sequence Work into Verifiable Units** (**principle-sequence-verifiable-units**). Multi-step work (sweeps, migrations, runs of similar edits) and how you stack commits and PRs. Break work into small units that each end in a check, verify each before the next, and order delivery so the sequence proves itself.
-- **Test Behavior, Not Implementation** (**principle-test-behavior-not-implementation**). Writing, changing, or keeping a test. Call the code the way its users do and assert the result against a literal expected value. If the test would still pass when every imported function returns `undefined`, rewrite the assertion or delete the test.
+- **Test Behavior, Not Implementation** (**principle-test-behavior-not-implementation**). Writing, changing, or keeping a test. Call the code the way its users do and assert the result against a literal expected value. Use mutations to check coverage, accounting for observable effects and absence contracts.
 - **Explain the Number** (**principle-explain-the-number**). Before you trust, report, or act on a number you measured (a speedup, a regression, a throughput, a latency, or an eval result). Find what limits it, and rule out that it measured something other than the work you think.
 
 **Delegation**

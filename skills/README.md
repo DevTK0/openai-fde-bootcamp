@@ -26,7 +26,8 @@ by `/pstack`. Edit `skills/` as the single source; the symlinks reflect changes
 without reinstalling. The skills are available to Codex on the next turn.
 No global installation, model configuration, or companion plugin is required.
 The original pstack repository is a provenance reference, not a runtime
-dependency. Removed skills are not fetched or invoked.
+dependency. Agent-facing skill edits use Codex's built-in `skill-creator`, resolved
+from the session skill catalog. Removed pstack skills are not fetched or invoked.
 
 ## Included subset
 
@@ -73,7 +74,8 @@ Imported from `cursor/plugins`, directory `pstack`, at commit
 Upstream's MIT notice is preserved in [LICENSE](LICENSE).
 
 - Renamed `poteto-mode` to `pstack` and trimmed its routing to the bundled subset.
-- Preserved the principles, removing only Explain the Number's link to the
+- Preserved the principles with focused corrections to nonnegative-duration
+  modeling and test-assertion guidance. Removed Explain the Number's link to the
   excluded benchmark skill. Removed Cursor-specific frontmatter
   from skill files; retained standard `name` and `description` fields.
 - Replaced Cursor tool APIs, pinned model identifiers, model-rule paths, loop
@@ -88,7 +90,8 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
   sources live in `skills/`, with optional discovery symlinks.
 - Replaced the unbundled PR watcher, Origin-specific CLI assumptions, and Cursor
   cloud agents with Codex PR tools and subagents. Preserved shipping's
-  independent-verifier gate.
+  independent-verifier gate. Verdicts require exact head/base commits; a changed
+  revision requires fresh verification instead of upstream patch-ID reuse.
 - Preserved unrelated work instead of upstream reset-based worktree recovery.
 - Adapted upstream review triage to check PR comments, reviews, and threads
   regardless of reviewer. Historical examples remain attributed to upstream.

@@ -77,11 +77,20 @@ A time range, as start plus duration:
 // Don't: a comment holds the invariant
 type TimeRange = { start: Date; end: Date }; // start <= end
 
-// Do: a negative range can't be written; derive end when needed
-type TimeRange = { start: Date; durationMs: number };
+// Validate once at the boundary, then carry the invariant in the type.
+type NonnegativeDurationMs = number & { readonly __brand: "NonnegativeDurationMs" };
+
+function parseDurationMs(value: number): NonnegativeDurationMs {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new RangeError("duration must be finite and nonnegative");
+  }
+  return value as NonnegativeDurationMs;
+}
+
+type TimeRange = { start: Date; durationMs: NonnegativeDurationMs };
 ```
 
-Keep `durationMs` a plain number. Brand it (per Branded types) only if a raw number could be passed where a duration is expected, not by reflex. Pick the representation that makes the bad state unconstructable, then expose the reading you need on top (`pairs.flat()`, a `rangeEnd()` helper).
+A plain `number` also permits negative values, `NaN`, and infinity. Validate it before constructing the branded duration. Validate the start date and representable end date at the boundary when the domain requires them. Pick the representation that makes the bad state unconstructable, then expose the reading you need on top (`pairs.flat()`, a `rangeEnd()` helper).
 
 ## Simplest total type
 

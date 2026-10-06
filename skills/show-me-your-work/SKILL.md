@@ -44,7 +44,7 @@ A run is one agent conversation, including its later turns and any summary of it
 
 By default the log is a working artifact, not committed. Keep it at `decisions.tsv` in the work dir, or `.audit/<task-slug>.tsv` when several efforts run at once, and leave it out of git.
 
-Commit it only when the work is ambitious enough that a reviewer needs the trail to trust the result.
+This repository ignores root `decisions.tsv`, `children.tsv`, and `.audit/` to keep local trails out of broad staging commands. Commit a trail only when the work is ambitious enough that a reviewer needs it to trust the result; review its contents and explicitly stage that file with `git add -f <path>`.
 
 ## Rules
 
