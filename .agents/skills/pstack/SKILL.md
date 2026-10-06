@@ -1,6 +1,6 @@
 ---
 name: pstack
-description: "Pstack shipping workflow for Codex. Use for /pstack, opening PRs, addressing PR feedback and CI, verifying and landing PRs, running full/stack autopilot queues, adapting upstream pstack skills, or designing a workflow when no narrower playbook fits."
+description: "Pstack shipping workflow for Codex. Use for /pstack, opening PRs, addressing PR feedback and CI, verifying and landing PRs, running full/stack autopilot queues, adapting upstream pstack skills, running autonomously to a stated outcome, or designing a workflow when no narrower playbook fits."
 ---
 
 # Pstack
@@ -16,6 +16,7 @@ The Principles section below grounds every trigger. In your reply, name each pri
 Remaining triggers:
 
 - Asked to import, port, adapt, or update upstream pstack skills or playbooks → **Adapting skills**. Its instructions are self-contained; `.agents/skills/README.md` is not required.
+- Asked to run autonomously until a stated outcome, "do not stop until X", or "/loop until X" → **Autonomous run**. Explicit autopilot queues retain their own playbooks. Importing this playbook does not start a run.
 - Explicit "figure it out", a large migration, or work with no narrower matching playbook → the **figure-it-out** skill. It designs a scoped workflow under this entrypoint's existing authority. Prefer Adapting skills for skill imports and the lifecycle playbooks for PR work.
 - Nontrivial change, architecture decision, or "are we sure?" → the **how** skill.
 - Reading or editing TypeScript → the **typescript-best-practices** skill.
@@ -122,7 +123,7 @@ Comments follow the same rule as the reply. Write them clean as you go. Keep a c
 
 Open a todolist whose first items are the matched playbook's steps, copied in verbatim, before any task-specific todos. A step you choose not to do stays in the list with a one-line `skip: <reason>`. Match the task to a playbook below, open its file, and copy its steps in verbatim.
 
-This port covers the PR lifecycle and skill adaptation below. The **figure-it-out** skill designs a workflow for work with no narrower match. Use supporting skills as needed to understand changes, repair CI or review findings, and verify behavior. Autopilot owners may build the changes in their assigned queue using the supporting skills. Standalone feature, investigation, prototype, refactoring, and eval playbooks remain excluded; do not invoke those removed workflows.
+This port covers the PR lifecycle, autonomous runs, and skill adaptation below. The **figure-it-out** skill designs a workflow for work with no narrower match. Use supporting skills as needed to understand changes, repair CI or review findings, and verify behavior. Autopilot owners may build the changes in their assigned queue using the supporting skills. Standalone feature, investigation, prototype, refactoring, and eval playbooks remain excluded; do not invoke those removed workflows.
 
 - **Babysit.** Driving a PR or a stack to merge-ready: conflicts, review threads, CI. `playbooks/babysit.md`.
 - **Shipping.** The half after Babysit. Independently verifying a green stack, then landing the contiguous verified run bottom-up through available PR tools or the repository forge CLI. `playbooks/shipping.md`.
@@ -130,3 +131,4 @@ This port covers the PR lifecycle and skill adaptation below. The **figure-it-ou
 - **Autopilot-full.** Own a queue of independent changes through build, swarm verification, and authorized landing. `playbooks/autopilot-full.md`.
 - **Autopilot-stack.** Build and swarm-verify a queue, then deliver one linear PR stack for human landing. `playbooks/autopilot-stack.md`.
 - **Adapting skills.** Import or update upstream pstack instructions for this Codex repository. `playbooks/adapting-skills.md`.
+- **Autonomous run.** Drive a checkable exit condition during the active session, with an iteration log and a handoff if interrupted. `playbooks/autonomous-run.md`.

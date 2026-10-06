@@ -47,11 +47,12 @@ All **24 principles** are included. Their index and triggers are in
 | [technical-writing](technical-writing/SKILL.md) | Structure clear documentation and technical explanations. |
 | [show-me-your-work](show-me-your-work/SKILL.md) | Preserve decision evidence, as referenced by Prove It Works. |
 
-The **6 playbooks** cover:
+The **7 playbooks** cover:
 
 | Area | Playbooks |
 | --- | --- |
 | Autopilot | [autopilot-full](pstack/playbooks/autopilot-full.md), [autopilot-stack](pstack/playbooks/autopilot-stack.md) |
+| Autonomous execution | [autonomous run](pstack/playbooks/autonomous-run.md) |
 | Skill maintenance | [adapting skills](pstack/playbooks/adapting-skills.md) |
 | PR lifecycle | [opening a PR](pstack/playbooks/opening-a-pr.md), [babysit](pstack/playbooks/babysit.md), [shipping](pstack/playbooks/shipping.md) |
 
@@ -73,6 +74,7 @@ Imported from `cursor/plugins`, directory `pstack`, at commit
 [`df581122cde17e6e27686b5a448bde23e4ad4318`](https://github.com/cursor/plugins/tree/df581122cde17e6e27686b5a448bde23e4ad4318/pstack).
 Upstream's MIT notice is preserved in [LICENSE](LICENSE).
 
+- Added `autonomous-run` from the same revision, replacing Cursor loops and watcher defaults with bounded session waits, scoped fixes, and explicit handoff instructions.
 - Added `figure-it-out` from the same revision, with local skill resolution, sequential delivery, scoped rollback, and session-bound supervision. Removed Cursor-only invocation frontmatter, consistent with the other imported skills.
 - Renamed `poteto-mode` to `pstack` and trimmed its routing to the bundled subset.
 - Preserved the principles with focused corrections to nonnegative-duration

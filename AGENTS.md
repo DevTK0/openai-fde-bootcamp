@@ -27,7 +27,7 @@ Developer setup:
    `Read .agents/skills/pstack/SKILL.md and use it for <task>`.
 
 See [.agents/skills/README.md](.agents/skills/README.md) for the included skills, all 24
-principles, the six playbooks, upstream revision, and local adaptations.
+principles, the seven playbooks, upstream revision, and local adaptations.
 For upstream skill imports or updates, follow [.agents/skills/pstack/playbooks/adapting-skills.md](.agents/skills/pstack/playbooks/adapting-skills.md). It contains the adaptation procedure without requiring a README read.
 No global installation or companion plugin is required. Edit skill sources directly in `.agents/skills/`.
 
