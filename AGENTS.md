@@ -7,6 +7,42 @@ Turborepo + pnpm workspace.
 - `apps/web` – Next.js app (App Router, Tailwind CSS v4).
 - `packages/ui` – shared shadcn/ui component library, published to the workspace as `@workspace/ui`.
 - `packages/eslint-config`, `packages/typescript-config` – shared tooling configs.
+- `skills` – repository-owned agent workflows for the software factory.
+
+## Pstack skills
+
+The repository's software factory entrypoint is `/pstack`. When a user starts a
+request with `/pstack`, read [skills/pstack/SKILL.md](skills/pstack/SKILL.md) and
+follow the matching playbook. Codex discovers the skill through `.agents/skills/pstack`; `/pstack` is a
+repository prompt alias, while `$pstack` is the native skill invocation.
+
+Developer setup:
+
+1. Use the Node and pnpm versions specified in `package.json`, then run `pnpm install`.
+2. Open an agent session in this checkout. Skills are versioned under `skills/`.
+3. Start with `/pstack <task>`. In Codex's native skill UI, use `$pstack` or
+   select it through `/skills`. The checked-in `.agents/skills/` symlinks
+   register all 35 skills for this repository. Restart the session if the new entry does not appear.
+4. If the client intercepts `/pstack`, use `$pstack` or
+   `Read skills/pstack/SKILL.md and use it for <task>`.
+
+See [skills/README.md](skills/README.md) for the included skills, all 24
+principles, the five shipping/autopilot playbooks, upstream revision, and local adaptations.
+No global installation or companion plugin is required. Keep edits in `skills/`;
+do not duplicate skill sources under the discovery directory.
+
+These skills target Codex. Ordinary delivery runs sequentially. Parallel workers
+are allowed only inside an explicitly invoked swarm or an executing autopilot
+workflow, with isolated checkouts/runtime state and capacity reserved for verification.
+Use Codex session tools and the configured model.
+PR creation automatically commits, pushes the task branch, and opens a
+PR unless the user sets a different stopping point. Merging follows the Shipping
+playbook or an executing Autopilot-full queue with landing authority.
+Autopilot-stack delivers verified PRs for human landing and never merges. Follow user scope and Codex permissions.
+Shipping and autopilot require independent verification. Autopilot supervision
+lasts only for the active Codex session; stop workers and persist a handoff when
+the session ends. Do not claim an unattended scheduler is running. Report unavailable capabilities honestly. Run
+`pnpm check` and the playbook's task-specific verification before handing off.
 
 ## UI components: use shadcn/ui
 
