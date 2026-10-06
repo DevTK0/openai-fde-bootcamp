@@ -39,8 +39,3 @@ and failure tests differ. The individual articles explain the closest boundaries
 The current fixtures support some prototypes directly and only motivate others.
 Images, invoices, part ledgers, complete component histories, and live telemetry
 need new data. A proposal that needs those inputs says so explicitly.
-
-A reviewer can rerun `python scripts/verify-opportunities.py --expected 10` from
-the repository root to check article count, required sections, index coverage,
-and internal links. That structural check does not establish semantic uniqueness,
-source truth, or a business benefit.
