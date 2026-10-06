@@ -93,7 +93,8 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
   cloud agents with Codex PR tools and subagents. Preserved shipping's
   independent-verifier gate and verification reuse. Patch equivalence uses a
   whitespace-preserving diff rather than patch IDs; relevant base changes
-  require reassessing affected verification.
+  require reassessing affected verification. Shipping untrusted contributor PRs
+  requires verification isolated from landing credentials and shared Git state.
 - Preserved unrelated work instead of upstream reset-based worktree recovery.
 - Adapted upstream review triage to check PR comments, reviews, and threads
   regardless of reviewer. Historical examples remain attributed to upstream.
