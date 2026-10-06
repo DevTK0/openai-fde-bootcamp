@@ -101,7 +101,9 @@ queues allow isolated parallel workers within Codex capacity. Swarm verification
 requires every lane's evidence at the exact revision; missing lanes block a clean
 verdict. Same-model agents are allowed, but self-review is not independent proof.
 
-Autopilot-full builds and lands independent PRs under the operator's merge grant.
+Autopilot-full builds independent PRs in parallel under the operator's merge grant.
+The coordinator serializes final verification and landing so one owner's merge
+does not invalidate another owner's final verification.
 Autopilot-stack builds and verifies one linear stack and leaves landing to the
 human. Both open early PRs as work records, retain decision/child-agent trails,
 and supervise progress during the active Codex session. They do not install a
