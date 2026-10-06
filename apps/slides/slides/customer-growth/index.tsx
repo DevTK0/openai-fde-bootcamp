@@ -1,11 +1,10 @@
 import { useSlidePageNumber, type Page } from "@open-slide/core"
 import "../../components/deck.css"
 
-export const meta = { title: "Boardings do not show customer growth" }
+export const meta = { title: "Customer growth" }
 export const notes = [
   "Boardings do not count individual customers.\n\nCounting bus entries does not identify unique customers, whether they are new, or what the operator earns. The commercial model could involve fares, contracts or other payments; it is not supplied in these reports. A boarding cannot automatically be multiplied by an assumed fare.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Supplied operating and passenger reports only. All figures are fictional exercise data, not live business results.",
   "The records show over two million boardings.\n\nThe complete operating extract has 2,048,591 boarding events across 6,900 trips and 252,380 stop visits. Repeat travel and transfers may count the same person multiple times. There is no payment or customer-identity field linking these events to customer acquisition.\n\nInterpretation: Repeated travel and transfers count again; boarding events do not reveal new customers or earnings.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Supplied operating and passenger reports only. All figures are fictional exercise data, not live business results.",
-  "One passenger gave up waiting.\n\nThis is a concrete sign of friction before completing a journey. The same report set also includes a person who waited for the next bus and someone whose changed bus ran as expected. These six selected accounts are not a random customer sample or a churn measure.\n\nInterpretation: Six selected accounts cannot establish an abandonment rate, lost customers or lost revenue.\n\nSource: Passenger account · delayed morning bus · 7 Oct 2026.\nScope: Supplied operating and passenger reports only. All figures are fictional exercise data, not live business results.",
   "The records do not identify new or returning customers.\n\nThis is a gap in the supplied material, not proof that the company has no customer systems. There are no acquisition channels, customer groups, campaign costs or repeat-customer identifiers here. Those absences prevent a defensible acquisition cost, retention rate or campaign return calculation.\n\nInterpretation: These fields are absent from the supplied reports; the business may hold them elsewhere.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Supplied operating and passenger reports only. All figures are fictional exercise data, not live business results.",
   "Caveats\n\nThis section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Supplied operating and passenger reports only. All figures are fictional exercise data, not live business results.",
   "Ten weekdays do not show ridership growth.\n\nTen weekdays do not show ridership growth. Share monthly passenger totals from earlier months and years.\n\nRepeated travel and transfers count again; boarding events do not reveal new customers or earnings.\n\nRequest routine monthly ridership totals over earlier months and years, monthly revenue reports and operator contracts, and marketing budgets or invoices if acquisition spending exists. Existing campaign summaries may be useful if already maintained, but do not require customer-level tracking, new versus repeat passenger histories or abandonment research. Aggregate ridership changes can be measured from comparable periods; they do not prove which service issue caused a change. The payment model determines whether ridership changes affect operator revenue.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Operating records and six passenger accounts · October 2026.\nScope: Supplied operating and passenger reports only. All figures are fictional exercise data, not live business results.",
@@ -24,11 +23,11 @@ const PageNumber = () => {
 
 const Page1: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. How it works"
+    aria-label="Customer growth. How it works"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
+      <span>{"LIONLINK · Customer growth"}</span>
       <span>{"How it works"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -214,11 +213,11 @@ const Page1: Page = () => (
 
 const Page2: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. Recorded evidence"
+    aria-label="Customer growth. Recorded evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
+      <span>{"LIONLINK · Customer growth"}</span>
       <span>{"Recorded evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -404,96 +403,11 @@ const Page2: Page = () => (
 
 const Page3: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. Passenger evidence"
+    aria-label="Customer growth. Evidence gap"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
-      <span>{"Passenger evidence"}</span>
-    </header>
-    <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"One passenger gave up waiting."}
-    </h1>
-    <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {"The passenger reported making other arrangements after a delay."}
-    </p>
-    <figure
-      aria-label="One passenger gave up waiting."
-      className="my-4 min-h-0 w-full flex-1"
-    >
-      <div
-        aria-label="One passenger gave up waiting. The passenger reported making other arrangements after a delay."
-        className="relative h-full w-full"
-      >
-        <div className="absolute top-[139.234px] left-[341.957px] h-[118.57px] w-[107.174px] text-foreground">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            viewBox="2.5960858791600883 1.596085879160088 18.807828241679825 20.807828241679825"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="pointer-events-none h-full w-full"
-          >
-            <circle cx="12" cy="8" r="5"></circle>
-            <path d="M20 21a8 8 0 0 0-16 0"></path>
-          </svg>
-        </div>
-        <div className="absolute top-[340.883px] left-[352.619px] h-[85.852px] w-[85.851px] text-destructive">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            viewBox="-0.2905967234756459 -0.2905967234756459 24.581193446951293 24.581193446951293"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="pointer-events-none h-full w-full"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 6v6h4"></path>
-          </svg>
-        </div>
-        <p className="absolute top-[140.787px] left-[640.595px] m-0 h-[65.645px] w-[337px] text-center text-[length:54.704px] leading-[1.2] font-[500] whitespace-pre text-foreground">
-          {'"I gave up and'}
-        </p>
-        <p className="absolute top-[224.607px] left-[640.595px] m-0 h-[65.645px] w-[634.719px] text-center text-[length:54.704px] leading-[1.2] font-[500] whitespace-pre text-foreground">
-          {'made other arrangements"'}
-        </p>
-        <p className="absolute top-[371.694px] left-[743.396px] m-0 h-[30.705px] w-[663.078px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
-          {"One passenger account. Later travel is unknown."}
-        </p>
-      </div>
-    </figure>
-    <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
-      <span>
-        {"Source: Passenger account · delayed morning bus · 7 Oct 2026"}
-        <br />
-        {
-          "Fictional exercise data · Supplied operating and passenger reports only"
-        }
-      </span>
-      <span className="text-[23px] tabular-nums">
-        <PageNumber />
-      </span>
-    </footer>
-  </section>
-)
-
-const Page4: Page = () => (
-  <section
-    aria-label="Boardings do not show customer growth. Evidence gap"
-    className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
-  >
-    <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
+      <span>{"LIONLINK · Customer growth"}</span>
       <span>{"Evidence gap"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -677,13 +591,13 @@ const Page4: Page = () => (
   </section>
 )
 
-const Page5: Page = () => (
+const Page4: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. Section divider"
+    aria-label="Customer growth. Section divider"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      {"LIONLINK · Boardings do not show customer growth"}
+      {"LIONLINK · Customer growth"}
     </header>
     <div className="flex flex-1 items-center justify-between gap-24">
       <div className="max-w-[1200px]">
@@ -726,13 +640,13 @@ const Page5: Page = () => (
   </section>
 )
 
-const Page6: Page = () => (
+const Page5: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. Caveat"
+    aria-label="Customer growth. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
+      <span>{"LIONLINK · Customer growth"}</span>
       <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -831,13 +745,13 @@ const Page6: Page = () => (
   </section>
 )
 
-const Page7: Page = () => (
+const Page6: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. Caveat"
+    aria-label="Customer growth. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
+      <span>{"LIONLINK · Customer growth"}</span>
       <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -975,13 +889,13 @@ const Page7: Page = () => (
   </section>
 )
 
-const Page8: Page = () => (
+const Page7: Page = () => (
   <section
-    aria-label="Boardings do not show customer growth. Caveat"
+    aria-label="Customer growth. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Boardings do not show customer growth"}</span>
+      <span>{"LIONLINK · Customer growth"}</span>
       <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -1122,5 +1036,4 @@ export default [
   Page5,
   Page6,
   Page7,
-  Page8,
 ] satisfies Page[]

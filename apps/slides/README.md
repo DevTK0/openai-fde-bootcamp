@@ -1,9 +1,9 @@
 # LionLink stakeholder slides
 
-Eleven decks with one full slide per stakeholder data request, using [Open Slide](https://github.com/open-slide/open-slide),
+Six decks grouped by business problem, with one full slide per caveat, using [Open Slide](https://github.com/open-slide/open-slide),
 pinned to `@open-slide/core` 2.0.1. The runtime provides the deck browser, slide
 navigation, presentation mode, speaker notes and its built-in download menu.
-Authored slides use explanatory SVG diagrams, Lucide icons and the shared
+Authored slides use editable text, shapes, vector icons and the shared
 `@workspace/ui` Tailwind theme. No third-party presentation service or model credentials are needed.
 
 ## Run and refresh
@@ -32,27 +32,34 @@ build/test inputs include all three source snapshots so changes invalidate the c
 
 All paths start with `/slides/s/`:
 
-| Deck | Route |
-| --- | --- |
-| Repair costs were higher in the second year | `repair-spend` |
-| Recurring discomfort has a cost | `hvac-comfort` |
-| A small number of delays can disrupt journeys | `service-reliability` |
-| Some passengers cannot board the bus they need | `crowding` |
-| Bus use varies sharply at the same departure | `capacity-use` |
-| Workshop bookings conflict with available resources | `workshop-scheduling` |
-| Workshop estimates do not establish usable buses | `fleet-availability` |
-| The festival plan has an end-to-end capacity gap | `festival-allocation` |
-| The disruption plan cannot clear the assumed queue | `incident-relief` |
-| Maintenance spending is broader than repair bills | `investment-options` |
-| Boarding counts do not explain customer growth | `customer-growth` |
+| Deck | Route | Pages | Covers |
+| --- | --- | --- | --- |
+| Maintenance costs | `maintenance-costs` | 12 | Repair bills, total maintenance, bus use and cost concentration |
+| Workshop capacity and bus availability | `workshop-capacity` | 13 | Booking clashes, staffing, repairs and safety approvals |
+| Crowding and spare capacity | `passenger-demand` | 9 | Queues, full buses, quiet days and misleading averages |
+| Late and uncomfortable journeys | `service-quality` | 14 | Delays, passenger accounts and recurring cooling repairs |
+| Festival and disruption plans | `special-service-plans` | 12 | Connections, capacity, queues and planning assumptions |
+| Customer growth | `customer-growth` | 7 | Boardings, individual customers, revenue and marketing data |
+
+The former eleven decks are consolidated into 67 pages. Repeated introductions,
+annual cost caveats, replacement-cost requests and the duplicated abandoned-journey
+account are removed. Each deck has one Caveats section after its problem evidence.
+The maintenance deck ends with one combined monetary impact page. The repair
+increase is part of the total maintenance increase and must not be added again.
+
+Old deck URLs redirect to their new deck and matching retained or combined page.
+`content/deck-groups.json` records the consolidation and redirects. The eleven
+original problem statements remain in `content/decks.ts` as the evidence reference;
+they are not eleven separate decks in the browser.
 
 Each starts with a plain-language introduction to bus operations, then shows the
 problem, supporting observations, business significance and evidence limits. Every page has a visual and a
 readable data-source citation. After the problem pages, each limitation and its corresponding existing-record request
 gets a separate full slide explaining the conclusion that the extract cannot support.
 Diagrams show the limitation itself: limited time coverage, selected samples, proposed
-versus completed work, missing cost breakdowns, or provisional capacity. Only the two maintenance decks retain impact pages, showing recorded dollar increases.
-The other nine omit impact: the supplied data cannot establish a dollar or ridership change.
+versus completed work, missing cost breakdowns, or provisional capacity. Only the combined maintenance deck retains an impact page, showing the recorded
+dollar increase. The other decks omit impact because the supplied data cannot
+establish a dollar or ridership change.
 Requests focus on more history and routine operating, workshop and accounting records;
 no new passenger tracking or customer research is requested. Detailed caveats also
 appear in speaker notes. There are no small evidence-limit strips.
@@ -69,7 +76,7 @@ colours, size and position; the canvas supports moving and resizing elements.
 Use Open Slide's **Save** button to persist pending changes. Notes use its built-in
 notes editor. **Preview** and **Present** hide editing controls.
 
-All 86 pages contain literal JSX in their own `slides/<id>/index.tsx`. Chart labels
+All 67 pages contain literal JSX in their own `slides/<id>/index.tsx`. Chart labels
 are HTML text and bars are individual shapes, so the native inspector can select
 them. Icons remain vector graphics inside selectable groups. Chart bars and their
 numeric labels are separate objects; update both when changing figures. Page

@@ -1,13 +1,14 @@
 import { useSlidePageNumber, type Page } from "@open-slide/core"
 import "../../components/deck.css"
 
-export const meta = {
-  title: "Maintenance costs include more than repairs",
-}
+export const meta = { title: "Maintenance costs" }
 export const notes = [
   "Maintenance includes more than repairs.\n\nThese are distinct categories in the canonical monthly ledger. Annual summaries and selected job records overlap the same ledger and cannot be added as extra spending. Supplier quotes are not included because they are proposed purchases, not incurred costs.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
   "Annual maintenance costs rose to S$81,835.\n\nTotal earlier spending is S$65,045; later spending is S$81,835. These include labour and parts recorded in the monthly source. They exclude fuel, wages outside the job charges, financing and unpriced replacement cover.\n\nInterpretation: Two annual totals do not establish a sustained trend; prices and the mix of work may have changed.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
   "Repairs drove most of the cost increase.\n\nThe increase is S$16,790 overall. Regular service charges rose S$5,670, repair charges rose S$11,255, and extra preventive charges fell by S$135. A decline in preventive spending does not prove that it caused the rise in repairs.\n\nInterpretation: Changes in spending do not prove that fewer preventive checks caused more repairs.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
+  "Repair costs rose faster than bus use.\n\nEarlier year: October 2024 to September 2025. Later year: October 2025 to September 2026. Repair spend rose from S$13,625 to S$24,880, while distance rose from 131,600 to 146,570 km. These are incurred repair charges, not quotes.\n\nInterpretation: Two years show a difference, not a sustained trend; only eight selected buses are included.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
+  "Repair costs rose per kilometre.\n\nDividing repair charges by the distance recorded in the same period makes the comparison more informative than raw bills. The difference remains substantial after allowing for distance. It does not establish whether age, workload, specific faults or other conditions caused the increase.\n\nInterpretation: Distance is accounted for; bus age, workload, prices and one-off repairs are not.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
+  "Repair jobs rose from 31 to 55.\n\nThere were 31 corrective jobs in the earlier year and 55 in the later year. The increase is not just a comparison of one expensive invoice with many small ones. Jobs can follow faults found between duties; these counts must not be called cancelled trips or breakdowns.\n\nInterpretation: More jobs may reflect more inspections or changed recording, as well as more faults.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
   "Two buses account for almost half the repair costs.\n\nThe highest two buses account for S$19,015 of S$38,505, or 49.4%. The group of six is combined, not an average bus. These raw totals differ in mileage and do not prove vehicle age or a particular component caused the difference.\n\nInterpretation: Two buses may cost more because of heavier use, age or one major job; totals alone cannot explain why.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
   "Caveats\n\nThis section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
   "Two years do not show a cost trend.\n\nTwo years do not show a cost trend. Share earlier monthly maintenance reports using the same cost categories.\n\nTwo annual totals do not establish a sustained trend; prices and the mix of work may have changed.\n\nRequest earlier monthly maintenance reports using the same cost categories, the equivalent records for the rest of the fleet, and underlying invoices and job sheets. Bus ages and mileage should come from the fleet register and existing operating records. These are extensions of routine records already supplied. Reconcile categories and overlapping job records before comparing years. The overall maintenance increase includes the repair increase, so the two impact figures must not be added.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Monthly maintenance and mileage records · Oct 2024 to Sep 2026.\nScope: Same eight selected buses · not the whole fleet. All figures are fictional exercise data, not live business results.",
@@ -27,11 +28,11 @@ const PageNumber = () => {
 
 const Page1: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. How it works"
+    aria-label="Maintenance costs. How it works"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"How it works"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -216,11 +217,11 @@ const Page1: Page = () => (
 
 const Page2: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Recorded evidence"
+    aria-label="Maintenance costs. Recorded evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Recorded evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -288,11 +289,11 @@ const Page2: Page = () => (
 
 const Page3: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Recorded evidence"
+    aria-label="Maintenance costs. Recorded evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Recorded evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -377,11 +378,274 @@ const Page3: Page = () => (
 
 const Page4: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Recorded evidence"
+    aria-label="Maintenance costs. Recorded evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
+      <span>{"Recorded evidence"}</span>
+    </header>
+    <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
+      {"Repair costs rose faster than bus use."}
+    </h1>
+    <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
+      {"The same eight buses, compared across two full years."}
+    </p>
+    <figure
+      aria-label="Repair costs rose faster than bus use."
+      className="my-4 min-h-0 w-full flex-1"
+    >
+      <div
+        aria-label="Repair costs rose faster than bus use. The same eight buses, compared across two full years."
+        className="relative h-full w-full"
+      >
+        <div className="absolute top-[97.879px] left-[555.186px] h-[254.228px] w-[16px] text-foreground">
+          <svg
+            viewBox="490.9330546362422 110.93305463624223 18.13389072751553 288.1338907275155"
+            width="100%"
+            height="100%"
+            aria-hidden="true"
+            className="pointer-events-none h-full w-full"
+          >
+            <line
+              x1="500"
+              x2="500"
+              y1="120"
+              y2="390"
+              strokeWidth="2px"
+              fill="rgb(0, 0, 0)"
+              stroke="oklch(1 0 0 / 0.1)"
+              strokeDasharray="none"
+              strokeLinecap="butt"
+              strokeLinejoin="miter"
+              className="stroke-border"
+            ></line>
+          </svg>
+        </div>
+        <p className="absolute top-[146.701px] left-[318.695px] m-0 h-[30.705px] w-[202.375px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+          {"Distance travelled"}
+        </p>
+        <div className="absolute top-[136.76px] left-[563.186px] h-[59.998px] w-[758.8px] [border-radius:3.529px] bg-muted"></div>
+        <div className="absolute top-[136.76px] left-[563.186px] h-[59.998px] w-[104.492px] [border-radius:3.529px] bg-primary"></div>
+        <p className="absolute top-[135.054px] left-[1488.737px] m-0 h-[50.822px] w-[117.594px] text-center text-[length:42.352px] leading-[1.2] font-[600] whitespace-pre text-foreground">
+          {"11.4%"}
+        </p>
+        <p className="absolute top-[279.05px] left-[337.163px] m-0 h-[30.705px] w-[183.906px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+          {"Repair spending"}
+        </p>
+        <div className="absolute top-[269.109px] left-[563.186px] h-[59.998px] w-[758.8px] [border-radius:3.529px] bg-muted"></div>
+        <div className="absolute top-[269.109px] left-[563.186px] h-[59.998px] w-[758.8px] [border-radius:3.529px] bg-destructive"></div>
+        <p className="absolute top-[267.403px] left-[1476.284px] m-0 h-[50.822px] w-[130.047px] text-center text-[length:42.352px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+          {"82.6%"}
+        </p>
+        <p className="absolute top-[349.636px] left-[553.186px] m-0 h-[30.705px] w-[20px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"0"}
+        </p>
+        <p className="absolute top-[464.338px] left-[780.171px] m-0 h-[30.705px] w-[413.063px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"Percentage increase from earlier year"}
+        </p>
+      </div>
+    </figure>
+    <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
+      <span>
+        {
+          "Source: Monthly maintenance and mileage records · Oct 2024 to Sep 2026"
+        }
+        <br />
+        {
+          "Fictional exercise data · Same eight selected buses · not the whole fleet"
+        }
+      </span>
+      <span className="text-[23px] tabular-nums">
+        <PageNumber />
+      </span>
+    </footer>
+  </section>
+)
+
+const Page5: Page = () => (
+  <section
+    aria-label="Maintenance costs. Recorded evidence"
+    className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+  >
+    <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
+      <span>{"LIONLINK · Maintenance costs"}</span>
+      <span>{"Recorded evidence"}</span>
+    </header>
+    <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
+      {"Repair costs rose per kilometre."}
+    </h1>
+    <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
+      {"Costs per 1,000 kilometres account for the increase in bus use."}
+    </p>
+    <figure
+      aria-label="Repair costs rose per kilometre."
+      className="my-4 min-h-0 w-full flex-1"
+    >
+      <div
+        aria-label="Repair costs rose per kilometre. Costs per 1,000 kilometres account for the increase in bus use."
+        className="relative h-full w-full"
+      >
+        <div className="absolute top-[97.879px] left-[555.186px] h-[254.228px] w-[16px] text-foreground">
+          <svg
+            viewBox="490.9330546362422 110.93305463624223 18.13389072751553 288.1338907275155"
+            width="100%"
+            height="100%"
+            aria-hidden="true"
+            className="pointer-events-none h-full w-full"
+          >
+            <line
+              x1="500"
+              x2="500"
+              y1="120"
+              y2="390"
+              strokeWidth="2px"
+              fill="rgb(0, 0, 0)"
+              stroke="oklch(1 0 0 / 0.1)"
+              strokeDasharray="none"
+              strokeLinecap="butt"
+              strokeLinejoin="miter"
+              className="stroke-border"
+            ></line>
+          </svg>
+        </div>
+        <p className="absolute top-[146.701px] left-[394.398px] m-0 h-[30.705px] w-[126.672px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+          {"Earlier year"}
+        </p>
+        <div className="absolute top-[136.76px] left-[563.186px] h-[59.998px] w-[758.8px] [border-radius:3.529px] bg-muted"></div>
+        <div className="absolute top-[136.76px] left-[563.186px] h-[59.998px] w-[462.81px] [border-radius:3.529px] bg-primary"></div>
+        <p className="absolute top-[135.054px] left-[1474.424px] m-0 h-[50.822px] w-[131.906px] text-center text-[length:42.352px] leading-[1.2] font-[600] whitespace-pre text-foreground">
+          {"S$104"}
+        </p>
+        <p className="absolute top-[279.05px] left-[406.992px] m-0 h-[30.705px] w-[114.078px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+          {"Later year"}
+        </p>
+        <div className="absolute top-[269.109px] left-[563.186px] h-[59.998px] w-[758.8px] [border-radius:3.529px] bg-muted"></div>
+        <div className="absolute top-[269.109px] left-[563.186px] h-[59.998px] w-[758.8px] [border-radius:3.529px] bg-destructive"></div>
+        <p className="absolute top-[267.403px] left-[1477.721px] m-0 h-[50.822px] w-[128.609px] text-center text-[length:42.352px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+          {"S$170"}
+        </p>
+        <p className="absolute top-[349.636px] left-[553.186px] m-0 h-[30.705px] w-[20px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"0"}
+        </p>
+        <p className="absolute top-[464.338px] left-[812.491px] m-0 h-[30.705px] w-[348.422px] text-center text-[length:25.587px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"Singapore dollars per 1,000 km"}
+        </p>
+      </div>
+    </figure>
+    <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
+      <span>
+        {
+          "Source: Monthly maintenance and mileage records · Oct 2024 to Sep 2026"
+        }
+        <br />
+        {
+          "Fictional exercise data · Same eight selected buses · not the whole fleet"
+        }
+      </span>
+      <span className="text-[23px] tabular-nums">
+        <PageNumber />
+      </span>
+    </footer>
+  </section>
+)
+
+const Page6: Page = () => (
+  <section
+    aria-label="Maintenance costs. Recorded evidence"
+    className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+  >
+    <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
+      <span>{"LIONLINK · Maintenance costs"}</span>
+      <span>{"Recorded evidence"}</span>
+    </header>
+    <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
+      {"Repair jobs rose from 31 to 55."}
+    </h1>
+    <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
+      {
+        "Each repair visit counts as one job. A job does not always mean a breakdown."
+      }
+    </p>
+    <figure
+      aria-label="Repair jobs rose from 31 to 55."
+      className="my-4 min-h-0 w-full flex-1"
+    >
+      <div
+        aria-label="Repair jobs rose from 31 to 55. Each repair visit counts as one job. A job does not always mean a breakdown."
+        className="relative h-full w-full"
+      >
+        <div className="absolute top-[114.026px] left-[508.092px] h-[290.558px] w-[16px] text-foreground">
+          <svg
+            viewBox="492.1327993148442 112.1327993148442 15.734401370311593 285.7344013703116"
+            width="100%"
+            height="100%"
+            aria-hidden="true"
+            className="pointer-events-none h-full w-full"
+          >
+            <line
+              x1="500"
+              x2="500"
+              y1="120"
+              y2="390"
+              strokeWidth="2px"
+              fill="rgb(0, 0, 0)"
+              stroke="oklch(1 0 0 / 0.1)"
+              strokeDasharray="none"
+              strokeLinecap="butt"
+              strokeLinejoin="miter"
+              className="stroke-border"
+            ></line>
+          </svg>
+        </div>
+        <p className="absolute top-[169.098px] left-[321.873px] m-0 h-[35.387px] w-[145.375px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+          {"Earlier year"}
+        </p>
+        <div className="absolute top-[157.616px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
+        <div className="absolute top-[157.616px] left-[516.092px] h-[69.148px] w-[492.909px] [border-radius:4.068px] bg-primary"></div>
+        <p className="absolute top-[155.59px] left-[1660.495px] m-0 h-[58.572px] w-[57.516px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-foreground">
+          {"31"}
+        </p>
+        <p className="absolute top-[321.63px] left-[336.389px] m-0 h-[35.387px] w-[130.859px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+          {"Later year"}
+        </p>
+        <div className="absolute top-[310.148px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
+        <div className="absolute top-[310.148px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-destructive"></div>
+        <p className="absolute top-[308.122px] left-[1653.729px] m-0 h-[58.572px] w-[64.281px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+          {"55"}
+        </p>
+        <p className="absolute top-[402.98px] left-[504.873px] m-0 h-[35.387px] w-[22.438px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"0"}
+        </p>
+        <p className="absolute top-[535.175px] left-[861.734px] m-0 h-[35.387px] w-[284.922px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"Completed repair jobs"}
+        </p>
+      </div>
+    </figure>
+    <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
+      <span>
+        {
+          "Source: Monthly maintenance and mileage records · Oct 2024 to Sep 2026"
+        }
+        <br />
+        {
+          "Fictional exercise data · Same eight selected buses · not the whole fleet"
+        }
+      </span>
+      <span className="text-[23px] tabular-nums">
+        <PageNumber />
+      </span>
+    </footer>
+  </section>
+)
+
+const Page7: Page = () => (
+  <section
+    aria-label="Maintenance costs. Recorded evidence"
+    className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+  >
+    <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Recorded evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -470,13 +734,13 @@ const Page4: Page = () => (
   </section>
 )
 
-const Page5: Page = () => (
+const Page8: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Section divider"
+    aria-label="Maintenance costs. Section divider"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      {"LIONLINK · Maintenance costs include more than repairs"}
+      {"LIONLINK · Maintenance costs"}
     </header>
     <div className="flex flex-1 items-center justify-between gap-24">
       <div className="max-w-[1200px]">
@@ -519,13 +783,13 @@ const Page5: Page = () => (
   </section>
 )
 
-const Page6: Page = () => (
+const Page9: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Caveat"
+    aria-label="Maintenance costs. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -628,13 +892,13 @@ const Page6: Page = () => (
   </section>
 )
 
-const Page7: Page = () => (
+const Page10: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Caveat"
+    aria-label="Maintenance costs. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -933,13 +1197,13 @@ const Page7: Page = () => (
   </section>
 )
 
-const Page8: Page = () => (
+const Page11: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Caveat"
+    aria-label="Maintenance costs. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -1106,13 +1370,13 @@ const Page8: Page = () => (
   </section>
 )
 
-const Page9: Page = () => (
+const Page12: Page = () => (
   <section
-    aria-label="Maintenance costs include more than repairs. Impact"
+    aria-label="Maintenance costs. Impact"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · Maintenance costs include more than repairs"}</span>
+      <span>{"LIONLINK · Maintenance costs"}</span>
       <span>{"Impact"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
@@ -1187,4 +1451,7 @@ export default [
   Page7,
   Page8,
   Page9,
+  Page10,
+  Page11,
+  Page12,
 ] satisfies Page[]

@@ -1,0 +1,187 @@
+[
+  {
+    "id": "maintenance-costs",
+    "title": "Maintenance costs",
+    "pages": [
+      ["investment-options", 1],
+      ["investment-options", 2],
+      ["investment-options", 3],
+      ["repair-spend", 2],
+      ["repair-spend", 3],
+      ["repair-spend", 4],
+      ["investment-options", 4],
+      ["investment-options", 5],
+      ["investment-options", 6],
+      ["investment-options", 7],
+      ["investment-options", 8],
+      ["investment-options", 9]
+    ],
+    "aliases": {
+      "repair-spend": {
+        "1": 1,
+        "5": 8,
+        "6": 9,
+        "7": 10,
+        "8": 11,
+        "9": 12
+      }
+    }
+  },
+  {
+    "id": "workshop-capacity",
+    "title": "Workshop capacity and bus availability",
+    "pages": [
+      ["workshop-scheduling", 1],
+      ["workshop-scheduling", 2],
+      ["workshop-scheduling", 3],
+      ["workshop-scheduling", 4],
+      ["fleet-availability", 1],
+      ["fleet-availability", 2],
+      ["fleet-availability", 3],
+      ["workshop-scheduling", 5],
+      ["workshop-scheduling", 6],
+      ["workshop-scheduling", 7],
+      ["fleet-availability", 6],
+      ["fleet-availability", 7],
+      ["fleet-availability", 8]
+    ],
+    "revisions": [
+      {
+        "page": 13,
+        "title": "Replacement bus costs are not provided.",
+        "caption": "Share dated hire invoices and credits to check replacement bus costs.",
+        "notesFrom": [["workshop-scheduling", 8]]
+      }
+    ],
+    "aliases": {
+      "workshop-scheduling": {
+        "8": 13
+      },
+      "fleet-availability": {
+        "4": 6,
+        "5": 8
+      }
+    }
+  },
+  {
+    "id": "passenger-demand",
+    "title": "Crowding and spare capacity",
+    "pages": [
+      ["crowding", 1],
+      ["crowding", 2],
+      ["crowding", 3],
+      ["capacity-use", 2],
+      ["capacity-use", 4],
+      ["crowding", 4],
+      ["crowding", 5],
+      ["capacity-use", 6],
+      ["capacity-use", 7]
+    ],
+    "revisions": [
+      {
+        "page": 8,
+        "caption": "Share more months of trip and boarding records, including weekends.",
+        "notesFrom": [["crowding", 6]]
+      }
+    ],
+    "aliases": {
+      "crowding": {
+        "6": 8
+      },
+      "capacity-use": {
+        "1": 1,
+        "3": 4,
+        "5": 7
+      }
+    }
+  },
+  {
+    "id": "service-quality",
+    "title": "Late and uncomfortable journeys",
+    "pages": [
+      ["service-reliability", 1],
+      ["service-reliability", 2],
+      ["service-reliability", 3],
+      ["service-reliability", 4],
+      ["hvac-comfort", 1],
+      ["hvac-comfort", 2],
+      ["hvac-comfort", 3],
+      ["hvac-comfort", 4],
+      ["service-reliability", 5],
+      ["service-reliability", 6],
+      ["service-reliability", 7],
+      ["service-reliability", 8],
+      ["hvac-comfort", 6],
+      ["hvac-comfort", 7]
+    ],
+    "aliases": {
+      "hvac-comfort": {
+        "5": 9
+      }
+    }
+  },
+  {
+    "id": "special-service-plans",
+    "title": "Festival and disruption plans",
+    "pages": [
+      ["festival-allocation", 1],
+      ["festival-allocation", 2],
+      ["festival-allocation", 3],
+      ["incident-relief", 1],
+      ["incident-relief", 2],
+      ["incident-relief", 3],
+      ["festival-allocation", 5],
+      ["festival-allocation", 6],
+      ["festival-allocation", 7],
+      ["incident-relief", 6],
+      ["incident-relief", 7],
+      ["festival-allocation", 8]
+    ],
+    "revisions": [
+      {
+        "page": 3,
+        "caption": "The 85-place shuttle arrives at 23:05. The last connecting bus leaves at 22:45.",
+        "notesFrom": [["festival-allocation", 4]]
+      },
+      {
+        "page": 5,
+        "caption": "The two planned departures leave 122 people waiting at 19:00.",
+        "notesFrom": [["incident-relief", 4]]
+      },
+      {
+        "page": 12,
+        "title": "Neither plan shows the financial effect.",
+        "caption": "Share event and replacement service contracts, hire quotes and invoices.",
+        "replace": {
+          "Last connection gap in plan": "Two proposed services",
+          "Event contract and agreed fees": "Contracts, quotes and invoices",
+          "Festival bus timetable and capacity plan \u00b7 9 Nov 2026": "Festival and disruption plans \u00b7 October and November 2026"
+        },
+        "notesFrom": [["incident-relief", 8]]
+      }
+    ],
+    "aliases": {
+      "festival-allocation": {
+        "4": 3
+      },
+      "incident-relief": {
+        "4": 5,
+        "5": 7,
+        "8": 12
+      }
+    }
+  },
+  {
+    "id": "customer-growth",
+    "title": "Customer growth",
+    "pages": [
+      ["customer-growth", 1],
+      ["customer-growth", 2],
+      ["customer-growth", 4],
+      ["customer-growth", 5],
+      ["customer-growth", 6],
+      ["customer-growth", 7],
+      ["customer-growth", 8]
+    ]
+  }
+]
