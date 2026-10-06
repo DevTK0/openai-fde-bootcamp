@@ -31,4 +31,4 @@ Acceptance requires every proposed path to meet every declared access constraint
 
 Access requirements can reveal sensitive needs. Store them locally where practical, and avoid accounts for a basic journey search. Route quality depends on maintained infrastructure evidence, so a broad but stale graph is a poor first release.
 
-The closest idea is accessible-space reservation. Routing chooses a feasible sequence of connections. Reservation allocates a scarce place on a particular departure through concurrent holds. Neither establishes the other's guarantee. Stop alerts, meanwhile, recognize progress along an already chosen journey rather than choose that journey.
+The closest idea is local stop alerts. Routing chooses a feasible sequence of connections through explicit access constraints. Stop alerts recognize progress along an already chosen journey from noisy device positions. Their shared coordinates do not make their decision mechanisms interchangeable. Neither proposal guarantees that a wheelchair space remains available on a departure.
