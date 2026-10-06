@@ -9,8 +9,11 @@ config.server = {
   ...config.server,
   host: "127.0.0.1",
   strictPort: true,
-  // nginx preserves the public host; permit only the configured deployment host.
-  allowedHosts: ["valley-or-edit.halibut-bass.ts.net"],
+  // nginx preserves the host for both the public site and collaborative preview.
+  allowedHosts: [
+    "valley-or-edit.exe.xyz",
+    "valley-or-edit.halibut-bass.ts.net",
+  ],
   fs: {
     ...config.server?.fs,
     allow: [
