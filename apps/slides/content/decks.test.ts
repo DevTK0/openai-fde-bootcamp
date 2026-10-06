@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import { existsSync } from "node:fs"
 import { decks } from "./decks"
 import { reviews } from "./review"
+import { limitationStories } from "./limitations"
 import { speakerNotes } from "../components/deck"
 
 const jargon =
@@ -18,16 +19,16 @@ describe("plain-language visual decks", () => {
       ).toBe(true)
       expect(deck.slides[0]?.stage).toBe("How it works")
       expect(deck.slides[4]?.stage).toBe("Stakeholder data request")
-      expect(deck.slides[4]?.visual.kind).toBe("data-request")
+      expect(deck.slides[4]?.visual.kind).toBe("limitation")
       const requests = deck.slides.filter(
         (slide) => slide.stage === "Stakeholder data request"
       )
       expect(requests).toHaveLength(reviews[deck.id]!.items.length)
       requests.forEach((slide, index) => {
-        expect(slide.visual.kind).toBe("data-request")
-        if (slide.visual.kind === "data-request") {
-          expect(slide.visual.item.label).toBe(
-            reviews[deck.id]!.items[index]!.label
+        expect(slide.visual.kind).toBe("limitation")
+        if (slide.visual.kind === "limitation") {
+          expect(slide.visual).toEqual(
+            limitationStories[deck.id]![index]!.visual
           )
           expect(slide.visual).not.toHaveProperty("items")
         }
