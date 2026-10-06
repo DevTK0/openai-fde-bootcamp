@@ -1,4 +1,2 @@
 @import "@workspace/ui/globals.css";
 @source "../**/*.{ts,tsx}";
-
-@source "../editor/**/*.{ts,tsx}";

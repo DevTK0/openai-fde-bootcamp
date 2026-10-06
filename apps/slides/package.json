@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "pnpm generate && node scripts/dev.mjs",
     "generate": "node scripts/generate-evidence.mjs",
-    "build": "pnpm generate && open-slide build && node scripts/build-editor.mjs",
-    "start": "node scripts/preview.mjs",
+    "build": "pnpm generate && open-slide build",
+    "start": "node scripts/dev.mjs",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "editor:server": "node scripts/editor-server.mjs"
+    "preview": "open-slide preview --host 127.0.0.1 --port 3004"
   },
   "dependencies": {
     "@open-slide/core": "2.0.1",
@@ -21,12 +21,9 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.20.5",
     "@types/react": "^19",
-    "@types/react-dom": "^19.3.0",
     "@workspace/eslint-config": "workspace:*",
-    "esbuild": "0.28.2",
     "eslint": "^10",
     "typescript": "^5",
     "vite": "^8.3.2",

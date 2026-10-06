@@ -12,11 +12,5 @@
     "skipLibCheck": true,
     "types": ["@open-slide/core/env", "node"]
   },
-  "include": [
-    "slides",
-    "components",
-    "content",
-    "open-slide.config.ts",
-    "editor"
-  ]
+  "include": ["slides", "components", "content", "open-slide.config.ts"]
 }

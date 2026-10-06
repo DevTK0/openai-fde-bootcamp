@@ -3,14 +3,9 @@ export default [
   ...config,
   { ignores: ["dist/**", ".editor-data/**"] },
   {
-    files: ["scripts/**/*.mjs", "server/**/*.mjs"],
+    files: ["scripts/**/*.mjs"],
     languageOptions: {
-      globals: {
-        URL: "readonly",
-        console: "readonly",
-        process: "readonly",
-        Buffer: "readonly",
-      },
+      globals: { URL: "readonly", console: "readonly", process: "readonly" },
     },
   },
 ]

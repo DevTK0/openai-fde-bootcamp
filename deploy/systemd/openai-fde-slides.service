@@ -1,0 +1,16 @@
+[Unit]
+Description=Open Slide native authoring server
+After=network.target
+
+[Service]
+Type=simple
+User=exedev
+WorkingDirectory=/home/exedev/.t3/projects/openai-fde/apps/slides
+ExecStart=/usr/bin/node scripts/dev.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
