@@ -1,15 +1,17 @@
-import { render, screen } from "@testing-library/react"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+
+const { redirect } = vi.hoisted(() => ({
+  redirect: vi.fn(() => {
+    throw new Error("NEXT_REDIRECT")
+  }),
+}))
+vi.mock("next/navigation", () => ({ redirect }))
 
 import Page from "@/app/page"
 
-describe("Page", () => {
-  it("renders the heading and a shadcn button", () => {
-    render(<Page />)
-
-    expect(
-      screen.getByRole("heading", { name: /project ready/i })
-    ).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Button" })).toBeInTheDocument()
+describe("Home page", () => {
+  it("redirects to the dashboard", () => {
+    expect(() => Page()).toThrow("NEXT_REDIRECT")
+    expect(redirect).toHaveBeenCalledWith("/dashboard")
   })
 })
