@@ -55,7 +55,8 @@ export const commandSchema = z.discriminatedUnion("kind", [
     requestId: id,
     answer: z.string().trim().min(1).max(12000),
   }),
-  z.object({ kind: z.enum(["retry", "cancel"]), requestId: id }),
+  z.object({ kind: z.literal("retry"), requestId: id }),
+  z.object({ kind: z.literal("cancel"), requestId: id }),
 ])
 export type Command = z.infer<typeof commandSchema>
 export const snapshotSchema = z.object({

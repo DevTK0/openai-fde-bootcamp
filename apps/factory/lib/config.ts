@@ -9,6 +9,9 @@ export const runnerConfigSchema = z.object({
   dataDir: z.string().min(1),
   codex: z.string().min(1),
   check: z.object({ command: z.string().min(1), args: z.array(z.string()) }),
+  prepare: z
+    .object({ command: z.string().min(1), args: z.array(z.string()) })
+    .nullable(),
   timeoutMs: z.number().int().min(100).max(3600000),
 })
 export type RunnerConfig = z.infer<typeof runnerConfigSchema>
@@ -25,6 +28,10 @@ export function readRunnerConfig(): RunnerConfig {
     codex: process.env.FACTORY_CODEX_BIN || "codex",
     check: JSON.parse(
       process.env.FACTORY_CHECK_COMMAND || '{"command":"pnpm","args":["check"]}'
+    ),
+    prepare: JSON.parse(
+      process.env.FACTORY_PREPARE_COMMAND ||
+        '{"command":"pnpm","args":["install","--frozen-lockfile","--prod=false"]}'
     ),
     timeoutMs: Number(process.env.FACTORY_TIMEOUT_MS || 1200000),
   })

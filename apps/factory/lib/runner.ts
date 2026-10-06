@@ -26,19 +26,21 @@ const resultJsonSchema = {
   additionalProperties: false,
 }
 const OUTPUT_LIMIT = 500000
-function workerEnvironment() {
-  const env: NodeJS.ProcessEnv = {}
+function workerEnvironment(credentials: boolean) {
+  const env: NodeJS.ProcessEnv = { NODE_ENV: "production" }
   for (const name of [
     "PATH",
     "HOME",
     "CODEX_HOME",
-    "OPENAI_API_KEY",
-    "CODEX_API_KEY",
     "TMPDIR",
     "LANG",
     "SYSTEMROOT",
   ])
     if (process.env[name]) env[name] = process.env[name]
+  if (credentials) {
+    for (const name of ["OPENAI_API_KEY", "CODEX_API_KEY"])
+      if (process.env[name]) env[name] = process.env[name]
+  }
   return env
 }
 export function execute(
@@ -47,21 +49,25 @@ export function execute(
   cwd: string,
   options: {
     input?: string
+    credentials?: boolean
     signal?: AbortSignal
     timeoutMs?: number
     childChanged?: (pid: number | null) => void
   } = {}
-): Promise<{ exitCode: number; output: string }> {
+): Promise<{ exitCode: number; output: string; truncated: boolean }> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd,
-      env: workerEnvironment(),
+      env: workerEnvironment(options.credentials ?? false),
       stdio: ["pipe", "pipe", "pipe"],
       detached: true,
     })
     let output = ""
+    let truncated = false
     const append = (data: Buffer) => {
-      output = (output + data.toString()).slice(-OUTPUT_LIMIT)
+      const next = output + data.toString()
+      truncated ||= next.length > OUTPUT_LIMIT
+      output = next.slice(-OUTPUT_LIMIT)
     }
     child.stdout.on("data", append)
     child.stderr.on("data", append)
@@ -94,7 +100,7 @@ export function execute(
     })
     child.on("close", (code) => {
       cleanup()
-      resolve({ exitCode: code ?? -1, output })
+      resolve({ exitCode: code ?? -1, output, truncated })
     })
   })
 }
@@ -106,7 +112,9 @@ export async function preflight(config: RunnerConfig) {
   )
   if (git.exitCode !== 0)
     throw new Error("FACTORY_REPO is not an accessible Git repository.")
-  const login = await execute(config.codex, ["login", "status"], config.repo)
+  const login = await execute(config.codex, ["login", "status"], config.repo, {
+    credentials: true,
+  })
   if (login.exitCode !== 0)
     throw new Error(
       "Codex authentication is unavailable. Run codex login in the worker environment."
@@ -143,6 +151,7 @@ export async function runOnce(
     if (abort.signal.aborted) throw new Error("Implementation interrupted.")
     const result = await execute(command, args, cwd, {
       input,
+      credentials: command === config.codex,
       signal: abort.signal,
       timeoutMs: config.timeoutMs,
       childChanged: (pid) => store.childChanged(pid),
@@ -152,13 +161,30 @@ export async function runOnce(
   }
   try {
     await mkdir(runDir, { recursive: true, mode: 0o700 })
+    const base = await run("git", ["rev-parse", "HEAD"], config.repo)
+    if (base.exitCode !== 0 || !/^[a-f0-9]{40,64}\s*$/.test(base.output))
+      throw new Error("Cannot resolve the repository base commit.")
+    const baseSha = base.output.trim()
+    await writeFile(join(runDir, "base.txt"), baseSha)
     const created = await run(
       "git",
-      ["worktree", "add", "-b", branch, worktree, "HEAD"],
+      ["worktree", "add", "-b", branch, worktree, baseSha],
       config.repo
     )
     if (created.exitCode !== 0)
       throw new Error(`Cannot create isolated worktree: ${created.output}`)
+    if (config.prepare) {
+      const prepared = await run(
+        config.prepare.command,
+        config.prepare.args,
+        worktree
+      )
+      await writeFile(join(runDir, "prepare.log"), prepared.output)
+      if (prepared.exitCode !== 0)
+        throw new Error(
+          `Dependency preparation failed with code ${prepared.exitCode}. Inspect prepare.log.`
+        )
+    }
     const schemaPath = join(runDir, "result-schema.json")
     const outputPath = join(runDir, "result.json")
     await writeFile(schemaPath, JSON.stringify(resultJsonSchema))
@@ -202,10 +228,14 @@ export async function runOnce(
       throw new Error("Cannot collect the implementation diff.")
     const diff = await run(
       "git",
-      ["diff", "HEAD", "--no-ext-diff", "--no-color"],
+      ["diff", baseSha, "--no-ext-diff", "--no-color"],
       worktree
     )
     await writeFile(join(runDir, "change.diff"), diff.output)
+    if (diff.truncated || checks.truncated)
+      throw new Error(
+        "Review output exceeded the 500000-character limit. Inspect the worktree directly."
+      )
     if (diff.exitCode !== 0 || !diff.output.trim())
       throw new Error("Agent returned no reviewable code changes.")
     if (checks.exitCode !== 0)
