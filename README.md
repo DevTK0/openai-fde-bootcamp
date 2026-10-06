@@ -36,7 +36,7 @@ In Codex CLI or the IDE extension, you can also select it from `/skills`.
 Our **`/pstack`** prompt alias works when the client passes it to the agent; it
 doesn't register a custom slash command in the client. If skills are missing,
 restart Codex in this checkout. You can always ask directly:
-`Read skills/pstack/SKILL.md and use it for this task.`
+`Read .agents/skills/pstack/SKILL.md and use it for this task.`
 
 Choose a workflow based on where your work stands:
 
@@ -54,7 +54,7 @@ independent agents to check the work and run only while the Codex session is act
 
 Before your first autopilot run, ask Codex to use `create-verification-skill` to
 set up repeatable checks for the app. That app-specific skill isn't set up yet.
-The [skill catalog](skills/README.md) has the full workflow details and explains
+The [skill catalog](.agents/skills/README.md) has the full workflow details and explains
 how this collection adapts the original pstack.
 
 ## Make a change
@@ -66,7 +66,7 @@ The main places to work are:
 | [apps/web](apps/web) | Dashboard pages and app components |
 | [apps/slides](apps/slides) | Presentations and supporting evidence |
 | [packages/ui](packages/ui) | Shared shadcn/ui components and theme |
-| [skills](skills) | Codex workflows and principles |
+| [skills](.agents/skills) | Codex workflows and principles |
 | [Data](Data) | Sample workbooks, CSVs, and source documentation |
 
 Use the shared components for UI work. To add a missing shadcn component, run

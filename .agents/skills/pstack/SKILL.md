@@ -5,7 +5,7 @@ description: "Pstack shipping workflow for Codex. Use for /pstack, opening PRs, 
 
 # Pstack
 
-This port runs in Codex. Follow the repository's `AGENTS.md` and the user's requested scope. Resolve repository-owned skills from `skills/<name>/SKILL.md`, principle shorthand from `skills/principle-<name>/SKILL.md`, and playbooks relative to this file's directory. Read the source files behind discovery symlinks. The `skill-creator` dependency is a Codex system skill: resolve it from the session's available-skills catalog, not from this repository.
+This port runs in Codex. Follow the repository's `AGENTS.md` and the user's requested scope. Resolve repository-owned skills from `.agents/skills/<name>/SKILL.md`, principle shorthand from `.agents/skills/principle-<name>/SKILL.md`, and playbooks relative to this file's directory. The `skill-creator` dependency is a Codex system skill: resolve it from the session's available-skills catalog, not from this repository.
 
 Use Codex's file, shell, planning, and delegation tools. Use the available Codex browser tools for browser verification. Run `pnpm check` and task-specific verification before handing off repository changes. For PR creation, commit the work, push the task branch, and open a PR automatically unless the user explicitly sets a different stopping point. PR status checks remain read-only. Merging follows Shipping or an explicitly executed Autopilot-full queue with landing authority. Autopilot-stack never merges.
 

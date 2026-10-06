@@ -7,23 +7,21 @@ Codex execution and this repository's rules.
 
 ## Start
 
-Follow [AGENTS.md](../AGENTS.md#pstack-skills) for developer setup. Example:
+Follow [AGENTS.md](../../AGENTS.md#pstack-skills) for developer setup. Example:
 
 ```text
 /pstack verify this change, commit it, and open a PR.
 ```
 
 `AGENTS.md` routes `/pstack` messages to [pstack/SKILL.md](pstack/SKILL.md).
-The checked-in `.agents/skills/pstack` symlink also exposes the entrypoint to
-Codex. Codex's native skill selector uses `/skills` or `$pstack`; `/pstack` is
+Codex discovers the entrypoint directly in `.agents/skills/pstack`. Codex's native skill selector uses `/skills` or `$pstack`; `/pstack` is
 our repository prompt alias, not a new built-in Codex command. If a client
 intercepts unknown slash commands, use `$pstack` or explicitly ask the agent to
-read `skills/pstack/SKILL.md`. See the [official skill discovery documentation](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
+read `.agents/skills/pstack/SKILL.md`. See the [official skill discovery documentation](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
 
 All 35 skills (the entrypoint, 10 supporting skills, and 24 principles) are
-registered through relative symlinks in `.agents/skills/`. Playbooks are loaded
-by `/pstack`. Edit `skills/` as the single source; the symlinks reflect changes
-without reinstalling. The skills are available to Codex on the next turn.
+stored directly in `.agents/skills/`. Playbooks are loaded
+by `/pstack`. Edit the skill sources in place. The skills are available to Codex on the next turn.
 No global installation, model configuration, or companion plugin is required.
 The original pstack repository is a provenance reference, not a runtime
 dependency. Agent-facing skill edits use Codex's built-in `skill-creator`, resolved
@@ -88,7 +86,7 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
   opens a PR, matching upstream unless the user sets a different stopping point.
 - Added verification/TypeScript skills and delivery playbooks from
   the same revision. Generated verification
-  sources live in `skills/`, with optional discovery symlinks.
+  sources live directly in `.agents/skills/`.
 - Replaced the unbundled PR watcher, Origin-specific CLI assumptions, and Cursor
   cloud agents with Codex PR tools and subagents. Preserved shipping's
   independent-verifier gate and verification reuse. Patch equivalence uses a
