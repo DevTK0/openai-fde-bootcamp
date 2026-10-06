@@ -1,0 +1,43 @@
+---
+title: Why a lower quote is not automatically the better option
+description: Compare the work included before comparing proposed maintenance prices.
+---
+
+import { FindingFigure } from "../../components/FindingFigure";
+import { quoteChart } from "../../lib/findings";
+
+The supplied prices are proposed quotes, not money already spent.
+The maintenance options cover different work, so the height of a bar is not a
+ranking of value or a recommendation to buy.
+
+## Compare scope before price
+
+The chart shows each quoted package in full. A package with four visits cannot
+be read as a single-visit price, and a diagnostic review does not include every
+repair it might identify.
+
+<FindingFigure
+  client:load
+  {...quoteChart}
+  source="Source: Cost options. Fictional quotes issued 16 October 2026, valid 19 October–16 November 2026. SGD excluding tax."
+/>
+
+The option identifiers refer to these scopes:
+
+- **NW-OPT001** is a targeted HVAC review. Parts and corrective work are quoted separately.
+- **NW-OPT002** is four planned cleaning and checking visits. Some cleaning overlaps routine service.
+- **NW-OPT003** is a fan assembly replacement, conditional on Engineering establishing that replacement is justified.
+- **NW-OPT005** is an inspection of a comparison vehicle. It is not a requirement to repair a healthy vehicle.
+
+Overlapping work must not be added as if every option were a separate necessary
+purchase. The records provide no measured savings or guaranteed reduction in faults.
+
+## Keep the replacement proposal separate
+
+The fleet replacement option is a capital proposal with a different scope and
+lead time. It excludes finance, infrastructure, resale, and transition costs.
+Putting it beside a maintenance visit as though the two solve the same problem
+would omit those differences.
+
+Historical repair spending provides context; it does not prove
+that a proposed replacement or preventive package is economical.

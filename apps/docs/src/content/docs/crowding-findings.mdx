@@ -1,0 +1,41 @@
+---
+title: Why a remaining queue does not always mean a full bus
+description: Separate boarding events, stop-call queues, and capacity before drawing a conclusion.
+---
+
+import { FindingFigure } from "../../components/FindingFigure";
+import { operations, crowdingChart, fmt } from "../../lib/findings";
+
+Across **{fmt(operations.metrics.calls)} recorded stop calls**,
+**{fmt(operations.metrics.queuedCalls)}** have a remaining queue. Only
+**{fmt(operations.metrics.fullCalls)}** depart at their recorded capacity.
+A queue left behind is therefore not, by itself, evidence that a bus was full.
+
+## Keep the queue accounting categories separate
+
+Within the supplied route-position windows, the records balance as follows:
+initial queue plus new arrivals equals boardings plus the final remaining queue.
+
+<FindingFigure
+  client:load
+  {...crowdingChart}
+  source="Source: operating stop-call and queue-window records, all services and dates, 5–16 October 2026. Fictional sample records."
+/>
+
+The **{fmt(operations.metrics.boardings)} boardings** are events, not unique people.
+The **{fmt(operations.metrics.remainingQueue)} remaining** is summed across separate
+route-position and date windows. It is not a count of people waiting simultaneously
+at the end of one network-wide period.
+
+## A stop call is only one observation
+
+People arriving during a stop's dwell can miss the counting cutoff even when the
+bus has space. Repeated calls can also observe the same waiting group. Adding all
+remaining queues across calls would not produce a count of unique passengers.
+The model does not include abandonment or switching to another route.
+
+## Passenger accounts have a different scope
+
+Passenger accounts can identify a journey worth checking. They do not, on their
+own, establish the number of people affected across the network or a change in
+customer retention.

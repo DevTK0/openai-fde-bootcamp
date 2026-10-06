@@ -1,5 +1,7 @@
 "use client"
 
+import { Plot } from "@workspace/ui/components/report-chart"
+
 import { useEffect, useState } from "react"
 import {
   ArrowDownToLine,
@@ -31,7 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { Metric, Notice, Pick, Plot, Records } from "@/components/report-ui"
+import { Metric, Notice, Pick, Records } from "@/components/report-ui"
 import {
   operationsManifest as manifest,
   type OperationsReport,
