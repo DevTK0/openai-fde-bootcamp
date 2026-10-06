@@ -1,6 +1,7 @@
 import { operationsManifest } from "@/lib/operations"
 import {
   getOperationsReport,
+  OperationsQueryBusyError,
   queryOperationsTable,
   readOperationsDownload,
   sourceTable,
@@ -49,5 +50,15 @@ export async function GET(request: Request) {
       { error: "Invalid page or search (maximum 120 characters)" },
       { status: 400 }
     )
-  return Response.json(await queryOperationsTable(table, query, page))
+  try {
+    return Response.json(await queryOperationsTable(table, query, page))
+  } catch (error) {
+    if (error instanceof OperationsQueryBusyError) {
+      return Response.json(
+        { error: error.message },
+        { status: 503, headers: { "Retry-After": "1" } }
+      )
+    }
+    throw error
+  }
 }
