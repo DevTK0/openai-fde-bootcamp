@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { existsSync } from "node:fs"
 import { decks } from "./decks"
+import { reviews } from "./review"
 import { speakerNotes } from "../components/deck"
 
 const jargon =
@@ -15,9 +16,32 @@ describe("plain-language visual decks", () => {
       expect(
         existsSync(new URL(`../slides/${deck.id}/index.tsx`, import.meta.url))
       ).toBe(true)
-      expect(deck.slides).toHaveLength(5)
       expect(deck.slides[0]?.stage).toBe("How it works")
-      expect(deck.slides[4]?.stage).toBe("Business significance")
+      expect(deck.slides[4]?.stage).toBe("Stakeholder data request")
+      expect(deck.slides[4]?.visual.kind).toBe("data-request")
+      const requests = deck.slides.filter(
+        (slide) => slide.stage === "Stakeholder data request"
+      )
+      expect(requests).toHaveLength(reviews[deck.id]!.items.length)
+      requests.forEach((slide, index) => {
+        expect(slide.visual.kind).toBe("data-request")
+        if (slide.visual.kind === "data-request") {
+          expect(slide.visual.item.label).toBe(
+            reviews[deck.id]!.items[index]!.label
+          )
+          expect(slide.visual).not.toHaveProperty("items")
+        }
+      })
+      const impact = deck.slides.find((slide) => slide.stage === "Impact")
+      if (impact) {
+        expect(deck.slides.at(-1)).toBe(impact)
+        expect(["calculation", "measures", "bars"]).toContain(
+          impact.visual.kind
+        )
+        expect(impact.caption).not.toMatch(/request|ask/i)
+      }
+      for (const slide of deck.slides)
+        expect(slide).not.toHaveProperty("caveat")
       expect(
         new Set(deck.slides.map((s) => s.visual.kind)).size
       ).toBeGreaterThan(1)
@@ -50,7 +74,7 @@ describe("plain-language visual decks", () => {
       }
     }
   })
-  it("keeps explanation and caveats aligned with the five presenter pages", () => {
+  it("keeps explanation and caveats aligned with all presenter pages", () => {
     for (const deck of decks) {
       const notes = speakerNotes(deck)
       expect(notes).toHaveLength(deck.slides.length)

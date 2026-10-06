@@ -1,6 +1,6 @@
 # LionLink stakeholder slides
 
-Eleven five-page decks using [Open Slide](https://github.com/open-slide/open-slide),
+Eleven decks with one full slide per stakeholder data request, using [Open Slide](https://github.com/open-slide/open-slide),
 pinned to `@open-slide/core` 2.0.1. The runtime provides the deck browser, slide
 navigation, presentation mode, speaker notes and its built-in download menu.
 Authored slides use explanatory SVG diagrams, Lucide icons and the shared
@@ -34,11 +34,11 @@ All paths start with `/slides/s/`:
 
 | Deck | Route |
 | --- | --- |
-| Repair costs are rising faster than use | `repair-spend` |
+| Repair costs were higher in the second year | `repair-spend` |
 | Recurring discomfort has a cost | `hvac-comfort` |
 | A small number of delays can disrupt journeys | `service-reliability` |
 | Some passengers cannot board the bus they need | `crowding` |
-| The same bus is full on some days and mostly empty on others | `capacity-use` |
+| Bus use varies sharply at the same departure | `capacity-use` |
 | Workshop bookings conflict with available resources | `workshop-scheduling` |
 | Workshop estimates do not establish usable buses | `fleet-availability` |
 | The festival plan has an end-to-end capacity gap | `festival-allocation` |
@@ -48,8 +48,13 @@ All paths start with `/slides/s/`:
 
 Each starts with a plain-language introduction to bus operations, then shows the
 problem, supporting observations, business significance and evidence limits. Every page has a visual and a
-readable data-source citation. Supporting explanation and limitations live in the
-speaker notes. Slides and notes exclude internal vehicle identifiers and code paths.
+readable data-source citation. After the problem pages, each limitation and its corresponding existing-record request
+gets a separate full slide, using the same large-icon diagram style as the problem slides. Only the two maintenance decks retain impact pages, showing recorded dollar increases.
+The other nine omit impact: the supplied data cannot establish a dollar or ridership change.
+Requests focus on more history and routine operating, workshop and accounting records;
+no new passenger tracking or customer research is requested. Detailed caveats also
+appear in speaker notes. There are no small evidence-limit strips.
+Editorial caveats and requests live in `content/review.ts`; quantitative impacts live in `content/impact.ts`. Slides and notes exclude internal vehicle identifiers and code paths.
 Use **Present** for slideshow mode; `?p=2` links directly to a page. The dashboard header links to the deck browser.
 
 ## nginx deployment
