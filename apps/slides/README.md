@@ -1,6 +1,6 @@
 # LionLink stakeholder slides
 
-Six decks grouped by business problem, with one full slide per caveat, using [Open Slide](https://github.com/open-slide/open-slide),
+Three decks grouped by business function, with one full slide per caveat, using [Open Slide](https://github.com/open-slide/open-slide),
 pinned to `@open-slide/core` 2.0.1. The runtime provides the deck browser, slide
 navigation, presentation mode, speaker notes and its built-in download menu.
 Authored slides use editable text, shapes, vector icons and the shared
@@ -34,23 +34,30 @@ All paths start with `/slides/s/`:
 
 | Deck | Route | Pages | Covers |
 | --- | --- | --- | --- |
-| Maintenance costs | `maintenance-costs` | 12 | Repair bills, total maintenance, bus use and cost concentration |
-| Workshop capacity and bus availability | `workshop-capacity` | 13 | Booking clashes, staffing, repairs and safety approvals |
-| Crowding and spare capacity | `passenger-demand` | 9 | Queues, full buses, quiet days and misleading averages |
-| Late and uncomfortable journeys | `service-quality` | 14 | Delays, passenger accounts and recurring cooling repairs |
-| Festival and disruption plans | `special-service-plans` | 12 | Connections, capacity, queues and planning assumptions |
-| Customer growth | `customer-growth` | 7 | Boardings, individual customers, revenue and marketing data |
+| Scheduling | `scheduling` | 25 | Late journeys, workshop booking clashes, festival connections and disruption response |
+| Maintenance | `maintenance` | 24 | Maintenance costs, repairs, safety approvals and cooling faults |
+| Ridership | `ridership` | 14 | Crowding, spare capacity, boardings and customer growth |
 
-The former eleven decks are consolidated into 67 pages. Repeated introductions,
-annual cost caveats, replacement-cost requests and the duplicated abandoned-journey
-account are removed. Each deck has one Caveats section after its problem evidence.
+The decks contain 63 pages. Scheduling brings together the evidence about when
+buses run and whether the proposed plans have enough capacity. Maintenance covers
+bus condition, repair work and its costs. Ridership covers passenger demand and
+what the boarding records can tell us about growth. Each deck has one Caveats
+section after its problem evidence. Repeated separators and the duplicate request
+for more boarding history are removed.
 The maintenance deck ends with one combined monetary impact page. The repair
 increase is part of the total maintenance increase and must not be added again.
 
 Old deck URLs redirect to their new deck and matching retained or combined page.
-`content/deck-groups.json` records the consolidation and redirects. The eleven
+`content/deck-groups.json` records page provenance.
+`content/legacy-deck-pages.json` maps old links, including pages from decks that
+were split between business functions. The eleven
 original problem statements remain in `content/decks.ts` as the evidence reference;
 they are not eleven separate decks in the browser.
+
+To reproduce the page moves from the previous six-deck commit without overwriting
+browser edits, run `node apps/slides/scripts/regroup-decks.mjs /tmp/regrouped-slides`
+from the repository root. The script writes to a separate directory for review.
+It is a historical migration, not part of the app build.
 
 Each starts with a plain-language introduction to bus operations, then shows the
 problem, supporting observations, business significance and evidence limits. Every page has a visual and a
@@ -76,7 +83,7 @@ colours, size and position; the canvas supports moving and resizing elements.
 Use Open Slide's **Save** button to persist pending changes. Notes use its built-in
 notes editor. **Preview** and **Present** hide editing controls.
 
-All 67 pages contain literal JSX in their own `slides/<id>/index.tsx`. Chart labels
+All 63 pages contain literal JSX in their own `slides/<id>/index.tsx`. Chart labels
 are HTML text and bars are individual shapes, so the native inspector can select
 them. Icons remain vector graphics inside selectable groups. Chart bars and their
 numeric labels are separate objects; update both when changing figures. Page

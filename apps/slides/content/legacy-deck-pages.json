@@ -1,0 +1,18 @@
+{
+  "investment-options": {"1":["maintenance",1],"2":["maintenance",2],"3":["maintenance",3],"4":["maintenance",7],"5":["maintenance",15],"6":["maintenance",16],"7":["maintenance",17],"8":["maintenance",18],"9":["maintenance",24]},
+  "repair-spend": {"1":["maintenance",1],"2":["maintenance",4],"3":["maintenance",5],"4":["maintenance",6],"5":["maintenance",15],"6":["maintenance",16],"7":["maintenance",17],"8":["maintenance",18],"9":["maintenance",24]},
+  "workshop-scheduling": {"1":["scheduling",5],"2":["scheduling",6],"3":["scheduling",7],"4":["scheduling",8],"5":["scheduling",15],"6":["scheduling",19],"7":["scheduling",20],"8":["maintenance",21]},
+  "fleet-availability": {"1":["maintenance",8],"2":["maintenance",9],"3":["maintenance",10],"4":["maintenance",9],"5":["scheduling",15],"6":["maintenance",19],"7":["maintenance",20],"8":["maintenance",21]},
+  "crowding": {"1":["ridership",1],"2":["ridership",2],"3":["ridership",3],"4":["ridership",6],"5":["ridership",10],"6":["ridership",11]},
+  "capacity-use": {"1":["ridership",1],"2":["ridership",4],"3":["ridership",4],"4":["ridership",5],"5":["ridership",10],"6":["ridership",11],"7":["ridership",12]},
+  "service-reliability": {"1":["scheduling",1],"2":["scheduling",2],"3":["scheduling",3],"4":["scheduling",4],"5":["scheduling",15],"6":["scheduling",16],"7":["scheduling",17],"8":["scheduling",18]},
+  "hvac-comfort": {"1":["maintenance",11],"2":["maintenance",12],"3":["maintenance",13],"4":["maintenance",14],"5":["scheduling",15],"6":["maintenance",22],"7":["maintenance",23]},
+  "festival-allocation": {"1":["scheduling",9],"2":["scheduling",10],"3":["scheduling",11],"4":["scheduling",11],"5":["scheduling",15],"6":["scheduling",21],"7":["scheduling",22],"8":["scheduling",25]},
+  "incident-relief": {"1":["scheduling",12],"2":["scheduling",13],"3":["scheduling",14],"4":["scheduling",13],"5":["scheduling",15],"6":["scheduling",23],"7":["scheduling",24],"8":["scheduling",25]},
+  "customer-growth": {"1":["ridership",7],"2":["ridership",8],"3":["ridership",9],"4":["ridership",10],"5":["ridership",11],"6":["ridership",13],"7":["ridership",14]},
+  "maintenance-costs": {"1":["maintenance",1],"2":["maintenance",2],"3":["maintenance",3],"4":["maintenance",4],"5":["maintenance",5],"6":["maintenance",6],"7":["maintenance",7],"8":["maintenance",15],"9":["maintenance",16],"10":["maintenance",17],"11":["maintenance",18],"12":["maintenance",24]},
+  "workshop-capacity": {"1":["scheduling",5],"2":["scheduling",6],"3":["scheduling",7],"4":["scheduling",8],"5":["maintenance",8],"6":["maintenance",9],"7":["maintenance",10],"8":["scheduling",15],"9":["scheduling",19],"10":["scheduling",20],"11":["maintenance",19],"12":["maintenance",20],"13":["maintenance",21]},
+  "passenger-demand": {"1":["ridership",1],"2":["ridership",2],"3":["ridership",3],"4":["ridership",4],"5":["ridership",5],"6":["ridership",6],"7":["ridership",10],"8":["ridership",11],"9":["ridership",12]},
+  "service-quality": {"1":["scheduling",1],"2":["scheduling",2],"3":["scheduling",3],"4":["scheduling",4],"5":["maintenance",11],"6":["maintenance",12],"7":["maintenance",13],"8":["maintenance",14],"9":["scheduling",15],"10":["scheduling",16],"11":["scheduling",17],"12":["scheduling",18],"13":["maintenance",22],"14":["maintenance",23]},
+  "special-service-plans": {"1":["scheduling",9],"2":["scheduling",10],"3":["scheduling",11],"4":["scheduling",12],"5":["scheduling",13],"6":["scheduling",14],"7":["scheduling",15],"8":["scheduling",21],"9":["scheduling",22],"10":["scheduling",23],"11":["scheduling",24],"12":["scheduling",25]}
+}
