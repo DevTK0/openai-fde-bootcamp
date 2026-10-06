@@ -1,0 +1,128 @@
+{
+  "service": "238",
+  "route": "B238_1",
+  "stop": "52009",
+  "departure": "07:15",
+  "rows": [
+    {
+      "date": "2026-10-05",
+      "tripId": "NW-20261005-0136",
+      "callId": "NW-20261005-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 124,
+      "boarded": 85,
+      "remaining": 39,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-06",
+      "tripId": "NW-20261006-0136",
+      "callId": "NW-20261006-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 115,
+      "boarded": 85,
+      "remaining": 30,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": true
+    },
+    {
+      "date": "2026-10-07",
+      "tripId": "NW-20261007-0136",
+      "callId": "NW-20261007-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 113,
+      "boarded": 85,
+      "remaining": 28,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-08",
+      "tripId": "NW-20261008-0136",
+      "callId": "NW-20261008-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 109,
+      "boarded": 85,
+      "remaining": 24,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-09",
+      "tripId": "NW-20261009-0136",
+      "callId": "NW-20261009-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 18,
+      "boarded": 18,
+      "remaining": 0,
+      "capacity": 85,
+      "onboard": 18,
+      "reported": false
+    },
+    {
+      "date": "2026-10-12",
+      "tripId": "NW-20261012-0136",
+      "callId": "NW-20261012-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 114,
+      "boarded": 85,
+      "remaining": 29,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-13",
+      "tripId": "NW-20261013-0136",
+      "callId": "NW-20261013-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 118,
+      "boarded": 85,
+      "remaining": 33,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-14",
+      "tripId": "NW-20261014-0136",
+      "callId": "NW-20261014-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 116,
+      "boarded": 85,
+      "remaining": 31,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-15",
+      "tripId": "NW-20261015-0136",
+      "callId": "NW-20261015-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 114,
+      "boarded": 85,
+      "remaining": 29,
+      "capacity": 85,
+      "onboard": 85,
+      "reported": false
+    },
+    {
+      "date": "2026-10-16",
+      "tripId": "NW-20261016-0136",
+      "callId": "NW-20261016-0136-01",
+      "vehicle": "NW-V050",
+      "waiting": 26,
+      "boarded": 26,
+      "remaining": 0,
+      "capacity": 85,
+      "onboard": 26,
+      "reported": false
+    }
+  ]
+}
