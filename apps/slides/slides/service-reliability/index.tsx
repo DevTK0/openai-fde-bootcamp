@@ -1,16 +1,16 @@
 import { useSlidePageNumber, type Page } from "@open-slide/core"
 import "../../components/deck.css"
 
-export const meta = { title: "A small number of delays can disrupt journeys" }
+export const meta = { title: "Late buses disrupt journeys" }
 export const notes = [
-  "Passengers rely on the time, not just the bus.\n\nDeparture delay and arrival delay describe different parts of the experience. The operating data records both against the published timetable. Five minutes is an analytical threshold for these slides, not a supplied contractual service standard.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "Late arrivals are more common than late starts.\n\nThe departure and arrival counts overlap and must not be added as unique disrupted journeys. A bus can leave near its scheduled time and encounter delay en route. These counts alone do not establish the cause, passenger count or revenue effect.\n\nInterpretation: Ten weekdays may be unusual; five minutes is an analytical threshold, not an agreed service standard.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "Every late start falls on three routes.\n\nThe descriptive labels avoid internal route references. These are counts with the trip denominators displayed. The rates differ: 24 of 280, 17 of 280 and 7 of 220. All other supplied routes have no departures beyond the five-minute threshold in this extract.\n\nInterpretation: The route pattern is limited to this extract and does not establish the cause of delays.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "One passenger abandoned the delayed journey.\n\nThe passenger expected the 06:20 departure and reported giving up before the bus arrived. This is evidence of an abandoned intended journey. It does not show whether a fare was lost, whether the person was a new customer, or whether they stopped using the operator later.\n\nInterpretation: One abandoned journey does not establish a lost fare or a customer who never returned.\n\nSource: Passenger account · Toa Payoh morning departure · 7 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "Caveats & data requests\n\nThis section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "Ten weekdays cannot show whether delays persist across the year.\n\nTen weekdays cannot show whether delays persist across the year. Share earlier operating extracts, including weekends, to compare reliability across more months.\n\nTen weekdays may be unusual; five minutes is an analytical threshold, not an agreed service standard.\n\nRequest more months of the same scheduled and actual departure and arrival records, including weekends, plus timetable versions covering those dates. For financial consequences, request applicable service contracts and actual penalty deductions or invoices already held by finance. These records can show recurring performance and recorded penalties without requiring passenger-level journey matching or estimates of abandoned travel.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "Earlier running times need the timetables that applied on those dates.\n\nEarlier running times need the timetables that applied on those dates. When sharing older operating records, include the matching timetable versions so lateness is measured consistently.\n\nThe route pattern is limited to this extract and does not establish the cause of delays.\n\nRequest more months of the same scheduled and actual departure and arrival records, including weekends, plus timetable versions covering those dates. For financial consequences, request applicable service contracts and actual penalty deductions or invoices already held by finance. These records can show recurring performance and recorded penalties without requiring passenger-level journey matching or estimates of abandoned travel.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
-  "Late trips do not automatically create a financial penalty.\n\nLate trips do not automatically create a financial penalty. Share the service contracts and recorded deductions to establish whether these delays affected payments.\n\nOne abandoned journey does not establish a lost fare or a customer who never returned.\n\nRequest more months of the same scheduled and actual departure and arrival records, including weekends, plus timetable versions covering those dates. For financial consequences, request applicable service contracts and actual penalty deductions or invoices already held by finance. These records can show recurring performance and recorded penalties without requiring passenger-level journey matching or estimates of abandoned travel.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Journey and passenger queue records · 5–16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "Passengers need buses to run on time.\n\nDeparture delay and arrival delay describe different parts of the experience. The operating data records both against the published timetable. Five minutes is an analytical threshold for these slides, not a supplied contractual service standard.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "More buses arrived late than left late.\n\nThe departure and arrival counts overlap and must not be added as unique disrupted journeys. A bus can leave near its scheduled time and encounter delay en route. These counts alone do not establish the cause, passenger count or revenue effect.\n\nInterpretation: Ten weekdays may be unusual; five minutes is an analytical threshold, not an agreed service standard.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "Three routes had all the late departures.\n\nThe descriptive labels avoid internal route references. These are counts with the trip denominators displayed. The rates differ: 24 of 280, 17 of 280 and 7 of 220. All other supplied routes have no departures beyond the five-minute threshold in this extract.\n\nInterpretation: The route pattern is limited to this extract and does not establish the cause of delays.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "One passenger gave up waiting.\n\nThe passenger expected the 06:20 departure and reported giving up before the bus arrived. This is evidence of an abandoned intended journey. It does not show whether a fare was lost, whether the person was a new customer, or whether they stopped using the operator later.\n\nInterpretation: One abandoned journey does not establish a lost fare or a customer who never returned.\n\nSource: Passenger account · Toa Payoh morning departure · 7 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "Caveats\n\nThis section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "Ten weekdays do not show a yearly pattern.\n\nTen weekdays do not show a yearly pattern. Share more months of trip records, including weekends.\n\nTen weekdays may be unusual; five minutes is an analytical threshold, not an agreed service standard.\n\nRequest more months of the same scheduled and actual departure and arrival records, including weekends, plus timetable versions covering those dates. For financial consequences, request applicable service contracts and actual penalty deductions or invoices already held by finance. These records can show recurring performance and recorded penalties without requiring passenger-level journey matching or estimates of abandoned travel.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "Older trips need matching timetables.\n\nOlder trips need matching timetables. Share the timetables used on those dates to measure how late each bus was.\n\nThe route pattern is limited to this extract and does not establish the cause of delays.\n\nRequest more months of the same scheduled and actual departure and arrival records, including weekends, plus timetable versions covering those dates. For financial consequences, request applicable service contracts and actual penalty deductions or invoices already held by finance. These records can show recurring performance and recorded penalties without requiring passenger-level journey matching or estimates of abandoned travel.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
+  "Late trips may not lead to penalties.\n\nLate trips may not lead to penalties. Share contracts and payment deductions to check whether delays reduced income.\n\nOne abandoned journey does not establish a lost fare or a customer who never returned.\n\nRequest more months of the same scheduled and actual departure and arrival records, including weekends, plus timetable versions covering those dates. For financial consequences, request applicable service contracts and actual penalty deductions or invoices already held by finance. These records can show recurring performance and recorded penalties without requiring passenger-level journey matching or estimates of abandoned travel.\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.\n\nSource: Journey and passenger queue records · 5 to 16 Oct 2026.\nScope: Ten supplied weekdays · not a complete month. All figures are fictional exercise data, not live business results.",
 ]
 
 const PageNumber = () => {
@@ -24,25 +24,25 @@ const PageNumber = () => {
 
 const Page1: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — How it works"
+    aria-label="Late buses disrupt journeys. How it works"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
       <span>{"How it works"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"Passengers rely on the time, not just the bus."}
+      {"Passengers need buses to run on time."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {"Leaving late can affect work, appointments and connections."}
+      {"Late buses can mean missed work, appointments or connections."}
     </p>
     <figure
-      aria-label="Passengers rely on the time, not just the bus."
+      aria-label="Passengers need buses to run on time."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Passengers rely on the time, not just the bus. Leaving late can affect work, appointments and connections."
+        aria-label="Passengers need buses to run on time. Late buses can mean missed work, appointments or connections."
         className="relative h-full w-full"
       >
         <div className="absolute top-[256.389px] left-[319.969px] h-[16px] w-[426.82px] text-muted-foreground">
@@ -139,7 +139,7 @@ const Page1: Page = () => (
             <path d="M12 6v6h4"></path>
           </svg>
         </div>
-        <p className="absolute top-[387.726px] left-[83.192px] m-0 h-[35.387px] w-[255.672px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+        <p className="absolute top-[387.726px] left-[83.192px] m-0 h-[35.387px] w-[255.672px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Promised departure"}
         </p>
         <div className="absolute top-[192.834px] left-[800.445px] h-[143.109px] w-[143.11px] text-destructive">
@@ -161,7 +161,7 @@ const Page1: Page = () => (
             <path d="m9 9 6 6"></path>
           </svg>
         </div>
-        <p className="absolute top-[387.726px] left-[788.133px] m-0 h-[35.387px] w-[167.734px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-destructive">
+        <p className="absolute top-[387.726px] left-[788.133px] m-0 h-[35.387px] w-[167.734px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-destructive">
           {"Extra waiting"}
         </p>
         <div className="absolute top-[199.189px] left-[1461.417px] h-[130.398px] w-[143.11px] text-destructive">
@@ -183,14 +183,14 @@ const Page1: Page = () => (
             <path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path>
           </svg>
         </div>
-        <p className="absolute top-[387.726px] left-[1415.363px] m-0 h-[35.387px] w-[235.219px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-destructive">
+        <p className="absolute top-[387.726px] left-[1415.363px] m-0 h-[35.387px] w-[235.219px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-destructive">
           {"Journey disrupted"}
         </p>
       </div>
     </figure>
     <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
       <span>
-        {"Source: Journey and passenger queue records · 5–16 Oct 2026"}
+        {"Source: Journey and passenger queue records · 5 to 16 Oct 2026"}
         <br />
         {
           "Fictional exercise data · Ten supplied weekdays · not a complete month"
@@ -205,25 +205,25 @@ const Page1: Page = () => (
 
 const Page2: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Recorded evidence"
+    aria-label="Late buses disrupt journeys. Recorded evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
       <span>{"Recorded evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"Late arrivals are more common than late starts."}
+      {"More buses arrived late than left late."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {"Journeys more than five minutes late, among 6,900 recorded trips."}
+      {"Trips more than five minutes late, out of 6,900 recorded trips."}
     </p>
     <figure
-      aria-label="Late arrivals are more common than late starts."
+      aria-label="More buses arrived late than left late."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Late arrivals are more common than late starts. Journeys more than five minutes late, among 6,900 recorded trips."
+        aria-label="More buses arrived late than left late. Trips more than five minutes late, out of 6,900 recorded trips."
         className="relative h-full w-full"
       >
         <div className="absolute top-[114.025px] left-[508.092px] h-[290.559px] w-[16px] text-foreground">
@@ -249,33 +249,33 @@ const Page2: Page = () => (
             ></line>
           </svg>
         </div>
-        <p className="absolute top-[169.097px] left-[275.982px] m-0 h-[35.387px] w-[191.266px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+        <p className="absolute top-[169.097px] left-[275.982px] m-0 h-[35.387px] w-[191.266px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Late departure"}
         </p>
         <div className="absolute top-[157.617px] left-[516.092px] h-[69.146px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[157.617px] left-[516.092px] h-[69.146px] w-[419.768px] [border-radius:4.068px] bg-primary"></div>
-        <p className="absolute top-[155.591px] left-[1651.682px] m-0 h-[58.572px] w-[66.328px] text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-foreground">
+        <p className="absolute top-[155.591px] left-[1651.682px] m-0 h-[58.572px] w-[66.328px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-foreground">
           {"48"}
         </p>
-        <p className="absolute top-[321.631px] left-[323.482px] m-0 h-[35.387px] w-[143.766px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+        <p className="absolute top-[321.631px] left-[323.482px] m-0 h-[35.387px] w-[143.766px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Late arrival"}
         </p>
         <div className="absolute top-[310.148px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[310.148px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[308.122px] left-[1627.948px] m-0 h-[58.572px] w-[90.063px] text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[308.122px] left-[1627.948px] m-0 h-[58.572px] w-[90.063px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           {"100"}
         </p>
-        <p className="absolute top-[402.98px] left-[504.873px] m-0 h-[35.387px] w-[22.438px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+        <p className="absolute top-[402.98px] left-[504.873px] m-0 h-[35.387px] w-[22.438px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
           {"0"}
         </p>
-        <p className="absolute top-[535.175px] left-[701.679px] m-0 h-[35.387px] w-[605.031px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
-          {"Trips over five minutes late · overlapping groups"}
+        <p className="absolute top-[535.175px] left-[701.679px] m-0 h-[35.387px] w-[605.031px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+          {"A trip can appear in both counts."}
         </p>
       </div>
     </figure>
     <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
       <span>
-        {"Source: Journey and passenger queue records · 5–16 Oct 2026"}
+        {"Source: Journey and passenger queue records · 5 to 16 Oct 2026"}
         <br />
         {
           "Fictional exercise data · Ten supplied weekdays · not a complete month"
@@ -290,25 +290,25 @@ const Page2: Page = () => (
 
 const Page3: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Recorded evidence"
+    aria-label="Late buses disrupt journeys. Recorded evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
       <span>{"Recorded evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"Every late start falls on three routes."}
+      {"Three routes had all the late departures."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {"The most affected route has 24 late starts out of 280 departures."}
+      {"The worst affected route had 24 late departures out of 280."}
     </p>
     <figure
-      aria-label="Every late start falls on three routes."
+      aria-label="Three routes had all the late departures."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Every late start falls on three routes. The most affected route has 24 late starts out of 280 departures."
+        aria-label="Three routes had all the late departures. The worst affected route had 24 late departures out of 280."
         className="relative h-full w-full"
       >
         <div className="absolute top-[63.182px] left-[508.092px] h-[443.09px] w-[16px] text-foreground">
@@ -334,41 +334,41 @@ const Page3: Page = () => (
             ></line>
           </svg>
         </div>
-        <p className="absolute top-[118.254px] left-[286.592px] m-0 h-[35.387px] w-[180.656px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+        <p className="absolute top-[118.254px] left-[286.592px] m-0 h-[35.387px] w-[180.656px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Most affected"}
         </p>
         <div className="absolute top-[106.771px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[106.771px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[104.745px] left-[1528.073px] m-0 h-[58.572px] w-[189.938px] text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[104.745px] left-[1528.073px] m-0 h-[58.572px] w-[189.938px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           <PageNumber />
         </p>
-        <p className="absolute top-[270.787px] left-[220.732px] m-0 h-[35.387px] w-[246.516px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+        <p className="absolute top-[270.787px] left-[220.732px] m-0 h-[35.387px] w-[246.516px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Next most affected"}
         </p>
         <div className="absolute top-[259.305px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[259.305px] left-[516.092px] h-[69.148px] w-[619.45px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[257.278px] left-[1536.698px] m-0 h-[58.572px] w-[181.313px] text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[257.278px] left-[1536.698px] m-0 h-[58.572px] w-[181.313px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           <PageNumber />
         </p>
-        <p className="absolute top-[423.318px] left-[285.092px] m-0 h-[35.387px] w-[182.156px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
+        <p className="absolute top-[423.318px] left-[285.092px] m-0 h-[35.387px] w-[182.156px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Third affected"}
         </p>
         <div className="absolute top-[411.836px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[411.836px] left-[516.092px] h-[69.148px] w-[255.067px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[409.81px] left-[1561.839px] m-0 h-[58.572px] w-[156.172px] text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[409.81px] left-[1561.839px] m-0 h-[58.572px] w-[156.172px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           <PageNumber />
         </p>
-        <p className="absolute top-[504.668px] left-[504.873px] m-0 h-[35.387px] w-[22.438px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+        <p className="absolute top-[504.668px] left-[504.873px] m-0 h-[35.387px] w-[22.438px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
           {"0"}
         </p>
-        <p className="absolute top-[535.175px] left-[779.46px] m-0 h-[35.387px] w-[449.469px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+        <p className="absolute top-[535.175px] left-[779.46px] m-0 h-[35.387px] w-[449.469px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
           {"Late starts · routes ranked by count"}
         </p>
       </div>
     </figure>
     <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
       <span>
-        {"Source: Journey and passenger queue records · 5–16 Oct 2026"}
+        {"Source: Journey and passenger queue records · 5 to 16 Oct 2026"}
         <br />
         {
           "Fictional exercise data · Ten supplied weekdays · not a complete month"
@@ -383,25 +383,25 @@ const Page3: Page = () => (
 
 const Page4: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Passenger evidence"
+    aria-label="Late buses disrupt journeys. Passenger evidence"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
       <span>{"Passenger evidence"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"One passenger abandoned the delayed journey."}
+      {"One passenger gave up waiting."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {"A direct account, not an estimate of company-wide customer loss."}
+      {"This is one account. It does not measure total customer losses."}
     </p>
     <figure
-      aria-label="One passenger abandoned the delayed journey."
+      aria-label="One passenger gave up waiting."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="One passenger abandoned the delayed journey. A direct account, not an estimate of company-wide customer loss."
+        aria-label="One passenger gave up waiting. This is one account. It does not measure total customer losses."
         className="relative h-full w-full"
       >
         <div className="absolute top-[161.691px] left-[262.346px] h-[134.213px] w-[121.078px] text-foreground">
@@ -440,13 +440,13 @@ const Page4: Page = () => (
             <path d="M12 6v6h4"></path>
           </svg>
         </div>
-        <p className="absolute top-[161.885px] left-[605.611px] m-0 h-[75.656px] w-[387.766px] text-[length:63.047px] leading-[1.2] font-[500] whitespace-pre text-foreground">
-          {"“I gave up and"}
+        <p className="absolute top-[161.885px] left-[605.611px] m-0 h-[75.656px] w-[387.766px] text-center text-[length:63.047px] leading-[1.2] font-[500] whitespace-pre text-foreground">
+          {'"I gave up and'}
         </p>
-        <p className="absolute top-[258.488px] left-[605.611px] m-0 h-[75.656px] w-[730.891px] text-[length:63.047px] leading-[1.2] font-[500] whitespace-pre text-foreground">
-          {"made other arrangements”"}
+        <p className="absolute top-[258.488px] left-[605.611px] m-0 h-[75.656px] w-[730.891px] text-center text-[length:63.047px] leading-[1.2] font-[500] whitespace-pre text-foreground">
+          {'made other arrangements"'}
         </p>
-        <p className="absolute top-[428.402px] left-[828.132px] m-0 h-[35.387px] w-[555.5px] text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
+        <p className="absolute top-[428.402px] left-[828.132px] m-0 h-[35.387px] w-[555.5px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
           {"Passenger reporting a delayed morning bus"}
         </p>
       </div>
@@ -468,20 +468,20 @@ const Page4: Page = () => (
 
 const Page5: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Section divider"
+    aria-label="Late buses disrupt journeys. Section divider"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      {"LIONLINK · A small number of delays can disrupt journeys"}
+      {"LIONLINK · Late buses disrupt journeys"}
     </header>
     <div className="flex flex-1 items-center justify-between gap-24">
       <div className="max-w-[1200px]">
         <div className="mb-12 h-2 w-32 bg-destructive"></div>
         <h1 className="text-[120px] leading-[1.05] font-semibold tracking-[-0.035em]">
-          {"Caveats & data requests"}
+          {"Caveats"}
         </h1>
         <p className="mt-12 text-[36px] leading-snug text-muted-foreground">
-          {"What the evidence cannot yet tell us."}
+          {"What the data does not tell us."}
         </p>
       </div>
       <div
@@ -517,34 +517,32 @@ const Page5: Page = () => (
 
 const Page6: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Stakeholder data request"
+    aria-label="Late buses disrupt journeys. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
-      <span>{"Stakeholder data request"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
+      <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"Ten weekdays cannot show whether delays persist across the year."}
+      {"Ten weekdays do not show a yearly pattern."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {
-        "Share earlier operating extracts, including weekends, to compare reliability across more months."
-      }
+      {"Share more months of trip records, including weekends."}
     </p>
     <figure
-      aria-label="Ten weekdays cannot show whether delays persist across the year."
+      aria-label="Ten weekdays do not show a yearly pattern."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Ten weekdays cannot show whether delays persist across the year. Share earlier operating extracts, including weekends, to compare reliability across more months."
+        aria-label="Ten weekdays do not show a yearly pattern. Share more months of trip records, including weekends."
         className="relative h-full w-full"
       >
-        <p className="absolute top-[57.969px] left-[399.522px] m-0 h-[42.352px] w-[442.031px] text-[length:35.293px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[57.969px] left-[399.522px] m-0 h-[42.352px] w-[442.031px] text-center text-[length:35.293px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"Earlier months and weekends"}
         </p>
-        <p className="absolute top-[61.586px] left-[1172.167px] m-0 h-[38.116px] w-[211.406px] text-[length:31.764px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"5–16 Oct 2026"}
+        <p className="absolute top-[61.586px] left-[1172.167px] m-0 h-[38.116px] w-[211.406px] text-center text-[length:31.764px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"5 to 16 Oct 2026"}
         </p>
         <div className="absolute top-[247.875px] left-[246.372px] h-[16px] w-[801.27px] text-muted-foreground">
           <svg
@@ -587,29 +585,29 @@ const Page6: Page = () => (
           </svg>
         </div>
         <div className="absolute top-[216.17px] left-[1074.935px] h-[79.41px] w-[405.87px] [border-radius:3.529px] bg-primary"></div>
-        <p className="absolute top-[227.698px] left-[1158.87px] m-0 h-[50.822px] w-[238px] text-[length:42.352px] leading-[1.2] font-[400] whitespace-pre [color:oklch(0.205_0_0)]">
+        <p className="absolute top-[227.698px] left-[1158.87px] m-0 h-[50.822px] w-[238px] text-center text-[length:42.352px] leading-[1.2] font-[400] whitespace-pre [color:oklch(0.205_0_0)]">
           {"10 weekdays"}
         </p>
-        <p className="absolute top-[129.759px] left-[593.381px] m-0 h-[116.467px] w-[54.313px] text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[129.759px] left-[593.381px] m-0 h-[116.467px] w-[54.313px] text-center text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           {"?"}
         </p>
-        <p className="absolute top-[343.136px] left-[466.287px] m-0 h-[33.881px] w-[308.5px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-muted-foreground">
-          {"No earlier observations in"}
+        <p className="absolute top-[343.136px] left-[466.287px] m-0 h-[33.881px] w-[308.5px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-muted-foreground">
+          {"No earlier records"}
         </p>
-        <p className="absolute top-[378.428px] left-[551.998px] m-0 h-[33.881px] w-[137.078px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-muted-foreground">
-          {"this extract"}
+        <p className="absolute top-[378.428px] left-[551.998px] m-0 h-[33.881px] w-[137.078px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-muted-foreground">
+          {"were provided."}
         </p>
-        <p className="absolute top-[343.136px] left-[1172.815px] m-0 h-[33.881px] w-[210.109px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-muted-foreground">
-          {"Supplied window"}
+        <p className="absolute top-[343.136px] left-[1172.815px] m-0 h-[33.881px] w-[210.109px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-muted-foreground">
+          {"Dates provided"}
         </p>
-        <p className="absolute top-[470.309px] left-[581.898px] m-0 h-[40.234px] w-[580.203px] text-[length:33.528px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"Recurring lateness is not yet established."}
+        <p className="absolute top-[470.309px] left-[581.898px] m-0 h-[40.234px] w-[580.203px] text-center text-[length:33.528px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"We do not know if delays persist."}
         </p>
       </div>
     </figure>
     <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
       <span>
-        {"Source: Journey and passenger queue records · 5–16 Oct 2026"}
+        {"Source: Journey and passenger queue records · 5 to 16 Oct 2026"}
         <br />
         {
           "Fictional exercise data · Ten supplied weekdays · not a complete month"
@@ -624,30 +622,30 @@ const Page6: Page = () => (
 
 const Page7: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Stakeholder data request"
+    aria-label="Late buses disrupt journeys. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
-      <span>{"Stakeholder data request"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
+      <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"Earlier running times need the timetables that applied on those dates."}
+      {"Older trips need matching timetables."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
       {
-        "When sharing older operating records, include the matching timetable versions so lateness is measured consistently."
+        "Share the timetables used on those dates to measure how late each bus was."
       }
     </p>
     <figure
-      aria-label="Earlier running times need the timetables that applied on those dates."
+      aria-label="Older trips need matching timetables."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Earlier running times need the timetables that applied on those dates. When sharing older operating records, include the matching timetable versions so lateness is measured consistently."
+        aria-label="Older trips need matching timetables. Share the timetables used on those dates to measure how late each bus was."
         className="relative h-full w-full"
       >
-        <p className="absolute top-[30.705px] left-[311.522px] m-0 h-[38.116px] w-[362.156px] text-[length:31.764px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[30.705px] left-[311.522px] m-0 h-[38.116px] w-[362.156px] text-center text-[length:31.764px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"Current dates are matched"}
         </p>
         <div className="absolute top-[177.289px] left-[211.079px] h-[16px] w-[549.807px] text-foreground">
@@ -670,7 +668,7 @@ const Page7: Page = () => (
             ></path>
           </svg>
         </div>
-        <p className="absolute top-[135.79px] left-[364.006px] m-0 h-[33.881px] w-[257.187px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[135.79px] left-[364.006px] m-0 h-[33.881px] w-[257.187px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"Scheduled departure"}
         </p>
         <div className="absolute top-[278.756px] left-[211.079px] h-[16px] w-[549.807px] text-foreground">
@@ -693,7 +691,7 @@ const Page7: Page = () => (
             ></path>
           </svg>
         </div>
-        <p className="absolute top-[237.257px] left-[390.342px] m-0 h-[33.881px] w-[204.516px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[237.257px] left-[390.342px] m-0 h-[33.881px] w-[204.516px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"Actual departure"}
         </p>
         <div className="absolute top-[380.223px] left-[211.079px] h-[16px] w-[549.807px] text-foreground">
@@ -716,7 +714,7 @@ const Page7: Page = () => (
             ></path>
           </svg>
         </div>
-        <p className="absolute top-[338.725px] left-[363.631px] m-0 h-[33.881px] w-[257.938px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[338.725px] left-[363.631px] m-0 h-[33.881px] w-[257.938px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"Difference = lateness"}
         </p>
         <div className="absolute top-[243.463px] left-[819.884px] h-[16px] w-[135.114px] text-muted-foreground">
@@ -761,23 +759,23 @@ const Page7: Page = () => (
           </svg>
         </div>
         <div className="absolute top-[216.17px] left-[1176.402px] h-[127.938px] w-[132.349px] [background-color:oklch(0.145_0_0)]"></div>
-        <p className="absolute top-[217.993px] left-[1215.421px] m-0 h-[116.467px] w-[54.313px] text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[217.993px] left-[1215.421px] m-0 h-[116.467px] w-[54.313px] text-center text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           {"?"}
         </p>
-        <p className="absolute top-[367.547px] left-[1071.467px] m-0 h-[35.999px] w-[342.219px] text-[length:29.999px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"Older schedules alongside"}
+        <p className="absolute top-[367.547px] left-[1071.467px] m-0 h-[35.999px] w-[342.219px] text-center text-[length:29.999px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"Older timetables and"}
         </p>
-        <p className="absolute top-[405.045px] left-[1159.077px] m-0 h-[35.999px] w-[167px] text-[length:29.999px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"older actuals"}
+        <p className="absolute top-[405.045px] left-[1159.077px] m-0 h-[35.999px] w-[167px] text-center text-[length:29.999px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"actual departure times"}
         </p>
-        <p className="absolute top-[470.309px] left-[552.352px] m-0 h-[40.234px] w-[639.297px] text-[length:33.528px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"Lateness needs a scheduled and actual time."}
+        <p className="absolute top-[470.309px] left-[552.352px] m-0 h-[40.234px] w-[639.297px] text-center text-[length:33.528px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"We need planned and actual times."}
         </p>
       </div>
     </figure>
     <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
       <span>
-        {"Source: Journey and passenger queue records · 5–16 Oct 2026"}
+        {"Source: Journey and passenger queue records · 5 to 16 Oct 2026"}
         <br />
         {
           "Fictional exercise data · Ten supplied weekdays · not a complete month"
@@ -792,27 +790,27 @@ const Page7: Page = () => (
 
 const Page8: Page = () => (
   <section
-    aria-label="A small number of delays can disrupt journeys — Stakeholder data request"
+    aria-label="Late buses disrupt journeys. Caveat"
     className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
-      <span>{"LIONLINK · A small number of delays can disrupt journeys"}</span>
-      <span>{"Stakeholder data request"}</span>
+      <span>{"LIONLINK · Late buses disrupt journeys"}</span>
+      <span>{"Caveat"}</span>
     </header>
     <h1 className="mt-10 max-w-[1680px] text-[76px] leading-[1.08] font-semibold tracking-[-0.035em]">
-      {"Late trips do not automatically create a financial penalty."}
+      {"Late trips may not lead to penalties."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
       {
-        "Share the service contracts and recorded deductions to establish whether these delays affected payments."
+        "Share contracts and payment deductions to check whether delays reduced income."
       }
     </p>
     <figure
-      aria-label="Late trips do not automatically create a financial penalty."
+      aria-label="Late trips may not lead to penalties."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Late trips do not automatically create a financial penalty. Share the service contracts and recorded deductions to establish whether these delays affected payments."
+        aria-label="Late trips may not lead to penalties. Share contracts and payment deductions to check whether delays reduced income."
         className="relative h-full w-full"
       >
         <div className="absolute top-[136.848px] left-[271.371px] h-[140.996px] w-[115.997px] text-foreground">
@@ -857,7 +855,7 @@ const Page8: Page = () => (
           </svg>
         </div>
         <div className="absolute top-[110.291px] left-[735.24px] h-[194.111px] w-[229.405px] [border-width:2.647px] [border-style:solid] border-muted-foreground"></div>
-        <p className="absolute top-[151.817px] left-[822.786px] m-0 h-[116.467px] w-[54.313px] text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[151.817px] left-[822.786px] m-0 h-[116.467px] w-[54.313px] text-center text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           {"?"}
         </p>
         <div className="absolute top-[203.758px] left-[1005.172px] h-[16px] w-[218.935px] text-muted-foreground">
@@ -899,26 +897,26 @@ const Page8: Page = () => (
             <path d="M6 12h.01M18 12h.01"></path>
           </svg>
         </div>
-        <p className="absolute top-[142.995px] left-[1427.179px] m-0 h-[116.467px] w-[54.313px] text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+        <p className="absolute top-[142.995px] left-[1427.179px] m-0 h-[116.467px] w-[54.313px] text-center text-[length:97.056px] leading-[1.2] font-[600] whitespace-pre text-destructive">
           {"?"}
         </p>
-        <p className="absolute top-[329.901px] left-[237.016px] m-0 h-[33.881px] w-[193.531px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[329.901px] left-[237.016px] m-0 h-[33.881px] w-[193.531px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"100 late arrivals"}
         </p>
-        <p className="absolute top-[329.901px] left-[661.7px] m-0 h-[33.881px] w-[376.484px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+        <p className="absolute top-[329.901px] left-[661.7px] m-0 h-[33.881px] w-[376.484px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
           {"Contract terms and deductions"}
         </p>
-        <p className="absolute top-[329.901px] left-[1213.944px] m-0 h-[33.881px] w-[339.609px] text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"Dollar effect not established"}
+        <p className="absolute top-[329.901px] left-[1213.944px] m-0 h-[33.881px] w-[339.609px] text-center text-[length:28.234px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"The cost is unknown."}
         </p>
-        <p className="absolute top-[470.309px] left-[605.75px] m-0 h-[40.234px] w-[532.5px] text-[length:33.528px] leading-[1.2] font-[400] whitespace-pre text-foreground">
-          {"Recorded financial penalty: unknown."}
+        <p className="absolute top-[470.309px] left-[605.75px] m-0 h-[40.234px] w-[532.5px] text-center text-[length:33.528px] leading-[1.2] font-[400] whitespace-pre text-foreground">
+          {"Penalty costs are not provided."}
         </p>
       </div>
     </figure>
     <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
       <span>
-        {"Source: Journey and passenger queue records · 5–16 Oct 2026"}
+        {"Source: Journey and passenger queue records · 5 to 16 Oct 2026"}
         <br />
         {
           "Fictional exercise data · Ten supplied weekdays · not a complete month"

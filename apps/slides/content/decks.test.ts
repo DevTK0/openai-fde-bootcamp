@@ -22,11 +22,9 @@ describe("plain-language visual decks", () => {
       expect(
         deck.slides.filter((slide) => slide.visual.kind === "divider")
       ).toHaveLength(1)
-      expect(deck.slides[5]?.stage).toBe("Stakeholder data request")
+      expect(deck.slides[5]?.stage).toBe("Caveat")
       expect(deck.slides[4]?.visual.kind).toBe("divider")
-      const requests = deck.slides.filter(
-        (slide) => slide.stage === "Stakeholder data request"
-      )
+      const requests = deck.slides.filter((slide) => slide.stage === "Caveat")
       expect(requests).toHaveLength(reviews[deck.id]!.items.length)
       requests.forEach((slide, index) => {
         expect(slide.visual.kind).toBe("limitation")

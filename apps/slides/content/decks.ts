@@ -79,8 +79,8 @@ export type Slide = {
   stage: string
 }
 export type Deck = { id: string; title: string; scope: string; slides: Slide[] }
-const history = "Monthly maintenance and mileage records · Oct 2024–Sep 2026"
-const operations = "Journey and passenger queue records · 5–16 Oct 2026"
+const history = "Monthly maintenance and mileage records · Oct 2024 to Sep 2026"
+const operations = "Journey and passenger queue records · 5 to 16 Oct 2026"
 const boarding =
   "Same 07:15 departure at Toa Payoh · ten weekdays in October 2026"
 const planning =
@@ -89,7 +89,7 @@ const workshop = "Workshop repair status records · October 2026"
 const festival = "Festival bus timetable and capacity plan · 9 Nov 2026"
 const incident = "Disruption plan and assumed passenger arrivals · 16 Oct 2026"
 const passengers = "Six supplied passenger accounts · October 2026"
-const cooling = "Selected cooling repair records · 28 Sep–12 Oct 2026"
+const cooling = "Selected cooling repair records · 28 Sep to 12 Oct 2026"
 const f = (n: number, d = 0) =>
   n.toLocaleString("en-SG", { maximumFractionDigits: d })
 const money = (n: number) => `S$${f(n)}`
@@ -161,8 +161,8 @@ const baseDecks: Deck[] = [
     slides: [
       slide(
         "How it works",
-        "More repairs mean both bills and buses off the road.",
-        "The records separate repair charges from time a bus cannot be used.",
+        "Repairs cost money and keep buses off the road.",
+        "The records track repair bills and time out of service separately.",
         history,
         flow([
           step("wrench", "Repair needed", true),
@@ -173,8 +173,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Repair spending grew much faster than distance travelled.",
-        "Change between the two complete years, for the same eight buses.",
+        "Repair costs rose faster than bus use.",
+        "The same eight buses, compared across two full years.",
         history,
         bars("Percentage increase from earlier year", [
           [
@@ -189,12 +189,12 @@ const baseDecks: Deck[] = [
             true,
           ],
         ]),
-        `Earlier year: October 2024–September 2025. Later year: October 2025–September 2026. Repair spend rose from ${money(h.earlier.repair)} to ${money(h.latest.repair)}, while distance rose from ${f(h.earlier.km)} to ${f(h.latest.km)} km. These are incurred repair charges, not quotes.`
+        `Earlier year: October 2024 to September 2025. Later year: October 2025 to September 2026. Repair spend rose from ${money(h.earlier.repair)} to ${money(h.latest.repair)}, while distance rose from ${f(h.earlier.km)} to ${f(h.latest.km)} km. These are incurred repair charges, not quotes.`
       ),
       slide(
         "Recorded evidence",
-        "Repair spending per kilometre was higher in the second year.",
-        "Repair spending per 1,000 km; this accounts for the increase in use.",
+        "Repair costs rose per kilometre.",
+        "Costs per 1,000 kilometres account for the increase in bus use.",
         history,
         bars("Singapore dollars per 1,000 km", [
           ["Earlier year", rate(h.earlier), money(Math.round(rate(h.earlier)))],
@@ -209,8 +209,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "The number of repair jobs also rose.",
-        "Separate repair visits count as separate jobs; they are not necessarily roadside breakdowns.",
+        "Repair jobs rose from 31 to 55.",
+        "Each repair visit counts as one job. A job does not always mean a breakdown.",
         history,
         bars("Completed repair jobs", [
           ["Earlier year", earlierJobs],
@@ -233,13 +233,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "hvac-comfort",
-    title: "Recurring discomfort has a cost",
+    title: "Cooling faults affect comfort and costs",
     scope: "Selected repair history and passenger accounts",
     slides: [
       slide(
         "How it works",
-        "Completing the journey does not guarantee a comfortable ride.",
-        "A bus can run while passengers experience heat and weak airflow.",
+        "A bus can run but still feel too hot.",
+        "Passengers reported heat and weak airflow during their journeys.",
         passengers,
         flow([
           step("bus", "Journey runs"),
@@ -250,16 +250,16 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "The same bus felt hot on two journeys.",
-        "Passenger reports one week apart match the same bus in the journey records.",
+        "Passengers felt hot on the same bus twice.",
+        "Two passenger reports, one week apart, match the same bus.",
         "Passenger accounts and matched departures · 5 and 12 Oct 2026",
         { kind: "comfort" },
         "The two accounts match departures using their stated stop and actual journey time. Both identify heat and weak airflow. These are selected accounts, not a complete complaint history; a wider complaint rate cannot be calculated from them."
       ),
       slide(
         "Recorded evidence",
-        "Three cooling repairs appear within fifteen days.",
-        "One bus, three separate recorded jobs; similar symptoms had different findings.",
+        "One bus needed three cooling repairs in 15 days.",
+        "The jobs found different faults despite similar symptoms.",
         cooling,
         bars(
           "Recorded repair charge · Singapore dollars",
@@ -274,7 +274,7 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "The cooling jobs also took the bus out of use.",
+        "Cooling repairs kept the bus out for 9.7 hours.",
         `Recorded repair holds total ${f(repairHours, 1)} hours; these are not passenger-delay hours.`,
         cooling,
         bars(
@@ -286,7 +286,7 @@ const baseDecks: Deck[] = [
             true,
           ])
         ),
-        "Durations are calculated from each job’s opening and confirmed release times. These selected jobs followed duties; no cancelled service is established by these records. Staff labour hours and workshop elapsed hours are also not the same quantity."
+        "Durations are calculated from each job's opening and confirmed release times. These selected jobs followed duties; no cancelled service is established by these records. Staff labour hours and workshop elapsed hours are also not the same quantity."
       ),
       slide(
         "Business significance",
@@ -304,13 +304,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "service-reliability",
-    title: "A small number of delays can disrupt journeys",
+    title: "Late buses disrupt journeys",
     scope: operatingScope,
     slides: [
       slide(
         "How it works",
-        "Passengers rely on the time, not just the bus.",
-        "Leaving late can affect work, appointments and connections.",
+        "Passengers need buses to run on time.",
+        "Late buses can mean missed work, appointments or connections.",
         operations,
         flow([
           step("clock", "Promised departure"),
@@ -321,10 +321,10 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Late arrivals are more common than late starts.",
-        "Journeys more than five minutes late, among 6,900 recorded trips.",
+        "More buses arrived late than left late.",
+        "Trips more than five minutes late, out of 6,900 recorded trips.",
         operations,
-        bars("Trips over five minutes late · overlapping groups", [
+        bars("A trip can appear in both counts.", [
           ["Late departure", o.late],
           ["Late arrival", o.arrivalLate, undefined, true],
         ]),
@@ -332,8 +332,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Every late start falls on three routes.",
-        "The most affected route has 24 late starts out of 280 departures.",
+        "Three routes had all the late departures.",
+        "The worst affected route had 24 late departures out of 280.",
         operations,
         bars(
           "Late starts · routes ranked by count",
@@ -348,8 +348,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Passenger evidence",
-        "One passenger abandoned the delayed journey.",
-        "A direct account, not an estimate of company-wide customer loss.",
+        "One passenger gave up waiting.",
+        "This is one account. It does not measure total customer losses.",
         "Passenger account · Toa Payoh morning departure · 7 Oct 2026",
         {
           kind: "quote",
@@ -374,25 +374,25 @@ const baseDecks: Deck[] = [
   },
   {
     id: "crowding",
-    title: "Some passengers cannot board the bus they need",
+    title: "Some passengers cannot board",
     scope: operatingScope,
     slides: [
       slide(
         "How it works",
-        "A running bus can still leave people behind.",
-        "Passengers need space at their stop and at the time they travel.",
+        "A bus can run and still leave people behind.",
+        "Passengers need space when the bus reaches their stop.",
         operations,
         flow([
           step("people", "Waiting passengers"),
           step("bus", "Limited places"),
           step("stop", "Some still waiting", true),
         ]),
-        "A bus’s capacity is the maximum number of people it can carry, including standing places. Stop-level queues reveal where demand and available places do not line up. A queue alone does not prove that a bus was full; the detailed boarding example below does."
+        "A bus's capacity is the maximum number of people it can carry, including standing places. Stop-level queues reveal where demand and available places do not line up. A queue alone does not prove that a bus was full; the detailed boarding example below does."
       ),
       slide(
         "Recorded evidence",
-        "A queue remained after about 9 in 100 stops.",
-        "22,210 of 252,380 recorded stop visits; rounded in the picture.",
+        "Queues remained after about 9 in 100 stop visits.",
+        "22,210 of 252,380 stop visits. The picture rounds this share.",
         operations,
         { kind: "queue", waitingPercent: (o.queuedCalls / o.calls) * 100 },
         "The exact share is 8.8%. Each dot represents one percentage point of stop visits, not a person. One passenger might remain in a queue through several buses, so this is not a unique count of people denied boarding."
@@ -400,7 +400,7 @@ const baseDecks: Deck[] = [
       slide(
         "Recorded evidence",
         "The same morning bus left people waiting on eight days.",
-        "People remaining after the 07:15 departure, on all ten supplied weekdays.",
+        "Queues after the 07:15 departure across ten weekdays.",
         boarding,
         {
           kind: "columns",
@@ -411,7 +411,7 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Passenger evidence",
-        "A passenger describes waiting for the next bus.",
+        "One passenger waited for the next bus.",
         "The 6 October account matches a departure that left 30 people waiting.",
         "Passenger account and origin boarding record · 6 Oct 2026",
         {
@@ -447,13 +447,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "capacity-use",
-    title: "Bus use varies sharply at the same departure",
+    title: "Bus demand varies by day",
     scope: "One morning departure · all ten supplied dates",
     slides: [
       slide(
         "How it works",
-        "Empty places and long queues can coexist.",
-        "An average hides how demand changes from day to day.",
+        "Bus demand changes from day to day.",
+        "Average demand hides differences between days.",
         boarding,
         flow([
           step("bus", "Fixed bus capacity"),
@@ -464,8 +464,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Eight departures were full; two were far below capacity.",
-        "Boardings at the same origin and departure time; the dashed line is bus capacity.",
+        "Eight departures were full. Two were mostly empty.",
+        "The same stop and departure time on ten days. The dashed line shows capacity.",
         boarding,
         {
           kind: "columns",
@@ -478,8 +478,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "On the quieter days, most places were empty at departure.",
-        "18 and 26 boardings on a bus with room for 85 people.",
+        "Only 18 and 26 people boarded on quieter days.",
+        "The bus had room for 85 people on each day.",
         boarding,
         bars(
           "Origin capacity used · percentage",
@@ -493,8 +493,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "The network average also hides local crowding.",
-        "Average recorded occupancy was 36%, yet queues remained at 8.8% of stop visits.",
+        "An average can hide crowding.",
+        "Average occupancy was 36%, but queues remained after 8.8% of stop visits.",
         operations,
         bars("Percent · different measures, not complementary shares", [
           ["Average occupancy", o.meanOccupancy, `${f(o.meanOccupancy)}%`],
@@ -522,13 +522,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "workshop-scheduling",
-    title: "Workshop bookings conflict with available resources",
+    title: "Workshop bookings exceed available space and staff",
     scope: "Future planning records · 19 October 2026",
     slides: [
       slide(
         "How it works",
-        "A bus cannot be serviced and carry passengers at once.",
-        "Maintenance competes for workshop space, mechanics and replacement buses.",
+        "A bus cannot carry passengers during maintenance.",
+        "Repairs need workshop space, mechanics and buses to cover the service.",
         planning,
         flow([
           step("wrench", "Workshop time"),
@@ -539,16 +539,16 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Planning evidence",
-        "Two jobs are booked into one workshop space.",
-        "Both requested bookings start at 09:00, creating two hours of overlap.",
+        "Two jobs need the same workshop space.",
+        "Both bookings start at 09:00 and overlap for two hours.",
         planning,
         { kind: "workshop", sequential: false },
-        "One requested job lasts 09:00–13:00 and the other 09:00–11:00. Both require one space. The workshop has one space continuously available 09:00–17:00. The diagram shows the requested bookings exactly; no alternative schedule is presented."
+        "One requested job lasts 09:00 to 13:00 and the other 09:00 to 11:00. Both require one space. The workshop has one space continuously available 09:00 to 17:00. The diagram shows the requested bookings exactly; no alternative schedule is presented."
       ),
       slide(
         "Planning evidence",
-        "The overlapping jobs also need too many mechanics.",
-        "At 09:00, one job needs two people and the other needs one.",
+        "Three mechanics are needed. Only two are available.",
+        "At 09:00, one job needs two mechanics and the other needs one.",
         planning,
         bars("Mechanics during the overlap", [
           ["Available", 2],
@@ -558,8 +558,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Planning evidence",
-        "Eight passenger trips depend on the two buses.",
-        "Only one replacement bus is named in the supplied plan.",
+        "Eight passenger trips need these two buses.",
+        "The plan names only one replacement bus.",
         planning,
         bars("Buses · not the number of journeys", [
           ["Buses requesting work", evidence.requests.length, undefined, true],
@@ -582,13 +582,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "fleet-availability",
-    title: "Workshop estimates do not establish usable buses",
+    title: "Repair estimates do not confirm bus availability",
     scope: "Separate group of eight workshop buses",
     slides: [
       slide(
         "How it works",
-        "Repair completion and permission to run are different events.",
-        "A bus needs recorded safety approval before returning to passenger service.",
+        "A repaired bus still needs safety approval.",
+        "It must pass the required checks before carrying passengers again.",
         workshop,
         flow([
           step("wrench", "Repair work"),
@@ -599,16 +599,16 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Eight buses are listed; none has a recorded safety sign-off.",
-        "This workshop extract contains no confirmed releases.",
+        "None of the eight buses has a recorded safety approval.",
+        "The workshop extract has no confirmed release records.",
         workshop,
         { kind: "fleet", count: evidence.workshop.length },
         "Each symbol represents one workshop bus. These eight buses are separate from the 172 buses in the operating timetable. Their absence from the available pool is not evidence of an equivalent number of cancelled services or a company-wide availability percentage."
       ),
       slide(
         "Recorded evidence",
-        "The work is held at different stages.",
-        "The eight current status records include repairs, parts waits and pending inspections.",
+        "The buses are at different repair stages.",
+        "The records show repairs, waits for parts and pending inspections.",
         workshop,
         bars(
           "Workshop buses by supplied status",
@@ -618,8 +618,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Evidence gap",
-        "Estimated finishes exist; confirmed releases do not.",
-        "Eight estimates are not eight usable buses.",
+        "An estimated finish is not a confirmed release.",
+        "The eight estimates do not confirm that buses can return to service.",
         workshop,
         bars("Records in the workshop extract", [
           [
@@ -631,7 +631,7 @@ const baseDecks: Deck[] = [
             evidence.workshop.filter((w) => w.confirmed_release_at).length,
           ],
         ]),
-        "The estimated dates span 6–16 October. No later actual release is supplied, so elapsed calendar time cannot safely be converted into actual downtime. This is a visibility limitation in the supplied data, not proof that the business has no approval process elsewhere."
+        "The estimated dates span 6 to 16 October. No later actual release is supplied, so elapsed calendar time cannot safely be converted into actual downtime. This is a visibility limitation in the supplied data, not proof that the business has no approval process elsewhere."
       ),
       slide(
         "Business significance",
@@ -649,13 +649,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "festival-allocation",
-    title: "The festival plan has an end-to-end capacity gap",
+    title: "The festival bus plan has gaps",
     scope: "Future timetable · not observed attendance",
     slides: [
       slide(
         "How it works",
-        "Some festival passengers depend on two connected buses.",
-        "Places on the onward bus do not help someone who cannot reach it.",
+        "Some festival passengers need two connecting buses.",
+        "They need space on both the shuttle and the connecting bus.",
         festival,
         flow([
           step("event", "Festival"),
@@ -667,8 +667,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Planning evidence",
-        "The listed onward capacity is more than twice the shuttle capacity.",
-        "Total planned places across listed departures; includes the provisional onward allocation.",
+        "Connecting buses have over twice the shuttle capacity.",
+        "Total planned places, including the unconfirmed connecting bus allocation.",
         festival,
         bars("Passenger places · separate legs", [
           ["Venue shuttle", shuttle.spaces],
@@ -678,16 +678,16 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Planning evidence",
-        "The final shuttle arrives after the final onward departure.",
-        "22:30 shuttle + 35-minute ride = 23:05 arrival; the last onward bus leaves at 22:45.",
+        "The final shuttle misses the last connecting bus.",
+        "The shuttle leaves at 22:30 and arrives at 23:05. The last connecting bus leaves at 22:45.",
         festival,
         { kind: "transfer", connected: false },
         "The 35-minute ride is a supplied planning allowance, not a measured travel time. The final arrival is 20 minutes after the last listed onward departure, before even allowing transfer time. No passenger has yet been observed making or missing this future connection."
       ),
       slide(
         "Planning evidence",
-        "Eighty-five shuttle places face that last-connection gap.",
-        "One of the three listed shuttle departures arrives too late for the onward bus.",
+        "The missed connection affects 85 planned places.",
+        "The final shuttle has 85 places but arrives too late for the connection.",
         festival,
         bars("Listed shuttle places", [
           ["Earlier departures", 170],
@@ -712,13 +712,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "incident-relief",
-    title: "The disruption plan cannot clear the assumed queue",
+    title: "Replacement buses cannot clear the planned queue",
     scope: "Bounded planning scenario · 16 October 2026",
     slides: [
       slide(
         "How it works",
-        "People keep arriving while replacement buses make their trips.",
-        "When trains stop, the queue depends on arrivals and available bus places.",
+        "Queues grow while replacement buses are away.",
+        "When trains stop, people keep arriving while buses make their trips.",
         incident,
         flow([
           step("train", "Train disruption", true),
@@ -729,16 +729,16 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Planning evidence",
-        "There are 292 people to carry and only 170 places.",
-        "Initial queue plus assumed arrivals, compared with the two committed departures.",
+        "The plan has 170 places for 292 people.",
+        "The initial queue and assumed arrivals exceed the two planned departures.",
         incident,
         { kind: "relief", demand, seats },
         "The arithmetic is 112 initially waiting plus 180 subsequent arrivals, versus two departures with 85 places each. Both departures have enough waiting demand to fill. The result assumes no abandonment or route switching, and accessible boarding."
       ),
       slide(
         "Planning evidence",
-        "More people arrive in every half-hour of the scenario.",
-        "Assumed new arrivals from 17:00 to 19:00; the initial queue is additional.",
+        "The plan assumes new arrivals every half-hour.",
+        "These are arrivals between 17:00 and 19:00, on top of the initial queue.",
         incident,
         {
           kind: "columns",
@@ -754,7 +754,7 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Planning evidence",
-        "The two planned departures leave 122 people waiting.",
+        "The plan leaves 122 people waiting.",
         "About 42% of the assumed demand remains at 19:00.",
         incident,
         bars("People in the supplied scenario", [
@@ -783,13 +783,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "investment-options",
-    title: "Maintenance spending is broader than repair bills",
+    title: "Maintenance costs include more than repairs",
     scope: historicalScope,
     slides: [
       slide(
         "How it works",
-        "Keeping a bus running creates several different costs.",
-        "Regular servicing, extra preventive work and repairs are separate charges.",
+        "Maintenance includes more than repairs.",
+        "The records separate regular servicing, extra checks and repairs.",
         history,
         flow([
           step("calendar", "Regular servicing"),
@@ -800,8 +800,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Total recorded maintenance spending rose to S$81,835.",
-        "All three categories for the same eight buses, in equal twelve-month periods.",
+        "Annual maintenance costs rose to S$81,835.",
+        "The same eight buses, compared across two full years.",
         history,
         {
           kind: "costmix",
@@ -829,8 +829,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Repair spending drives most of the increase.",
-        "Changes in recorded charges between the two years.",
+        "Repairs drove most of the cost increase.",
+        "The change in each maintenance cost between the two years.",
         history,
         bars(
           "Increase in Singapore dollars · preventive spending fell separately",
@@ -852,8 +852,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "Two buses account for almost half the repair spending.",
-        "Two-year repair charges within the eight-bus sample; buses ranked by total cost.",
+        "Two buses account for almost half the repair costs.",
+        "Two years of repair bills for eight buses, ranked by cost.",
         history,
         bars("Singapore dollars · full two-year period", [
           [
@@ -891,13 +891,13 @@ const baseDecks: Deck[] = [
   },
   {
     id: "customer-growth",
-    title: "Boarding counts do not explain customer growth",
+    title: "Boardings do not show customer growth",
     scope: "Supplied operating and passenger reports only",
     slides: [
       slide(
         "How it works",
-        "A boarding, a customer and revenue are different things.",
-        "One person can board repeatedly, transfer, or pay under different arrangements.",
+        "Boardings do not count individual customers.",
+        "One person may board several times, transfer between buses or pay under different arrangements.",
         operations,
         flow([
           step("bus", "Boarding events"),
@@ -908,8 +908,8 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "The reports record over two million boardings.",
-        "Across 6,900 trips; these are events, not two million distinct customers.",
+        "The records show over two million boardings.",
+        "These boardings occurred across 6,900 trips. They do not represent two million different customers.",
         operations,
         flow([
           step("bus", `${f(o.trips)} trips`),
@@ -920,21 +920,20 @@ const baseDecks: Deck[] = [
       ),
       slide(
         "Passenger evidence",
-        "There is a direct sign of an abandoned intended journey.",
-        "One supplied account says the passenger made other arrangements after waiting.",
+        "One passenger gave up waiting.",
+        "The passenger reported making other arrangements after a delay.",
         "Passenger account · delayed morning bus · 7 Oct 2026",
         {
           kind: "quote",
           text: "I gave up and made other arrangements",
-          attribution:
-            "One selected account; later customer behaviour is unknown",
+          attribution: "One passenger account. Later travel is unknown.",
         },
         "This is a concrete sign of friction before completing a journey. The same report set also includes a person who waited for the next bus and someone whose changed bus ran as expected. These six selected accounts are not a random customer sample or a churn measure."
       ),
       slide(
         "Evidence gap",
-        "New customers and repeat customers are not identified.",
-        "The supplied data cannot separate acquisition, repeat travel and transfers.",
+        "The records do not identify new or returning customers.",
+        "Boarding counts cannot separate new customers, repeat trips and transfers.",
         operations,
         flow([
           step("people", "Boardings: recorded"),
@@ -971,15 +970,15 @@ export const decks: Deck[] = baseDecks.map((deck) => {
       })),
       {
         stage: "Section divider",
-        title: "Caveats & data requests",
-        caption: "What the evidence cannot yet tell us.",
+        title: "Caveats",
+        caption: "What the data does not tell us.",
         source: deck.slides[0]!.source,
         visual: { kind: "divider" },
         notes:
           "This section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.",
       },
       ...limitationStories[deck.id]!.map((story, index): Slide => ({
-        stage: "Stakeholder data request",
+        stage: "Caveat",
         title: story.title,
         caption: story.caption,
         source: deck.slides[4]!.source,

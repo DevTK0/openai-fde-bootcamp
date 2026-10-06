@@ -287,7 +287,7 @@ export const reviews: Record<string, EvidenceReview> = {
       },
       {
         icon: "money",
-        label: "Relief contracts and invoices",
+        label: "Service contracts and invoices",
         detail: "Agreed rates and actual bills",
       },
     ],

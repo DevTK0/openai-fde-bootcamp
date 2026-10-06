@@ -25,101 +25,95 @@ export type LimitationStory = {
 export const limitationStories: Record<string, LimitationStory[]> = {
   "repair-spend": [
     {
-      title: "Two annual totals cannot establish a sustained increase.",
+      title: "Two years do not show a trend.",
       caption:
-        "Share earlier monthly repair records to distinguish a persistent increase from an unusual year.",
+        "Share earlier monthly repair records to check whether costs keep rising.",
       visual: {
         kind: "limitation",
         layout: "history",
-        observed: "Oct 2024–Sep 2026",
+        observed: "Oct 2024 to Sep 2026",
         missing: "Earlier years",
-        conclusion: "Long-term direction remains unknown.",
+        conclusion: "We need more years to check the trend.",
         value: "2 years",
       },
     },
     {
-      title:
-        "Costs for eight selected buses may not represent the whole fleet.",
-      caption:
-        "Share the same repair and mileage reports for the other buses before estimating fleet-wide costs.",
+      title: "Eight buses may not represent the fleet.",
+      caption: "Share repair and mileage reports for the other buses.",
       visual: {
         kind: "limitation",
         layout: "sample",
         observed: "8 selected buses",
         missing: "Other buses",
-        conclusion: "Fleet-wide repair cost cannot be inferred.",
+        conclusion: "Total fleet repair costs are unknown.",
         count: 8,
       },
     },
     {
-      title: "Higher repair bills do not tell us what became more expensive.",
+      title: "We do not know why repair bills rose.",
       caption:
-        "Share repair invoices and job sheets to separate parts, labour and major one-off jobs.",
+        "Share invoices and job sheets to separate parts, labour and major repairs.",
       visual: {
         kind: "limitation",
         layout: "breakdown",
         observed: "Repair totals supplied",
         missing: "Invoice detail needed",
-        conclusion: "The cause of higher spending remains unclear.",
+        conclusion: "We do not know why costs rose.",
         rows: ["Parts prices", "Labour charges", "Major one-off jobs"],
       },
     },
   ],
   "hvac-comfort": [
     {
-      title:
-        "Three cooling repairs on one bus cannot establish a fleet-wide pattern.",
+      title: "One bus cannot show how common cooling faults are.",
       caption:
-        "Share earlier cooling job sheets and those for other buses to check how widely faults recur.",
+        "Share earlier cooling job sheets and repair records for other buses.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "3 jobs on one bus",
         missing: "Earlier jobs and other buses",
-        conclusion: "Frequency across the fleet is unknown.",
+        conclusion: "We do not know how common faults are.",
         rows: ["28 Sep: repair", "5 Oct: repair", "12 Oct: repair"],
       },
     },
     {
-      title:
-        "Two selected complaints cannot show how common uncomfortable rides are.",
+      title: "Two complaints cannot show how common discomfort is.",
       caption:
-        "Share the existing cooling-complaint register for earlier months to establish recorded complaint volumes.",
+        "Share the full cooling complaint register, including earlier months.",
       visual: {
         kind: "limitation",
         layout: "sample",
         observed: "2 selected accounts",
         missing: "Full complaint register",
-        conclusion: "Selected accounts do not establish frequency.",
+        conclusion: "Two accounts do not show how common this is.",
         count: 2,
       },
     },
   ],
   "service-reliability": [
     {
-      title: "Ten weekdays cannot show whether delays persist across the year.",
-      caption:
-        "Share earlier operating extracts, including weekends, to compare reliability across more months.",
+      title: "Ten weekdays do not show a yearly pattern.",
+      caption: "Share more months of trip records, including weekends.",
       visual: {
         kind: "limitation",
         layout: "history",
-        observed: "5–16 Oct 2026",
+        observed: "5 to 16 Oct 2026",
         missing: "Earlier months and weekends",
-        conclusion: "Recurring lateness is not yet established.",
+        conclusion: "We do not know if delays persist.",
         value: "10 weekdays",
       },
     },
     {
-      title:
-        "Earlier running times need the timetables that applied on those dates.",
+      title: "Older trips need matching timetables.",
       caption:
-        "When sharing older operating records, include the matching timetable versions so lateness is measured consistently.",
+        "Share the timetables used on those dates to measure how late each bus was.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "Current dates are matched",
         missing: "Older schedules alongside older actuals",
-        conclusion: "Lateness needs a scheduled and actual time.",
+        conclusion: "We need planned and actual times.",
         rows: [
           "Scheduled departure",
           "Actual departure",
@@ -128,117 +122,109 @@ export const limitationStories: Record<string, LimitationStory[]> = {
       },
     },
     {
-      title: "Late trips do not automatically create a financial penalty.",
+      title: "Late trips may not lead to penalties.",
       caption:
-        "Share the service contracts and recorded deductions to establish whether these delays affected payments.",
+        "Share contracts and payment deductions to check whether delays reduced income.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "100 late arrivals",
         missing: "Contract terms and deductions",
-        conclusion: "Recorded financial penalty: unknown.",
+        conclusion: "Penalty costs are not provided.",
       },
     },
   ],
   crowding: [
     {
-      title:
-        "Two weeks of queues cannot establish the year-round crowding pattern.",
+      title: "Two weeks do not show typical crowding.",
       caption:
-        "Share earlier boarding extracts, including weekends, to check whether the queues persist.",
+        "Share earlier boarding records, including weekends, to check whether queues persist.",
       visual: {
         kind: "limitation",
         layout: "history",
-        observed: "5–16 Oct 2026",
+        observed: "5 to 16 Oct 2026",
         missing: "Earlier months and weekends",
-        conclusion: "Crowding beyond this window is unknown.",
+        conclusion: "Crowding on other dates is unknown.",
         value: "10 weekdays",
       },
     },
   ],
   "capacity-use": [
     {
-      title:
-        "Ten weekdays cannot establish typical demand across months and weekends.",
-      caption:
-        "Share earlier operating extracts to distinguish a recurring demand pattern from an unusual fortnight.",
+      title: "Ten weekdays do not show typical demand.",
+      caption: "Share more months of trip records, including weekends.",
       visual: {
         kind: "limitation",
         layout: "history",
-        observed: "5–16 Oct 2026",
+        observed: "5 to 16 Oct 2026",
         missing: "Earlier months and weekends",
-        conclusion: "Typical demand remains unconfirmed.",
+        conclusion: "Typical demand is unknown.",
         value: "10 weekdays",
       },
     },
     {
-      title:
-        "Empty places do not show how much operating cost could be avoided.",
+      title: "Empty places do not tell us what costs can fall.",
       caption:
-        "Share existing fuel, payroll and bus-cost reports to separate costs that change with service from costs that remain.",
+        "Share fuel, payroll and bus cost reports to identify which costs change when fewer buses run.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "Quiet departures observed",
         missing: "Fuel, payroll and bus costs",
-        conclusion: "Avoidable operating cost: unknown.",
+        conclusion: "Possible savings are unknown.",
       },
     },
   ],
   "workshop-scheduling": [
     {
-      title:
-        "One proposed schedule cannot show whether workshop clashes happen regularly.",
+      title: "One plan does not show how often bookings clash.",
       caption:
-        "Share earlier booking logs and completed job sheets to compare planned overlaps with what actually happened.",
+        "Share earlier bookings and completed job sheets to check how often clashes occur.",
       visual: {
         kind: "limitation",
         layout: "plan",
         observed: "19 Oct: proposed bookings",
         missing: "Earlier completed bookings",
-        conclusion: "One clash does not show how often it happens.",
+        conclusion: "We do not know how often jobs clash.",
       },
     },
     {
-      title:
-        "A planned staffing shortage does not show actual overtime worked.",
+      title: "A staffing gap does not prove overtime was worked.",
       caption:
-        "Share mechanic rosters and timesheets to compare scheduled staffing with paid hours.",
+        "Share mechanic rosters and timesheets to compare planned and paid hours.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "3 needed; 2 available in plan",
         missing: "Actual hours from timesheets",
-        conclusion: "Overtime cannot be inferred from the plan.",
+        conclusion: "The plan does not record overtime.",
         rows: ["Rostered hours", "Actual hours worked", "Overtime hours"],
       },
     },
     {
-      title:
-        "A replacement bus in the plan does not establish an extra expense.",
+      title: "A replacement bus may not cost extra.",
       caption:
-        "Share existing hire and cover invoices to establish whether replacement service incurred additional charges.",
+        "Share hire invoices to check whether covering the service added costs.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "1 replacement bus listed",
         missing: "Hire and cover invoices",
-        conclusion: "Additional cover spending: unknown.",
+        conclusion: "Extra replacement costs are unknown.",
       },
     },
   ],
   "fleet-availability": [
     {
-      title:
-        "An empty release field does not prove a bus is still unavailable.",
+      title: "Missing approval records do not prove buses are unavailable.",
       caption:
-        "Share completed job sheets and signed release records to establish when each bus was cleared for service.",
+        "Share signed release records and completed job sheets to confirm when buses could return to service.",
       visual: {
         kind: "limitation",
         layout: "records",
-        observed: "8 releases absent from extract",
+        observed: "8 release records are missing",
         missing: "Signed release dates and times",
-        conclusion: "Actual availability remains unconfirmed.",
+        conclusion: "Bus availability is unconfirmed.",
         rows: [
           "Expected completion",
           "Actual completion: ?",
@@ -247,207 +233,190 @@ export const limitationStories: Record<string, LimitationStory[]> = {
       },
     },
     {
-      title: "Current repair status cannot tell us how long each stage took.",
+      title: "Repair status does not show time spent waiting.",
       caption:
-        "Share dated job sheets, parts orders and delivery receipts to distinguish repair time from time waiting for parts.",
+        "Share dated job sheets, parts orders and delivery receipts to separate repair time from waits for parts.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "Current status recorded",
         missing: "Dates on jobs, orders and receipts",
-        conclusion: "Time waiting for parts remains unknown.",
+        conclusion: "Time waiting for parts is unknown.",
         rows: ["Part ordered: ?", "Part received: ?", "Repair completed: ?"],
       },
     },
     {
-      title:
-        "Workshop time cannot be converted directly into replacement-bus spending.",
+      title: "Time in repair does not show replacement costs.",
       caption:
-        "Share bus-hire invoices, including dates and credits, to establish actual replacement charges.",
+        "Share dated bus hire invoices and credits to check the actual charges.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "8 workshop buses listed",
         missing: "Dated bus-hire invoices",
-        conclusion: "Billed replacement cost: unknown.",
+        conclusion: "Replacement bus costs are unknown.",
       },
     },
   ],
   "festival-allocation": [
     {
-      title:
-        "Provisional allocations may change the capacity available for the event.",
+      title: "Some bus bookings are not confirmed.",
       caption:
-        "Share the latest confirmed timetable and bus bookings before treating the listed capacity as committed.",
+        "Share the latest timetable and confirmed bookings to check the available capacity.",
       visual: {
         kind: "limitation",
         layout: "allocation",
         observed: "Onward service: 596 listed places",
         missing: "Confirm the provisional allocation",
-        conclusion: "256 listed places remain provisional.",
+        conclusion: "256 places are not confirmed.",
       },
     },
     {
-      title:
-        "Planned bus capacity does not establish how many people will travel.",
+      title: "Planned places do not show passenger demand.",
       caption:
-        "Share previous comparable event reports and recorded bookings, if held, to ground the demand assumptions.",
+        "Share passenger counts from similar events and any existing bookings.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "Future event capacity plan",
         missing: "Previous event counts and bookings",
-        conclusion: "Actual demand cannot be read from capacity.",
+        conclusion: "Planned places do not show demand.",
         rows: ["Seats planned", "Bookings, if held: ?", "Past event usage: ?"],
       },
     },
     {
-      title: "A gap in the event timetable does not establish a monetary loss.",
+      title: "A missed connection does not show a financial loss.",
       caption:
-        "Share the event transport contract, agreed fees and hire quotes to understand the commercial exposure.",
+        "Share the transport contract, agreed fees and hire quotes to assess the cost.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "Last connection gap in plan",
         missing: "Event contract and agreed fees",
-        conclusion: "Financial exposure remains unpriced.",
+        conclusion: "The financial effect is unknown.",
       },
     },
   ],
   "incident-relief": [
     {
-      title:
-        "The remaining queue depends on assumptions about how the disruption unfolds.",
+      title: "The queue estimate depends on assumptions.",
       caption:
-        "Share previous incident reports with dispatch and restoration times to compare this scenario with past operations.",
+        "Share past incident reports with bus departure and train restart times to check those assumptions.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "122 waiting in the scenario",
         missing: "Past dispatch and restoration logs",
-        conclusion: "Scenario result is not an observed outcome.",
+        conclusion: "The queue is calculated, not measured.",
         rows: [
           "Assumed arrivals",
           "Assumed departures",
-          "Restoration assumed absent",
+          "No train restart is assumed",
         ],
       },
     },
     {
-      title:
-        "A resource snapshot cannot establish availability throughout the disruption.",
+      title: "Buses and drivers may not stay available.",
       caption:
-        "Share the relevant bus and driver rosters and release records to check availability across the full response window.",
+        "Share duty rosters and release records for the full disruption period.",
       visual: {
         kind: "limitation",
         layout: "records",
         observed: "One availability snapshot",
         missing: "Duties and releases across the period",
-        conclusion: "Available now does not mean available throughout.",
+        conclusion: "Later availability is unknown.",
         rows: ["Current availability", "Later duties: ?", "Release changes: ?"],
       },
     },
     {
-      title:
-        "A remaining queue does not tell us the cost of relief operations.",
+      title: "Queue length does not show replacement service costs.",
       caption:
-        "Share relief-service contracts and invoices to distinguish agreed rates from actual payments.",
+        "Share replacement service contracts and invoices to compare agreed rates with actual payments.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "122 waiting in the scenario",
-        missing: "Relief contracts and invoices",
-        conclusion: "Actual relief spending: unknown.",
+        missing: "Service contracts and invoices",
+        conclusion: "Replacement service costs are unknown.",
       },
     },
   ],
   "investment-options": [
     {
-      title:
-        "Two annual totals cannot establish a sustained maintenance-cost trend.",
+      title: "Two years do not show a cost trend.",
       caption:
-        "Share earlier monthly maintenance reports using the same categories to test whether higher spending persists.",
+        "Share earlier monthly maintenance reports using the same cost categories.",
       visual: {
         kind: "limitation",
         layout: "history",
-        observed: "Oct 2024–Sep 2026",
+        observed: "Oct 2024 to Sep 2026",
         missing: "Earlier years",
-        conclusion: "Long-term maintenance trend remains unknown.",
+        conclusion: "We need more years to check the trend.",
         value: "2 years",
       },
     },
     {
-      title:
-        "Eight selected buses cannot establish the maintenance burden of the whole fleet.",
+      title: "Eight buses may not represent the fleet.",
       caption:
-        "Share fleet-wide maintenance records, mileage and bus ages to compare buses doing similar work.",
+        "Share maintenance costs, mileage and ages for other buses doing similar work.",
       visual: {
         kind: "limitation",
         layout: "sample",
         observed: "8 selected buses",
         missing: "Other buses and their usage",
-        conclusion: "Fleet-wide maintenance cost remains unknown.",
+        conclusion: "Total fleet maintenance costs are unknown.",
         count: 8,
       },
     },
     {
-      title:
-        "Total maintenance spending cannot distinguish recurring costs from exceptional work.",
+      title: "Totals hide the cost of major one-off jobs.",
       caption:
-        "Share the underlying invoices and job sheets to identify major one-off jobs and changes in parts or labour charges.",
+        "Share invoices and job sheets to separate routine work, major jobs and price changes.",
       visual: {
         kind: "limitation",
         layout: "breakdown",
         observed: "Maintenance totals supplied",
         missing: "Underlying invoices and job sheets",
-        conclusion: "Recurring cost cannot be isolated from totals.",
-        rows: [
-          "Regular work",
-          "Parts and labour prices",
-          "Exceptional major jobs",
-        ],
+        conclusion: "Routine costs are not separated.",
+        rows: ["Regular work", "Parts and labour prices", "Major one-off jobs"],
       },
     },
   ],
   "customer-growth": [
     {
-      title:
-        "Ten weekdays of boardings cannot show whether ridership is growing.",
-      caption:
-        "Share monthly ridership totals for earlier months and years to compare equivalent periods.",
+      title: "Ten weekdays do not show ridership growth.",
+      caption: "Share monthly passenger totals from earlier months and years.",
       visual: {
         kind: "limitation",
         layout: "history",
-        observed: "5–16 Oct 2026",
+        observed: "5 to 16 Oct 2026",
         missing: "Earlier months and years",
-        conclusion: "Ridership growth cannot yet be measured.",
+        conclusion: "We cannot measure growth yet.",
         value: "10 weekdays",
       },
     },
     {
-      title:
-        "More boardings do not necessarily mean more revenue for the operator.",
+      title: "More boardings may not mean more revenue.",
       caption:
-        "Share monthly revenue reports and contracts to establish how payments relate to passenger numbers.",
+        "Share monthly revenue reports and contracts to check how passenger numbers affect payments.",
       visual: {
         kind: "limitation",
         layout: "money",
-        observed: "Boarding events recorded",
+        observed: "Boardings recorded",
         missing: "Revenue reports and payment terms",
-        conclusion: "Revenue per additional boarding: unknown.",
+        conclusion: "Revenue per extra boarding is unknown.",
       },
     },
     {
-      title:
-        "Boarding totals cannot show what was spent to attract passengers.",
+      title: "The reports do not include marketing costs.",
       caption:
-        "Share existing marketing budgets, invoices and campaign summaries, if held, to establish acquisition spending.",
+        "Share existing marketing budgets, invoices and campaign reports.",
       visual: {
         kind: "limitation",
         layout: "money",
         observed: "Boarding totals supplied",
         missing: "Marketing budgets and invoices",
-        conclusion: "Acquisition spending is not in these reports.",
+        conclusion: "Marketing costs are not provided.",
       },
     },
   ],
