@@ -1,3 +1,4 @@
+import { responseError } from "./response-error"
 import {
   orderedTranscripts,
   type FinalTranscript,
@@ -15,6 +16,7 @@ export async function startTranscription(options: {
   let stream: MediaStream | undefined
   let audio: AudioContext | undefined
   let timer: ReturnType<typeof setInterval> | undefined
+  let cancelHandshake: (() => void) | undefined
   let closed = false
   let speaking = false
   let lastVoice = 0
@@ -24,6 +26,7 @@ export async function startTranscription(options: {
     if (closed) return
     closed = true
     clearInterval(timer)
+    cancelHandshake?.()
     stream?.getTracks().forEach((track) => track.stop())
     void audio?.close()
     channel.close()
@@ -51,12 +54,22 @@ export async function startTranscription(options: {
   options.signal.addEventListener("abort", cleanup, { once: true })
   try {
     options.signal.throwIfAborted()
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const acquired = await navigator.mediaDevices.getUserMedia({ audio: true })
+    stream = acquired
     if (closed || options.signal.aborted) {
       stream.getTracks().forEach((track) => track.stop())
       throw new DOMException("Microphone setup cancelled", "AbortError")
     }
-    stream.getTracks().forEach((track) => peer.addTrack(track, stream))
+    stream.getTracks().forEach((track) => {
+      peer.addTrack(track, acquired)
+      track.addEventListener(
+        "ended",
+        () => {
+          if (!closed) fail("The microphone stopped. Reconnect to continue.")
+        },
+        { once: true }
+      )
+    })
     channel.addEventListener("message", (event: MessageEvent<unknown>) => {
       if (closed || typeof event.data !== "string") return
       try {
@@ -85,14 +98,10 @@ export async function startTranscription(options: {
         resolve()
       }
       channel.addEventListener("open", finish, { once: true })
-      options.signal.addEventListener(
-        "abort",
-        () => {
-          clearTimeout(timeout)
-          reject(new DOMException("Cancelled", "AbortError"))
-        },
-        { once: true }
-      )
+      cancelHandshake = () => {
+        clearTimeout(timeout)
+        reject(new DOMException("Cancelled", "AbortError"))
+      }
     })
     // Attach rejection handling while the SDP exchange is pending.
     void opened.catch(() => undefined)
@@ -106,7 +115,7 @@ export async function startTranscription(options: {
       body: peer.localDescription?.sdp,
       signal: options.signal,
     })
-    if (!response.ok) throw new Error(await response.text())
+    if (!response.ok) throw new Error(await responseError(response))
     options.signal.throwIfAborted()
     await peer.setRemoteDescription({
       type: "answer",
@@ -117,6 +126,8 @@ export async function startTranscription(options: {
     if (closed) throw new Error("Microphone connection closed during setup.")
     audio = new AudioContext()
     await audio.resume()
+    options.signal.throwIfAborted()
+    if (closed) throw new Error("Microphone connection closed during setup.")
     const analyser = audio.createAnalyser()
     analyser.fftSize = 1024
     audio.createMediaStreamSource(stream).connect(analyser)

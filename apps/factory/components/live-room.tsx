@@ -35,6 +35,7 @@ import {
   type FactoryRequest,
   type Snapshot,
 } from "@/lib/contracts"
+import { responseError } from "@/lib/response-error"
 import { transcriptOutbox } from "@/lib/transcription-outbox"
 import { startTranscription } from "@/lib/transcription"
 
@@ -62,6 +63,7 @@ export function LiveRoom() {
   const [microphone, setMicrophone] = useState<Microphone>("off")
   const [pending, setPending] = useState<PendingSegment[]>([])
   const [selected, setSelected] = useState<string | null>(null)
+  const typedCommand = useRef<PendingSegment | null>(null)
   const controller = useRef<AbortController | null>(null)
   const audio = useRef<Awaited<ReturnType<typeof startTranscription>> | null>(
     null
@@ -123,6 +125,13 @@ export function LiveRoom() {
     []
   )
 
+  useEffect(() => {
+    if (microphone === "off" && pending.length === 0) return
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
+    window.addEventListener("beforeunload", warn)
+    return () => window.removeEventListener("beforeunload", warn)
+  }, [microphone, pending.length])
+
   async function mutate(command: Command) {
     setBusy(true)
     setError("")
@@ -161,10 +170,12 @@ export function LiveRoom() {
     setMicrophone("connecting")
     setError("")
     try {
-      audio.current = await startTranscription({
+      const connection = await startTranscription({
         token: access,
         signal: abort.signal,
-        onPartial: setPartial,
+        onPartial: (text) => {
+          if (controller.current === abort) setPartial(text)
+        },
         onFinal: ({ text }) => {
           if (text.trim())
             saveSpeech({
@@ -176,13 +187,18 @@ export function LiveRoom() {
             })
         },
         onError: (text) => {
+          if (controller.current !== abort) return
           setError(text)
           setMicrophone("off")
           setPartial("")
         },
       })
-      if (!abort.signal.aborted) setMicrophone("listening")
+      if (controller.current === abort && !abort.signal.aborted) {
+        audio.current = connection
+        setMicrophone("listening")
+      }
     } catch (e) {
+      if (controller.current !== abort) return
       if (!abort.signal.aborted) setError(message(e))
       setMicrophone("off")
     }
@@ -308,6 +324,12 @@ export function LiveRoom() {
             <Button
               variant="ghost"
               size="sm"
+              disabled={micActive || pending.length > 0 || busy}
+              title={
+                micActive || pending.length > 0
+                  ? "Stop listening and save pending speech before disconnecting"
+                  : undefined
+              }
               onClick={() => {
                 controller.current?.abort()
                 revision.current += 1
@@ -395,6 +417,7 @@ export function LiveRoom() {
                       disabled={micActive || busy || pending.length > 0}
                       onClick={() => {
                         setSelected(null)
+                        currentRoom.current = room.id
                         void api(access, undefined, room.id).catch(
                           (e: unknown) => setError(message(e))
                         )
@@ -565,14 +588,27 @@ export function LiveRoom() {
                       onSubmit={(event) => {
                         event.preventDefault()
                         const text = draft
-                        void mutate({
-                          kind: "segment",
-                          id: crypto.randomUUID(),
-                          conversationId: snapshot.conversation?.id ?? "",
-                          speaker,
-                          text,
-                        })
-                          .then(() => setDraft(""))
+                        const conversationId = snapshot.conversation?.id ?? ""
+                        const previous = typedCommand.current
+                        const command: PendingSegment =
+                          previous &&
+                          previous.text === text &&
+                          previous.speaker === speaker &&
+                          previous.conversationId === conversationId
+                            ? previous
+                            : {
+                                kind: "segment",
+                                id: crypto.randomUUID(),
+                                conversationId,
+                                speaker,
+                                text,
+                              }
+                        typedCommand.current = command
+                        void mutate(command)
+                          .then(() => {
+                            setDraft("")
+                            typedCommand.current = null
+                          })
                           .catch((e: unknown) => setError(message(e)))
                       }}
                     >
@@ -666,7 +702,12 @@ export function LiveRoom() {
                 request={request}
                 busy={busy}
                 act={(command) =>
-                  mutate(command).catch((e: unknown) => setError(message(e)))
+                  mutate(command)
+                    .then(() => true)
+                    .catch((e: unknown) => {
+                      setError(message(e))
+                      return false
+                    })
                 }
               />
             )}
@@ -684,7 +725,7 @@ function RequestDetail({
 }: {
   request: FactoryRequest
   busy: boolean
-  act: (command: Command) => Promise<void>
+  act: (command: Command) => Promise<boolean>
 }) {
   const [answer, setAnswer] = useState("")
   const state = request.state
@@ -718,7 +759,9 @@ function RequestDetail({
             onSubmit={(event) => {
               event.preventDefault()
               void act({ kind: "answer", requestId: request.id, answer }).then(
-                () => setAnswer("")
+                (saved) => {
+                  if (saved) setAnswer("")
+                }
               )
             }}
           >
@@ -818,7 +861,7 @@ function RequestDetail({
               Cancel request
             </Button>
           )}
-          {["failed", "cancelled"].includes(state.kind) && (
+          {state.kind === "failed" && (
             <Button
               variant="outline"
               size="sm"

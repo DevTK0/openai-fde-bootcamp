@@ -9,7 +9,7 @@ export default function Layout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className="bg-background text-foreground antialiased">
+      <body className="bg-background font-sans text-foreground antialiased [--font-sans:Arial,Helvetica,sans-serif]">
         {children}
       </body>
     </html>
