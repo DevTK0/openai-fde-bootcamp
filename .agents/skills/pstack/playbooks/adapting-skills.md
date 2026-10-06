@@ -7,8 +7,6 @@ Use when importing or updating upstream pstack skills, principles, references, o
 1. Identify the source and requested scope.
 2. Compare upstream instructions with the local workflow.
 3. Adapt the requested files and wire their routes.
-4. Verify the adapted workflow.
-5. Deliver the change through Opening a PR.
 
 ### 1. Identify the source and requested scope
 
@@ -47,17 +45,3 @@ Write skills directly to `.agents/skills/<name>/SKILL.md`. Write pstack playbook
 Preserve upstream wording where it remains accurate. Change instructions where execution, permissions, dependencies, or repository conventions differ. Put execution requirements in the owning skill or playbook, not only in a catalog.
 
 Add a precise trigger to the pstack entrypoint and register new playbooks in its Playbooks section. Prefer the narrowest matching workflow. Do not restore excluded workflows incidentally. Keep existing catalog entries, counts, and provenance accurate when affected, but do not make a catalog read part of execution.
-
-### 4. Verify the adapted workflow
-
-Run the `skill-creator` validator on each changed skill folder. Check that local links and named dependencies resolve. Review the diff against the pinned source for accidental omissions and stale Cursor instructions.
-
-Trace one representative request through the entrypoint to the new instructions without reading `.agents/skills/README.md`. Also trace a neighboring request that should keep its existing route. Check delegation, authorization, verification, and handoff behavior in each applicable branch. Use independent forward-testing only when complexity warrants it and delegation is permitted.
-
-Run added or changed scripts against representative inputs. Run `pnpm check` and inspect `git diff --check`. Report structural validation separately from any live workflow execution; neither proves the other.
-
-### 5. Deliver the change through Opening a PR
-
-Follow [Opening a PR](opening-a-pr.md) to review, commit, push, and publish unless the user sets another stopping point. Opening the PR does not start Babysit or grant merge authority.
-
-Reply with the imported source, local files, material adaptations, verification results, remaining blockers, and the actual PR URL when created.
