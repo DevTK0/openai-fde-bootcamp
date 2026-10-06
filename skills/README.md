@@ -91,8 +91,9 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
   sources live in `skills/`, with optional discovery symlinks.
 - Replaced the unbundled PR watcher, Origin-specific CLI assumptions, and Cursor
   cloud agents with Codex PR tools and subagents. Preserved shipping's
-  independent-verifier gate. Verdicts require exact head/base commits; a changed
-  revision requires fresh verification instead of upstream patch-ID reuse.
+  independent-verifier gate and verification reuse. Patch equivalence uses a
+  whitespace-preserving diff rather than patch IDs; relevant base changes
+  require reassessing affected verification.
 - Preserved unrelated work instead of upstream reset-based worktree recovery.
 - Adapted upstream review triage to check PR comments, reviews, and threads
   regardless of reviewer. Historical examples remain attributed to upstream.
@@ -102,9 +103,7 @@ queues allow isolated parallel workers within Codex capacity. Swarm verification
 requires every lane's evidence at the exact revision; missing lanes block a clean
 verdict. Same-model agents are allowed, but self-review is not independent proof.
 
-Autopilot-full builds independent PRs in parallel under the operator's merge grant.
-The coordinator serializes final verification and landing so one owner's merge
-does not invalidate another owner's final verification.
+Autopilot-full builds and lands independent PRs under the operator's merge grant.
 Autopilot-stack builds and verifies one linear stack and leaves landing to the
 human. Both open early PRs as work records, retain decision/child-agent trails,
 and supervise progress during the active Codex session. They do not install a
