@@ -37,7 +37,7 @@ export const impacts: Partial<Record<string, Slide>> = {
   ),
   "investment-options": impact(
     `Annual maintenance costs rose by S$${f(total(h.latest) - total(h.earlier))}.`,
-    "This covers eight buses and includes the S$11,255 repair increase. It is not a measure of possible savings.",
+    `This covers eight buses and includes the S$${f(h.latest.repair - h.earlier.repair)} repair increase. It is not a measure of possible savings.`,
     history,
     {
       kind: "calculation",
@@ -52,6 +52,6 @@ export const impacts: Partial<Record<string, Slide>> = {
       ],
       unit: "Singapore dollars · servicing + extra checks + repairs",
     },
-    "The totals are S$81,835 and S$65,045, giving a difference of S$16,790. This includes the S$11,255 repair increase rather than being additional to it. Repair-job charges overlap these totals too. The difference is recorded expenditure, not a sustained trend, price-adjusted comparison or guaranteed avoidable cost. Fuel, financing and unpriced replacement cover are outside these maintenance categories."
+    `The totals are S$${f(total(h.latest))} and S$${f(total(h.earlier))}, giving a difference of S$${f(total(h.latest) - total(h.earlier))}. This includes the S$${f(h.latest.repair - h.earlier.repair)} repair increase rather than being additional to it. Repair-job charges overlap these totals too. The difference is recorded expenditure, not a sustained trend, price-adjusted comparison or guaranteed avoidable cost. Fuel, financing and unpriced replacement cover are outside these maintenance categories.`
   ),
 }

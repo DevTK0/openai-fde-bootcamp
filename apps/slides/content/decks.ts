@@ -977,13 +977,13 @@ export const decks: Deck[] = baseDecks.map((deck) => {
         notes:
           "This section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.",
       },
-      ...limitationStories[deck.id]!.map((story, index): Slide => ({
+      ...limitationStories[deck.id]!.map((story): Slide => ({
         stage: "Caveat",
         title: story.title,
         caption: story.caption,
         source: deck.slides[4]!.source,
         visual: story.visual,
-        notes: `${story.title} ${story.caption}\n\n${review.caveats[index] ?? ""}\n\n${review.notes}\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.`,
+        notes: `${story.title} ${story.caption}\n\n${review.notes}\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.`,
       })),
       ...(impact ? [impact] : []),
     ],

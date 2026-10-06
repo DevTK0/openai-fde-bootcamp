@@ -83,19 +83,48 @@ You can also run `pnpm lint`, `pnpm typecheck`, or `pnpm test` individually.
 Repository conventions and instructions for coding agents live in
 [AGENTS.md](AGENTS.md).
 
+## LionLink dashboards
+
+Visit `/dashboard` for fleet history, maintenance, October operations, workshop and
+festival planning, the incident baseline, passenger accounts, and quoted cost options.
+Relationships connects maintenance costs, component care, passenger evidence, and
+planning constraints. Dates are Singapore local time; money is SGD excluding tax.
+All operating observations are fictional exercise records.
+
+The dashboard combines two sources with different coverage:
+
+- `Data/` contains five Excel workbooks, three historical CSV files, and documentation,
+  providing 40 handout tables with maintenance history for eight selected vehicles.
+  Its explorer supports search, column sorting, pagination, and filtered CSV export.
+- The separate `lionlink-operations-source` directory supplies 21 operations CSV tables:
+  172 operating vehicles, 24 services, 6,900 trips, and 252,380 stop calls. Departures
+  cover 06:00 to 11:59 on ten weekdays from 5 to 16 October 2026, with complete downstream
+  calls retained. Its explorer provides search, 25-row pagination, and downloads of
+  complete original CSV files compressed with gzip. Reliability and crowding reports
+  can be filtered by service and date; workshop resources are shown separately.
+
+The operations snapshot is checked in under `apps/web/data/operations/`, including
+compressed source tables, report aggregates, and a manifest with source definitions
+and checksums. Running the app does not require the external source directory.
+Rebuilding the snapshot requires that directory's `data/schema.json`, CSV files,
+and source documentation.
+
 ## Update the sample data
 
-The apps read generated snapshots. After editing the records in `Data/`, run:
+The apps read generated snapshots. After changing either source, run these commands
+in order. Replace the operations path with your source directory:
 
 ```bash
 python3 scripts/import-data.py
+python3 scripts/import-operations.py /path/to/lionlink-operations-source
 pnpm --filter @workspace/slides generate
 pnpm check
 ```
 
 Python's standard library is enough; no extra Python packages are needed.
-Review the slide conclusions after a refresh—their wording doesn't update
-with the numbers. Dates use Singapore local time and costs are SGD excluding tax.
+Review the authored slide figures and conclusions after a refresh. They do not
+update automatically. Restart the dashboard to clear its cached reports, and
+rebuild it for production deployment. Dates use Singapore local time and costs are SGD excluding tax.
 
 The dashboard has no authentication, so keep deployments private if you replace
 the fictional records with sensitive data.

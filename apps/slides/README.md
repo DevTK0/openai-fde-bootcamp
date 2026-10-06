@@ -98,9 +98,11 @@ when evidence changes. There is no separate custom editor or saved-edits API.
 ## nginx deployment
 
 Nginx proxies `/slides/` to the loopback Open Slide server on port 3001, including
-its WebSocket connection. Open Slide's root-relative authoring APIs are routed to
-the same server. The existing `/` route continues to serve Next.js. The site's
-existing access controls also cover authoring: anyone with site access can edit.
+its WebSocket connection. Open Slide's root-relative authoring APIs internally enter the `/slides/` location
+before proxying to the same server. Access controls configured on `/slides/`
+therefore cover editing APIs too. The existing `/` route continues to serve Next.js.
+Anyone allowed into the authoring app can edit. Keep access controls at the server
+level or inside the shared `/slides/` location.
 
 ```bash
 pnpm install --frozen-lockfile

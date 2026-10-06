@@ -314,14 +314,14 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
           <rect
             x="180"
             y="200"
-            width={(1340 * 340) / 596}
+            width={(1340 * v.regular) / (v.regular + v.provisional)}
             height="150"
             className="fill-primary"
           />
           <rect
-            x={180 + (1340 * 340) / 596}
+            x={180 + (1340 * v.regular) / (v.regular + v.provisional)}
             y="200"
-            width={(1340 * 256) / 596}
+            width={(1340 * v.provisional) / (v.regular + v.provisional)}
             height="150"
             fill="none"
             className="stroke-destructive"
@@ -335,7 +335,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             fontSize="64"
             className="fill-primary-foreground"
           >
-            340
+            {v.regular}
           </text>
           <text
             x="1240"
@@ -344,7 +344,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             fontSize="64"
             className="fill-destructive"
           >
-            256 ?
+            {v.provisional} ?
           </text>
           <Words x={550} y={420} text="Regular places" size={38} />
           <Words x={1240} y={420} text="Provisional places" size={38} />

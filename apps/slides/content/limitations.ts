@@ -1,20 +1,41 @@
+import evidence from "./evidence.json"
+
+const onward = evidence.allocations
+  .filter((allocation) => allocation["Route ID"] === "EXT-E2")
+  .map((allocation) => {
+    const limit = allocation["Planning limit per departure"]
+    const times = allocation["Proposed departure times local"]
+    if (limit === null || !times)
+      throw new Error(
+        "An onward allocation is missing its capacity or departures"
+      )
+    const departures = times.split("|").filter(Boolean)
+    return {
+      status: allocation["Allocation status"],
+      places: limit * departures.length,
+    }
+  })
+const regular = onward
+  .filter((allocation) => allocation.status === "protected regular")
+  .reduce((places, allocation) => places + allocation.places, 0)
+const provisional = onward
+  .filter((allocation) => allocation.status.startsWith("provisional"))
+  .reduce((places, allocation) => places + allocation.places, 0)
+
 export type LimitationVisual = {
   kind: "limitation"
-  layout:
-    | "history"
-    | "sample"
-    | "breakdown"
-    | "records"
-    | "money"
-    | "plan"
-    | "allocation"
   observed: string
   missing: string
   conclusion: string
   value?: string
   count?: number
   rows?: string[]
-}
+} & (
+  | { layout: "allocation"; regular: number; provisional: number }
+  | {
+      layout: "history" | "sample" | "breakdown" | "records" | "money" | "plan"
+    }
+)
 export type LimitationStory = {
   title: string
   caption: string
@@ -266,9 +287,11 @@ export const limitationStories: Record<string, LimitationStory[]> = {
       visual: {
         kind: "limitation",
         layout: "allocation",
-        observed: "Onward service: 596 listed places",
+        regular,
+        provisional,
+        observed: `Onward service: ${regular + provisional} listed places`,
         missing: "Confirm the provisional allocation",
-        conclusion: "256 places are not confirmed.",
+        conclusion: `${provisional} places are not confirmed.`,
       },
     },
     {
