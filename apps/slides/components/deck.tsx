@@ -148,6 +148,8 @@ function Arrow({
 }
 function Diagram({ visual }: { visual: Visual }) {
   switch (visual.kind) {
+    case "divider":
+      return null
     case "calculation":
       return (
         <>
@@ -752,6 +754,40 @@ export function SlideCanvas({
   slide: Slide
   index: number
 }) {
+  if (slide.visual.kind === "divider") {
+    return (
+      <section
+        aria-label={`${deck.title} — ${slide.stage}`}
+        className="flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+      >
+        <header className="border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
+          LIONLINK · {deck.title}
+        </header>
+        <div className="flex flex-1 items-center justify-between gap-24">
+          <div className="max-w-[1200px]">
+            <div className="mb-12 h-2 w-32 bg-destructive" />
+            <h1 className="text-[120px] leading-[1.05] font-semibold tracking-[-0.035em]">
+              {slide.title}
+            </h1>
+            <p className="mt-12 text-[36px] leading-snug text-muted-foreground">
+              {slide.caption}
+            </p>
+          </div>
+          <Search
+            className="size-[260px] shrink-0 text-muted-foreground"
+            strokeWidth={1}
+            aria-hidden="true"
+          />
+        </div>
+        <footer className="flex justify-between border-t border-border pt-5 text-[23px] text-muted-foreground">
+          <span>Stakeholder discussion</span>
+          <span className="tabular-nums">
+            {index + 1} / {deck.slides.length}
+          </span>
+        </footer>
+      </section>
+    )
+  }
   return (
     <section
       aria-label={`${deck.title} — ${slide.stage}`}

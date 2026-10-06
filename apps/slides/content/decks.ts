@@ -23,6 +23,7 @@ export type SymbolName =
   | "road"
 export type Step = { icon: SymbolName; label: string; concern?: boolean }
 export type Visual =
+  | { kind: "divider" }
   | {
       kind: "calculation"
       terms: { lines: string[]; value?: string }[]
@@ -968,6 +969,15 @@ export const decks: Deck[] = baseDecks.map((deck) => {
         ...slide,
         notes: `${slide.notes}${index > 0 ? `\n\nInterpretation: ${review.caveats[index - 1]}` : ""}`,
       })),
+      {
+        stage: "Section divider",
+        title: "Caveats & data requests",
+        caption: "What the evidence cannot yet tell us.",
+        source: deck.slides[0]!.source,
+        visual: { kind: "divider" },
+        notes:
+          "This section separates the observed problems from the limits of the supplied evidence. Each following slide explains one limitation and the existing business records that would help assess it.",
+      },
       ...limitationStories[deck.id]!.map((story, index): Slide => ({
         stage: "Stakeholder data request",
         title: story.title,

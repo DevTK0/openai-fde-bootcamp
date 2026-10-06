@@ -18,8 +18,12 @@ describe("plain-language visual decks", () => {
         existsSync(new URL(`../slides/${deck.id}/index.tsx`, import.meta.url))
       ).toBe(true)
       expect(deck.slides[0]?.stage).toBe("How it works")
-      expect(deck.slides[4]?.stage).toBe("Stakeholder data request")
-      expect(deck.slides[4]?.visual.kind).toBe("limitation")
+      expect(deck.slides[4]?.stage).toBe("Section divider")
+      expect(
+        deck.slides.filter((slide) => slide.visual.kind === "divider")
+      ).toHaveLength(1)
+      expect(deck.slides[5]?.stage).toBe("Stakeholder data request")
+      expect(deck.slides[4]?.visual.kind).toBe("divider")
       const requests = deck.slides.filter(
         (slide) => slide.stage === "Stakeholder data request"
       )
