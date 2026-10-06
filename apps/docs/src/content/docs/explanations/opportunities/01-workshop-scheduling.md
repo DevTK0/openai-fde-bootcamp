@@ -33,4 +33,4 @@ The prototype passes if an independent replay finds no resource overlap, all eig
 
 ## Difference from nearby ideas
 
-[Crew-duty checking](/docs/explanations/opportunities/04-crew-duty-checking/) judges a proposed assignment but does not choose workshop start times. [Festival simulation](/docs/explanations/opportunities/05-festival-simulation/) explores uncertain queues rather than finding one resource-feasible booking. [Inventory replenishment](/docs/explanations/opportunities/08-spare-parts/) chooses stock thresholds across repeated demand, not individual appointments.
+[Crew-duty checking](/docs/explanations/opportunities/04-crew-duty-checking/) judges a proposed assignment but does not assign job start times. [Festival simulation](/docs/explanations/opportunities/05-festival-simulation/) explores uncertain queues rather than finding one resource-feasible booking. [Inventory replenishment](/docs/explanations/opportunities/08-spare-parts/) chooses stock thresholds across repeated demand, not individual appointments.

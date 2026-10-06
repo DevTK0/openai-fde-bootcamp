@@ -1,8 +1,6 @@
 ---
 title: Distinct problems and solution mechanisms
 description: Proposed LionLink projects distinguished by their decisions, inputs, and implementation mechanisms.
-sidebar:
-  order: 0
 ---
 
 These proposals extend the fictional LionLink exercise into possible projects.
