@@ -22,12 +22,13 @@ Developer setup:
 2. Open an agent session in this checkout. Skills are versioned under `.agents/skills/`.
 3. Start with `/pstack <task>`. In Codex's native skill UI, use `$pstack` or
    select it through `/skills`. The checked-in `.agents/skills/` directories
-   register all 35 skills for this repository. Restart the session if the new entry does not appear.
+   register all 36 skills for this repository. Restart the session if the new entry does not appear.
 4. If the client intercepts `/pstack`, use `$pstack` or
    `Read .agents/skills/pstack/SKILL.md and use it for <task>`.
 
 See [.agents/skills/README.md](.agents/skills/README.md) for the included skills, all 24
-principles, the five shipping/autopilot playbooks, upstream revision, and local adaptations.
+principles, the six playbooks, upstream revision, and local adaptations.
+For upstream skill imports or updates, follow [.agents/skills/pstack/playbooks/adapting-skills.md](.agents/skills/pstack/playbooks/adapting-skills.md). It contains the adaptation procedure without requiring a README read.
 No global installation or companion plugin is required. Edit skill sources directly in `.agents/skills/`.
 
 These skills target Codex. Ordinary delivery runs sequentially. Parallel workers
