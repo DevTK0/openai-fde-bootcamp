@@ -7,29 +7,28 @@ Turborepo + pnpm workspace.
 - `apps/web` – Next.js app (App Router, Tailwind CSS v4).
 - `packages/ui` – shared shadcn/ui component library, published to the workspace as `@workspace/ui`.
 - `packages/eslint-config`, `packages/typescript-config` – shared tooling configs.
-- `skills` – repository-owned agent workflows for the software factory.
+- `.agents/skills` – repository-owned agent workflows for the software factory.
 
 ## Pstack skills
 
 The repository's software factory entrypoint is `/pstack`. When a user starts a
-request with `/pstack`, read [skills/pstack/SKILL.md](skills/pstack/SKILL.md) and
+request with `/pstack`, read [.agents/skills/pstack/SKILL.md](.agents/skills/pstack/SKILL.md) and
 follow the matching playbook. Codex discovers the skill through `.agents/skills/pstack`; `/pstack` is a
 repository prompt alias, while `$pstack` is the native skill invocation.
 
 Developer setup:
 
 1. Use the Node and pnpm versions specified in `package.json`, then run `pnpm install`.
-2. Open an agent session in this checkout. Skills are versioned under `skills/`.
+2. Open an agent session in this checkout. Skills are versioned under `.agents/skills/`.
 3. Start with `/pstack <task>`. In Codex's native skill UI, use `$pstack` or
-   select it through `/skills`. The checked-in `.agents/skills/` symlinks
+   select it through `/skills`. The checked-in `.agents/skills/` directories
    register all 35 skills for this repository. Restart the session if the new entry does not appear.
 4. If the client intercepts `/pstack`, use `$pstack` or
-   `Read skills/pstack/SKILL.md and use it for <task>`.
+   `Read .agents/skills/pstack/SKILL.md and use it for <task>`.
 
-See [skills/README.md](skills/README.md) for the included skills, all 24
+See [.agents/skills/README.md](.agents/skills/README.md) for the included skills, all 24
 principles, the five shipping/autopilot playbooks, upstream revision, and local adaptations.
-No global installation or companion plugin is required. Keep edits in `skills/`;
-do not duplicate skill sources under the discovery directory.
+No global installation or companion plugin is required. Edit skill sources directly in `.agents/skills/`.
 
 These skills target Codex. Ordinary delivery runs sequentially. Parallel workers
 are allowed only inside an explicitly invoked swarm or an executing autopilot
