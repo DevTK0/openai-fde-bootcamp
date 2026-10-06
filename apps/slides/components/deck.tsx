@@ -147,6 +147,91 @@ function Arrow({
 }
 function Diagram({ visual }: { visual: Visual }) {
   switch (visual.kind) {
+    case "calculation":
+      return (
+        <>
+          {visual.terms.map((term, i) => (
+            <g key={i}>
+              {term.value && (
+                <text
+                  x={260 + i * 590}
+                  y={260}
+                  textAnchor="middle"
+                  fontSize="86"
+                  fontWeight="600"
+                  fill="currentColor"
+                  className={i === 2 ? "text-destructive" : "text-foreground"}
+                >
+                  {term.value}
+                </text>
+              )}
+              {term.lines.map((line, j) => (
+                <text
+                  key={line}
+                  x={260 + i * 590}
+                  y={(term.value ? 350 : 250) + j * 58}
+                  textAnchor="middle"
+                  fontSize="38"
+                  fill="currentColor"
+                >
+                  {line}
+                </text>
+              ))}
+            </g>
+          ))}
+          <Label x={555} y={275} large>
+            {visual.operator}
+          </Label>
+          <Label x={1145} y={275} large>
+            =
+          </Label>
+          <Label x={850} y={535} muted>
+            {visual.unit}
+          </Label>
+        </>
+      )
+    case "measures":
+      return (
+        <>
+          {visual.items.map((item, i) => (
+            <g key={item.label}>
+              <text
+                x={430 + i * 840}
+                y={255}
+                textAnchor="middle"
+                fontSize="100"
+                fontWeight="600"
+                fill="currentColor"
+              >
+                {item.value}
+              </text>
+              <Label x={430 + i * 840} y={365} large>
+                {item.label}
+              </Label>
+              <Label x={430 + i * 840} y={440} muted>
+                {item.detail}
+              </Label>
+            </g>
+          ))}
+        </>
+      )
+    case "data-request":
+      return (
+        <>
+          <Symbol name="chart" x={420} y={250} size={160} />
+          <Arrow x1={660} x2={1040} y={250} />
+          <Symbol name={visual.item.icon} x={1280} y={250} size={160} />
+          <Label x={420} y={410}>
+            {visual.item.uncertainty}
+          </Label>
+          <Label x={1280} y={410}>
+            {visual.item.label}
+          </Label>
+          <Label x={1280} y={475} muted>
+            {visual.item.detail}
+          </Label>
+        </>
+      )
     case "journey": {
       const xs = visual.steps.map(
         (_, i) => 200 + (i * 1300) / (visual.steps.length - 1)

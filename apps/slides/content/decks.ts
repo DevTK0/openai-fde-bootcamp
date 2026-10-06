@@ -1,4 +1,6 @@
 import evidence from "./evidence.json"
+import { reviews } from "./review"
+import { impacts } from "./impact"
 
 export type SymbolName =
   | "bus"
@@ -20,6 +22,25 @@ export type SymbolName =
   | "road"
 export type Step = { icon: SymbolName; label: string; concern?: boolean }
 export type Visual =
+  | {
+      kind: "calculation"
+      terms: { lines: string[]; value?: string }[]
+      operator: "−" | "÷" | "×"
+      unit: string
+    }
+  | {
+      kind: "measures"
+      items: { value: string; label: string; detail: string }[]
+    }
+  | {
+      kind: "data-request"
+      item: {
+        icon: SymbolName
+        label: string
+        detail: string
+        uncertainty: string
+      }
+    }
   | {
       kind: "journey"
       steps: Step[]
@@ -138,10 +159,10 @@ const initial = evidence.incident.requirements["Initial waiting people"],
 const protectedTrips = evidence.plannedTrips
 const historicalScope = "Same eight selected buses · not the whole fleet"
 const operatingScope = "Ten supplied weekdays · not a complete month"
-export const decks: Deck[] = [
+const baseDecks: Deck[] = [
   {
     id: "repair-spend",
-    title: "Repair costs are rising faster than use",
+    title: "Repair costs were higher in the second year",
     scope: historicalScope,
     slides: [
       slide(
@@ -178,7 +199,7 @@ export const decks: Deck[] = [
       ),
       slide(
         "Recorded evidence",
-        "The same distance now costs more to repair.",
+        "Repair spending per kilometre was higher in the second year.",
         "Repair spending per 1,000 km; this accounts for the increase in use.",
         history,
         bars("Singapore dollars per 1,000 km", [
@@ -432,7 +453,7 @@ export const decks: Deck[] = [
   },
   {
     id: "capacity-use",
-    title: "The same bus is full on some days and mostly empty on others",
+    title: "Bus use varies sharply at the same departure",
     scope: "One morning departure · all ten supplied dates",
     slides: [
       slide(
@@ -943,3 +964,29 @@ export const decks: Deck[] = [
     ],
   },
 ]
+
+export const decks: Deck[] = baseDecks.map((deck) => {
+  const review = reviews[deck.id]!
+  const impact = impacts[deck.id]
+  return {
+    ...deck,
+    slides: [
+      ...deck.slides.slice(0, 4).map((slide, index) => ({
+        ...slide,
+        notes: `${slide.notes}${index > 0 ? `\n\nInterpretation: ${review.caveats[index - 1]}` : ""}`,
+      })),
+      ...review.items.map((item, index): Slide => ({
+        stage: "Stakeholder data request",
+        title: `${review.uncertainties[index]}.`,
+        caption: `Please share ${item.label.charAt(0).toLowerCase() + item.label.slice(1)}: ${item.detail.charAt(0).toLowerCase() + item.detail.slice(1)}.`,
+        source: deck.slides[4]!.source,
+        visual: {
+          kind: "data-request",
+          item: { ...item, uncertainty: review.uncertainties[index]! },
+        },
+        notes: `This page concerns one gap: ${review.uncertainties[index]}. Request the existing ${item.label.toLowerCase()} (${item.detail.toLowerCase()}). The request extends the supplied material, not the operator's data-collection obligations. Confirm what is already retained before discussing additional analysis. These are fictional exercise records; validate against actual business records.`,
+      })),
+      ...(impact ? [impact] : []),
+    ],
+  }
+})

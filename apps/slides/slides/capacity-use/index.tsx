@@ -3,7 +3,7 @@ import { decks } from "../../content/decks"
 
 const deck = decks.find((deck) => deck.id === "capacity-use")!
 export const meta = {
-  title: "The same bus is full on some days and mostly empty on others",
+  title: "Bus use varies sharply at the same departure",
 }
 export const notes = speakerNotes(deck)
 export default createDeck(deck)
