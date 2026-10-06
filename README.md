@@ -67,7 +67,7 @@ The main places to work are:
 | [apps/slides](apps/slides) | Presentations and supporting evidence |
 | [packages/ui](packages/ui) | Shared shadcn/ui components and theme |
 | [skills](.agents/skills) | Codex workflows and principles |
-| [Data](Data) | Sample workbooks, CSVs, and source documentation |
+| [apps/web/lib/fleet-data.json](apps/web/lib/fleet-data.json) | Converted handout data and source documentation |
 
 Use the shared components for UI work. To add a missing shadcn component, run
 `pnpm dlx shadcn@latest add <component> -c apps/web` from the repo root.
@@ -110,10 +110,14 @@ and checksums. Running the app does not require the external source directory.
 The original handout files and Python conversion scripts are no longer included
 in this repository. The apps use the checked-in snapshots directly.
 
-## Update the sample data
+## Refresh slide evidence
 
-After updating the checked-in snapshots, regenerate the slide evidence and run
-the checks:
+The checked-in snapshots are fixed exercise fixtures. This repository no longer
+includes a workflow to import new source data. Replacing the fixtures requires
+coordinated updates to the operations manifest, compressed source tables, report
+aggregates, passenger matches, and boarding history.
+
+To regenerate slide evidence from the existing snapshots and check consistency:
 
 ```bash
 pnpm --filter @workspace/slides generate

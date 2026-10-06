@@ -959,7 +959,7 @@ export function FleetDashboard() {
           {section === "explorer" && <Explorer />}
           <footer className="border-t pt-5 text-xs text-muted-foreground">
             LionLink · Selected exercise records · Singapore time (UTC+08) ·
-            Sources: Data/ + lionlink-operations-source
+            Sources: supplied fleet handouts and operations records
           </footer>
         </main>
       </SidebarInset>
