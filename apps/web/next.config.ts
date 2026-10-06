@@ -2,6 +2,7 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],
+  outputFileTracingIncludes: { "/api/operations": ["./data/operations/**/*"] },
   // Allow the VM proxy and the collaborative browser development hostname.
   allowedDevOrigins: [
     "valley-or-edit.exe.xyz",
