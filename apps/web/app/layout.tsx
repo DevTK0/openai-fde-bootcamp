@@ -16,8 +16,9 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Dashboard | OpenAI FDE",
-  description: "Workspace dashboard with analytics and documents.",
+  title: "LionLink | Fleet Intelligence",
+  description:
+    "Fleet maintenance, operations, planning, and source-data dashboards for the LionLink exercise.",
 }
 
 export default function RootLayout({
