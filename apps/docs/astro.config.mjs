@@ -42,6 +42,10 @@ export default defineConfig({
           label: "Explanation",
           items: [
             {
+              label: "Problems and solutions",
+              autogenerate: { directory: "explanations/opportunities" },
+            },
+            {
               label: "Repair spending and distance",
               slug: "maintenance-findings",
             },

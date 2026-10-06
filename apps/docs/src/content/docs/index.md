@@ -31,3 +31,8 @@ recorded distance, and the difference between a total and a rate.
 - [Why the workshop requests cannot run together](/docs/workshop-findings/)
 - [What six passenger accounts can tell us](/docs/passenger-findings/)
 - [Why a lower quote is not automatically the better option](/docs/cost-findings/)
+
+## Explore possible projects
+
+[Distinct problems and solution mechanisms](/docs/explanations/opportunities/)
+examines proposed projects, the data they need, and experiments that can reject them.
