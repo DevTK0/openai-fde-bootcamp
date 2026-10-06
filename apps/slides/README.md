@@ -19,7 +19,7 @@ pnpm check
 
 The normal `pnpm dev` and `pnpm build` include this app. Evidence is generated
 before dev/build from `apps/web/lib/fleet-data.json` and the compressed operations
-summary, plus the selected departure’s complete ten-date boarding history. After refreshing the web imports, regenerate the evidence and review the corresponding authored slides.
+summary, plus the selected departure’s complete ten-date boarding history. After updating the web snapshots, regenerate the evidence and review the corresponding authored slides.
 A running dev session needs `pnpm --filter @workspace/slides generate` after a
 source refresh. Original editorial conclusions and planning assumptions remain in
 `content/decks.ts`; the editable deck files do not automatically adapt to changed evidence.

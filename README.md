@@ -93,8 +93,9 @@ All operating observations are fictional exercise records.
 
 The dashboard combines two sources with different coverage:
 
-- `Data/` contains five Excel workbooks, three historical CSV files, and documentation,
-  providing 40 handout tables with maintenance history for eight selected vehicles.
+- `apps/web/lib/fleet-data.json` contains the converted data and documentation from
+  five Excel workbooks and three historical CSV files, providing 40 handout tables
+  with maintenance history for eight selected vehicles.
   Its explorer supports search, column sorting, pagination, and filtered CSV export.
 - The separate `lionlink-operations-source` directory supplies 21 operations CSV tables:
   172 operating vehicles, 24 services, 6,900 trips, and 252,380 stop calls. Departures
@@ -106,22 +107,19 @@ The dashboard combines two sources with different coverage:
 The operations snapshot is checked in under `apps/web/data/operations/`, including
 compressed source tables, report aggregates, and a manifest with source definitions
 and checksums. Running the app does not require the external source directory.
-Rebuilding the snapshot requires that directory's `data/schema.json`, CSV files,
-and source documentation.
+The original handout files and Python conversion scripts are no longer included
+in this repository. The apps use the checked-in snapshots directly.
 
 ## Update the sample data
 
-The apps read generated snapshots. After changing either source, run these commands
-in order. Replace the operations path with your source directory:
+After updating the checked-in snapshots, regenerate the slide evidence and run
+the checks:
 
 ```bash
-python3 scripts/import-data.py
-python3 scripts/import-operations.py /path/to/lionlink-operations-source
 pnpm --filter @workspace/slides generate
 pnpm check
 ```
 
-Python's standard library is enough; no extra Python packages are needed.
 Review the authored slide figures and conclusions after a refresh. They do not
 update automatically. Restart the dashboard to clear its cached reports, and
 rebuild it for production deployment. Dates use Singapore local time and costs are SGD excluding tax.
