@@ -1,0 +1,42 @@
+---
+title: Why the workshop requests cannot run together
+description: The two tentative requests compete for the same bay and technician capacity.
+---
+
+import { FindingFigure } from "../../components/FindingFigure";
+import { workshopChart } from "../../lib/findings";
+
+Two maintenance requests are proposed for 09:00 on 19 October 2026. Each needs a
+bay. Together they need three technicians, while the workshop has one bay and two
+technicians available at a time.
+
+## The clash exists before considering service cover
+
+The requests exceed both bay and technician capacity at their common start time.
+The resource comparison identifies a scheduling conflict; it does not approve a
+new schedule or make a replacement vehicle available.
+
+<FindingFigure
+  client:load
+  {...workshopChart}
+  source="Source: Maintenance planning, Requested maintenance and Bay and staffing capacity. Issued 16 October 2026 for 19 October. Fictional planning records."
+/>
+
+One request has a proposed end time of 11:00 and the other 13:00. Moving a request
+may remove the overlap, but a workable plan also needs enough time, staff, duty
+cover, and a confirmed release for the vehicle.
+
+## A tentative end time is not a release
+
+Only one additional cover vehicle is offered in the supplied planning records.
+The protected service duties and named crews still need to be covered. A vehicle
+cannot be treated as ready merely because its tentative workshop end time has passed.
+
+The proposed times remain planning inputs until Engineering confirms release.
+
+## Keep plans separate from outcomes
+
+The graph shows requested resources, not resources consumed by completed work.
+It does not establish which plan was chosen, whether either job finished, or what
+service disruption occurred. The same distinction applies to festival proposals
+and incident assumptions in the supplied planning records.

@@ -11,7 +11,7 @@ presentations. Both use fictional sample data.
 
 ## Run it locally
 
-You'll need **Node.js 20.9+** and **pnpm 12.9.1**. From the repository root:
+You'll need **Node.js 22.12+** and **pnpm 12.9.1**. From the repository root:
 
 ```bash
 pnpm install
@@ -22,10 +22,11 @@ Then open:
 
 - [Fleet dashboard](http://localhost:3000/dashboard)
 - [Slide decks](http://127.0.0.1:3001/slides/)
+- [Documentation](http://127.0.0.1:3002/docs/)
 
 If port 3000 is occupied, use the web address printed in the terminal.
 To start just one app, use `pnpm --filter web dev` or
-`pnpm --filter @workspace/slides dev`.
+`pnpm --filter @workspace/slides dev`, or `pnpm --filter @workspace/docs dev`.
 
 ## Ship changes with Codex
 
@@ -65,6 +66,7 @@ The main places to work are:
 | --- | --- |
 | [apps/web](apps/web) | Dashboard pages and app components |
 | [apps/slides](apps/slides) | Presentations and supporting evidence |
+| [apps/docs](apps/docs) | Astro Starlight documentation served at `/docs/` |
 | [packages/ui](packages/ui) | Shared shadcn/ui components and theme |
 | [skills](.agents/skills) | Codex workflows and principles |
 | [apps/web/lib/fleet-data.json](apps/web/lib/fleet-data.json) | Converted handout data and source documentation |
@@ -133,3 +135,9 @@ the fictional records with sensitive data.
 
 For the deck list, data caveats, and slide deployment instructions, see the
 [slides README](apps/slides/README.md).
+
+## Documentation deployment
+
+Run `bash scripts/deploy-docs.sh` to build and publish the Astro Starlight docs on this VM.
+Nginx serves the static release at `/docs/`. The nginx snippet is `deploy/nginx/docs.conf`. Verify the published site with
+`python3 scripts/verify-docs.py http://127.0.0.1:8000`.

@@ -1,0 +1,16 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "$TURBO_ROOT$/apps/web/lib/fleet.ts",
+        "$TURBO_ROOT$/apps/web/lib/fleet-data.json",
+        "$TURBO_ROOT$/apps/web/lib/operations.ts",
+        "$TURBO_ROOT$/apps/web/data/operations/summary.json.gz",
+        "$TURBO_ROOT$/apps/web/data/operations/manifest.json"
+      ]
+    }
+  }
+}

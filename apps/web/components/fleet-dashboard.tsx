@@ -1,7 +1,9 @@
 "use client"
 
+import { Plot } from "@workspace/ui/components/report-chart"
+
 import { useState } from "react"
-import { Pick, Notice, Metric, Plot, Records } from "@/components/report-ui"
+import { Pick, Notice, Metric, Records } from "@/components/report-ui"
 import {
   OperationsDashboard,
   OperationsSources,
