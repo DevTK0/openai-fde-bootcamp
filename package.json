@@ -1,0 +1,12 @@
+{
+  "name": "astro-coolify-smoke",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "astro build"
+  },
+  "dependencies": {
+    "astro": "7.3.5"
+  }
+}
