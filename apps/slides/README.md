@@ -49,13 +49,16 @@ All paths start with `/slides/s/`:
 Each starts with a plain-language introduction to bus operations, then shows the
 problem, supporting observations, business significance and evidence limits. Every page has a visual and a
 readable data-source citation. After the problem pages, each limitation and its corresponding existing-record request
-gets a separate full slide, using the same large-icon diagram style as the problem slides. Only the two maintenance decks retain impact pages, showing recorded dollar increases.
+gets a separate full slide explaining the conclusion that the extract cannot support.
+Diagrams show the limitation itself: limited time coverage, selected samples, proposed
+versus completed work, missing cost breakdowns, or provisional capacity. Only the two maintenance decks retain impact pages, showing recorded dollar increases.
 The other nine omit impact: the supplied data cannot establish a dollar or ridership change.
 Requests focus on more history and routine operating, workshop and accounting records;
 no new passenger tracking or customer research is requested. Detailed caveats also
 appear in speaker notes. There are no small evidence-limit strips.
-Editorial caveats and requests live in `content/review.ts`; quantitative impacts live in `content/impact.ts`. Slides and notes exclude internal vehicle identifiers and code paths.
-Use **Present** for slideshow mode; `?p=2` links directly to a page. The dashboard header links to the deck browser.
+Presenter caveats live in `content/review.ts`; limitation narratives and diagram data
+live in `content/limitations.ts`; monetary impacts live in `content/impact.ts`. Slides and notes exclude internal vehicle identifiers and code paths.
+Use **Present** for slideshow mode; `?p=2` links directly to a page.
 
 ## nginx deployment
 

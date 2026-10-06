@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import type { Deck, Slide, SymbolName, Visual } from "../content/decks"
 import "./deck.css"
+import { LimitationDiagram } from "./limitation"
 
 const symbols = {
   bus: BusFront,
@@ -215,23 +216,8 @@ function Diagram({ visual }: { visual: Visual }) {
           ))}
         </>
       )
-    case "data-request":
-      return (
-        <>
-          <Symbol name="chart" x={420} y={250} size={160} />
-          <Arrow x1={660} x2={1040} y={250} />
-          <Symbol name={visual.item.icon} x={1280} y={250} size={160} />
-          <Label x={420} y={410}>
-            {visual.item.uncertainty}
-          </Label>
-          <Label x={1280} y={410}>
-            {visual.item.label}
-          </Label>
-          <Label x={1280} y={475} muted>
-            {visual.item.detail}
-          </Label>
-        </>
-      )
+    case "limitation":
+      return <LimitationDiagram visual={visual} />
     case "journey": {
       const xs = visual.steps.map(
         (_, i) => 200 + (i * 1300) / (visual.steps.length - 1)

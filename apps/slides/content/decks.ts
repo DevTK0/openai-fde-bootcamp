@@ -1,6 +1,7 @@
 import evidence from "./evidence.json"
 import { reviews } from "./review"
 import { impacts } from "./impact"
+import { limitationStories, type LimitationVisual } from "./limitations"
 
 export type SymbolName =
   | "bus"
@@ -32,15 +33,7 @@ export type Visual =
       kind: "measures"
       items: { value: string; label: string; detail: string }[]
     }
-  | {
-      kind: "data-request"
-      item: {
-        icon: SymbolName
-        label: string
-        detail: string
-        uncertainty: string
-      }
-    }
+  | LimitationVisual
   | {
       kind: "journey"
       steps: Step[]
@@ -975,16 +968,13 @@ export const decks: Deck[] = baseDecks.map((deck) => {
         ...slide,
         notes: `${slide.notes}${index > 0 ? `\n\nInterpretation: ${review.caveats[index - 1]}` : ""}`,
       })),
-      ...review.items.map((item, index): Slide => ({
+      ...limitationStories[deck.id]!.map((story, index): Slide => ({
         stage: "Stakeholder data request",
-        title: `${review.uncertainties[index]}.`,
-        caption: `Please share ${item.label.charAt(0).toLowerCase() + item.label.slice(1)}: ${item.detail.charAt(0).toLowerCase() + item.detail.slice(1)}.`,
+        title: story.title,
+        caption: story.caption,
         source: deck.slides[4]!.source,
-        visual: {
-          kind: "data-request",
-          item: { ...item, uncertainty: review.uncertainties[index]! },
-        },
-        notes: `This page concerns one gap: ${review.uncertainties[index]}. Request the existing ${item.label.toLowerCase()} (${item.detail.toLowerCase()}). The request extends the supplied material, not the operator's data-collection obligations. Confirm what is already retained before discussing additional analysis. These are fictional exercise records; validate against actual business records.`,
+        visual: story.visual,
+        notes: `${story.title} ${story.caption}\n\n${review.caveats[index] ?? ""}\n\n${review.notes}\n\nMissing records are absent from the supplied extract, not necessarily from the business. No unobserved data points or financial outcomes are estimated in this diagram.`,
       })),
       ...(impact ? [impact] : []),
     ],
