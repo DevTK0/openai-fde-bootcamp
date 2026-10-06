@@ -19,7 +19,7 @@ our repository prompt alias, not a new built-in Codex command. If a client
 intercepts unknown slash commands, use `$pstack` or explicitly ask the agent to
 read `.agents/skills/pstack/SKILL.md`. See the [official skill discovery documentation](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
 
-All 35 skills (the entrypoint, 10 supporting skills, and 24 principles) are
+All 36 skills (the entrypoint, 11 supporting skills, and 24 principles) are
 stored directly in `.agents/skills/`. Playbooks are loaded
 by `/pstack`. Edit the skill sources in place. The skills are available to Codex on the next turn.
 No global installation, model configuration, or companion plugin is required.
@@ -39,6 +39,7 @@ All **24 principles** are included. Their index and triggers are in
 | [maintain-verification-skill](maintain-verification-skill/SKILL.md) | Audit source and live behavior against an existing verification map. |
 | [typescript-best-practices](typescript-best-practices/SKILL.md) | Apply the type-system principles to TypeScript. |
 | [swarm](swarm/SKILL.md) | Coordinate independent workers and aggregate evidence-backed coverage. |
+| [figure-it-out](figure-it-out/SKILL.md) | Design an auditable workflow when no narrower playbook fits. |
 | [how](how/SKILL.md) | Trace the system before changing it. |
 | [architect](architect/SKILL.md) | Sketch usage, types, and boundaries before implementation. |
 | [tdd](tdd/SKILL.md) | Failing-before, passing-after evidence for cheap regression tests. |
@@ -46,14 +47,16 @@ All **24 principles** are included. Their index and triggers are in
 | [technical-writing](technical-writing/SKILL.md) | Structure clear documentation and technical explanations. |
 | [show-me-your-work](show-me-your-work/SKILL.md) | Preserve decision evidence, as referenced by Prove It Works. |
 
-The **5 shipping/autopilot playbooks** cover:
+The **7 playbooks** cover:
 
 | Area | Playbooks |
 | --- | --- |
 | Autopilot | [autopilot-full](pstack/playbooks/autopilot-full.md), [autopilot-stack](pstack/playbooks/autopilot-stack.md) |
+| Autonomous execution | [autonomous run](pstack/playbooks/autonomous-run.md) |
+| Skill maintenance | [adapting skills](pstack/playbooks/adapting-skills.md) |
 | PR lifecycle | [opening a PR](pstack/playbooks/opening-a-pr.md), [babysit](pstack/playbooks/babysit.md), [shipping](pstack/playbooks/shipping.md) |
 
-There are **10 supporting skills**, plus the entrypoint and all 24 principles.
+There are **11 supporting skills**, plus the entrypoint and all 24 principles.
 The verification skills are generators and maintenance workflows; no app-specific
 `verify-*` skill has been generated yet. Invoke `/pstack create a verification
 skill for apps/web` to run that workflow separately.
@@ -71,6 +74,8 @@ Imported from `cursor/plugins`, directory `pstack`, at commit
 [`df581122cde17e6e27686b5a448bde23e4ad4318`](https://github.com/cursor/plugins/tree/df581122cde17e6e27686b5a448bde23e4ad4318/pstack).
 Upstream's MIT notice is preserved in [LICENSE](LICENSE).
 
+- Added `autonomous-run` from the same revision, replacing Cursor loops and watcher defaults with bounded session waits, scoped fixes, and explicit handoff instructions.
+- Added `figure-it-out` from the same revision, with local skill resolution, sequential delivery, scoped rollback, and session-bound supervision. Removed Cursor-only invocation frontmatter, consistent with the other imported skills.
 - Renamed `poteto-mode` to `pstack` and trimmed its routing to the bundled subset.
 - Preserved the principles with focused corrections to nonnegative-duration
   modeling and test-assertion guidance. TypeScript examples also preserve tuple
@@ -116,8 +121,7 @@ Stopped writers must be confirmed before branch reassignment. Stack topology has
 one writer, and lease-protected pushes use the captured remote tip.
 
 Codex instructions live directly in the affected skills and playbooks.
-For updates, compare the corresponding file at the pinned commit, preserve its
-wording where possible, and reapply only the documented adaptations. Supporting
+For imports and updates, follow [Adapting skills](pstack/playbooks/adapting-skills.md), routed directly from the pstack entrypoint. That playbook contains the procedure and adaptation rules without requiring this README. Supporting
 references and the decision-log helper retain their upstream layout.
 
 ## MVP discussion
