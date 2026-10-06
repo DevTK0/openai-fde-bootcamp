@@ -1,0 +1,21 @@
+[Unit]
+Description=LionLink browser slide editor API
+After=network.target
+
+[Service]
+Type=simple
+User=exedev
+WorkingDirectory=/home/exedev/.t3/projects/openai-fde/apps/slides
+Environment=SLIDES_CATALOG_PATH=/var/www/openai-fde/slides/editor-catalog.json
+Environment=SLIDES_STORE_PATH=/var/lib/openai-fde-slides
+Environment=PORT=3002
+ExecStart=/usr/bin/node scripts/editor-server.mjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/openai-fde-slides
+
+[Install]
+WantedBy=multi-user.target

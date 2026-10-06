@@ -43,6 +43,11 @@
         "$TURBO_ROOT$/apps/web/data/operations/summary.json.gz",
         "$TURBO_ROOT$/apps/web/lib/boarding-history.json"
       ]
+    },
+    "@workspace/slides#editor:server": {
+      "cache": false,
+      "persistent": true,
+      "env": ["SLIDES_CATALOG_PATH", "SLIDES_STORE_PATH", "PORT"]
     }
   }
 }

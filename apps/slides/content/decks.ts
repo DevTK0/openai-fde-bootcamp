@@ -71,6 +71,7 @@ export type Visual =
     }
   | { kind: "quote"; text: string; attribution: string }
 export type Slide = {
+  diagramText?: Record<string, string>
   title: string
   caption: string
   source: string

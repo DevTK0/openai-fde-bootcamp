@@ -43,3 +43,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Saved browser slide edits (deployment data)
+apps/slides/.editor-data/

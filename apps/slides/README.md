@@ -60,16 +60,40 @@ Presenter caveats live in `content/review.ts`; limitation narratives and diagram
 live in `content/limitations.ts`; monetary impacts live in `content/impact.ts`. Slides and notes exclude internal vehicle identifiers and code paths.
 Use **Present** for slideshow mode; `?p=2` links directly to a page.
 
+## Browser editing
+
+Open a deck at `/slides/` and choose **Edit deck**, or visit `/slides/editor/`.
+Select a slide, edit its Text, Chart values or diagram Labels, then **Save changes**.
+The preview updates immediately; saving updates the shared presentation. Headline
+figures and chart values are separate fields: keep them consistent when changing data.
+The existing slide layouts are preserved. Reset restores an individual slide to its
+source version after saving. Unsaved changes can be discarded.
+
+Edits persist on the server, separately from report data and builds. Concurrent saves
+are rejected with a reload message instead of overwriting another person's changes.
+When a source slide changes after a rebuild, its old override is retained on disk but
+not applied; the editor identifies the affected slide for review.
+
+`pnpm --filter @workspace/slides start` provides the complete editor locally after a
+build. Local edits live in `apps/slides/.editor-data/edits`. The source development
+server previews code changes and uses the same local storage; rebuild/start to test
+the standalone editor and its launcher.
+
 ## nginx deployment
 
-The production app is static: nginx serves the generated app directly at `/slides/`.
-No persistent Node process is required for slides. The existing `/` proxy continues
-to serve Next.js. The dev authoring server stays local on port 3001.
+Nginx serves the generated viewer and editor at `/slides/`, and proxies `/slides/api/`
+to a loopback Node service on port 3002. The service is required to load and save
+slides. The existing `/` proxy continues to serve Next.js. The editor shares the
+site’s access controls: everyone with access to the site can edit the decks.
 
 ```bash
 pnpm --filter @workspace/slides build
 sudo install -d /var/www/openai-fde/slides
 sudo cp -a apps/slides/dist/. /var/www/openai-fde/slides/
+sudo install -d -o exedev -g exedev -m 700 /var/lib/openai-fde-slides
+sudo install -m 644 deploy/systemd/openai-fde-slides-editor.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now openai-fde-slides-editor
 sudo install -m 644 deploy/nginx/slides.conf /etc/nginx/snippets/openai-fde-slides.conf
 ```
 
@@ -91,9 +115,14 @@ and presenter links. Missing assets return 404. Copying a new build retains old
 hashed assets for already-open browser sessions; prune them during maintenance.
 The exe.dev HTTPS proxy and its visibility setting are unchanged.
 
+Back up `/var/lib/openai-fde-slides` to preserve production edits. Rebuilds do not
+replace it. Adjust the service working directory and user when deploying elsewhere.
+Restart the service after changing server code.
+
 Open Slide's source-editing endpoints are development-only. Version 2.0.1 may
 probe `/__comments` and `/__design` in a static viewer and receive harmless 404s;
-presentation and navigation continue to work. Edit authored decks in this repo.
+presentation and navigation continue to work. Browser editing uses the dedicated
+validated data API, not those source-editing endpoints.
 
 ## Evidence limits
 

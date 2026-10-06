@@ -23,6 +23,8 @@ import {
 } from "lucide-react"
 import type { Deck, Slide, SymbolName, Visual } from "../content/decks"
 import "./deck.css"
+import { DiagramTextContext, SvgText } from "./diagram-text"
+import { useSavedDeck, snapshot, subscribe } from "../editor/store"
 import { LimitationDiagram } from "./limitation"
 
 const symbols = {
@@ -88,7 +90,7 @@ function Label({
   anchor?: "start" | "middle" | "end"
 }) {
   return (
-    <text
+    <SvgText
       x={x}
       y={y}
       textAnchor={anchor}
@@ -104,7 +106,7 @@ function Label({
       }
     >
       {children}
-    </text>
+    </SvgText>
   )
 }
 function Arrow({
@@ -156,7 +158,7 @@ function Diagram({ visual }: { visual: Visual }) {
           {visual.terms.map((term, i) => (
             <g key={i}>
               {term.value && (
-                <text
+                <SvgText
                   x={260 + i * 590}
                   y={260}
                   textAnchor="middle"
@@ -166,10 +168,10 @@ function Diagram({ visual }: { visual: Visual }) {
                   className={i === 2 ? "text-destructive" : "text-foreground"}
                 >
                   {term.value}
-                </text>
+                </SvgText>
               )}
               {term.lines.map((line, j) => (
-                <text
+                <SvgText
                   key={line}
                   x={260 + i * 590}
                   y={(term.value ? 350 : 250) + j * 58}
@@ -178,7 +180,7 @@ function Diagram({ visual }: { visual: Visual }) {
                   fill="currentColor"
                 >
                   {line}
-                </text>
+                </SvgText>
               ))}
             </g>
           ))}
@@ -198,7 +200,7 @@ function Diagram({ visual }: { visual: Visual }) {
         <>
           {visual.items.map((item, i) => (
             <g key={item.label}>
-              <text
+              <SvgText
                 x={430 + i * 840}
                 y={255}
                 textAnchor="middle"
@@ -207,7 +209,7 @@ function Diagram({ visual }: { visual: Visual }) {
                 fill="currentColor"
               >
                 {item.value}
-              </text>
+              </SvgText>
               <Label x={430 + i * 840} y={365} large>
                 {item.label}
               </Label>
@@ -719,7 +721,7 @@ function Diagram({ visual }: { visual: Visual }) {
         <>
           <Symbol name="person" x={310} y={225} size={155} />
           <Symbol name="clock" x={310} y={435} size={95} concern />
-          <text
+          <SvgText
             x="590"
             y="220"
             fontSize="62"
@@ -727,8 +729,8 @@ function Diagram({ visual }: { visual: Visual }) {
             fill="currentColor"
           >
             “{words.slice(0, middle).join(" ")}
-          </text>
-          <text
+          </SvgText>
+          <SvgText
             x="590"
             y="315"
             fontSize="62"
@@ -736,7 +738,7 @@ function Diagram({ visual }: { visual: Visual }) {
             fill="currentColor"
           >
             {words.slice(middle).join(" ")}”
-          </text>
+          </SvgText>
           <Label x={1080} y={450} muted>
             {visual.attribution}
           </Label>
@@ -812,7 +814,9 @@ export function SlideCanvas({
         >
           <title>{slide.title}</title>
           <desc>{slide.caption}</desc>
-          <Diagram visual={slide.visual} />
+          <DiagramTextContext.Provider value={slide.diagramText ?? {}}>
+            <Diagram visual={slide.visual} />
+          </DiagramTextContext.Provider>
         </svg>
       </figure>
       <footer className="flex shrink-0 items-center justify-between gap-8 border-t border-border pt-5 text-[19px] leading-snug text-muted-foreground">
@@ -830,16 +834,39 @@ export function SlideCanvas({
 }
 export function createDeck(deck: Deck): Page[] {
   return deck.slides.map((slide, index) => {
-    const Page: Page = () => (
-      <SlideCanvas deck={deck} slide={slide} index={index} />
-    )
+    const Page: Page = () => {
+      const saved = useSavedDeck(deck.id)
+      if (!saved.data)
+        return (
+          <section className="grid h-full place-items-center bg-background text-[42px] text-foreground">
+            {saved.error
+              ? "Saved slides could not be loaded. Please reload."
+              : "Loading saved slides…"}
+          </section>
+        )
+      return (
+        <SlideCanvas
+          deck={deck}
+          slide={saved.data.slides[index] ?? slide}
+          index={index}
+        />
+      )
+    }
     Page.displayName = `${deck.id}-${index + 1}`
     return Page
   })
 }
 export function speakerNotes(deck: Deck) {
-  return deck.slides.map(
-    (slide) =>
-      `${slide.title}\n\n${slide.notes}\n\nSource: ${slide.source}.\nScope: ${deck.scope}. All figures are fictional exercise data, not live business results. These slides describe problems and evidence only; no remedy or financial uplift is asserted.`
-  )
+  const format = (slides: Slide[]) =>
+    slides.map(
+      (slide) =>
+        `${slide.title}\n\n${slide.notes}\n\nSource: ${slide.source}.\nScope: ${deck.scope}. All figures are fictional exercise data, not live business results.`
+    )
+  const notes = format(deck.slides)
+  if (typeof window !== "undefined")
+    subscribe(() => {
+      const saved = snapshot(deck.id).data
+      if (saved) notes.splice(0, notes.length, ...format(saved.slides))
+    })
+  return notes
 }

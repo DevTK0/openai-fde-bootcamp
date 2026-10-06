@@ -1,3 +1,4 @@
+import { useDiagramText, SvgText } from "./diagram-text"
 import { BusFront, UserRound, FileText, Banknote, CircleX } from "lucide-react"
 import type { LimitationVisual } from "../content/limitations"
 
@@ -16,6 +17,8 @@ function Words({
   muted?: boolean
   width?: number
 }) {
+  const original = text
+  text = useDiagramText(original)
   const lines: string[] = []
   for (const word of text.split(" ")) {
     const last = lines.at(-1)
@@ -27,6 +30,7 @@ function Words({
       x={x}
       y={y}
       textAnchor="middle"
+      data-original-text={original}
       fontSize={size}
       fill="currentColor"
       className={muted ? "text-muted-foreground" : "text-foreground"}
@@ -41,7 +45,7 @@ function Words({
 }
 function Unknown({ x, y }: { x: number; y: number }) {
   return (
-    <text
+    <SvgText
       x={x}
       y={y}
       textAnchor="middle"
@@ -51,7 +55,7 @@ function Unknown({ x, y }: { x: number; y: number }) {
       fill="currentColor"
     >
       ?
-    </text>
+    </SvgText>
   )
 }
 function Gap({ x1, x2, y }: { x1: number; x2: number; y: number }) {
@@ -89,7 +93,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             className="fill-primary"
             rx="4"
           />
-          <text
+          <SvgText
             x="1310"
             y="305"
             textAnchor="middle"
@@ -97,7 +101,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             className="fill-primary-foreground"
           >
             {v.value}
-          </text>
+          </SvgText>
           <Unknown x={565} y={255} />
           <Words
             x={565}
@@ -253,7 +257,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
           {v.rows?.map((row, i) => (
             <g key={row}>
               <Words x={1145} y={180 + i * 130} text={row} size={36} />
-              <text
+              <SvgText
                 x="1530"
                 y={190 + i * 130}
                 textAnchor="middle"
@@ -261,7 +265,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
                 className="fill-destructive"
               >
                 ?
-              </text>
+              </SvgText>
               <path
                 d={`M930 ${215 + i * 130}H1560`}
                 className="stroke-border"
@@ -328,7 +332,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             strokeWidth="5"
             strokeDasharray="15 15"
           />
-          <text
+          <SvgText
             x="550"
             y="295"
             textAnchor="middle"
@@ -336,8 +340,8 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             className="fill-primary-foreground"
           >
             340
-          </text>
-          <text
+          </SvgText>
+          <SvgText
             x="1240"
             y="295"
             textAnchor="middle"
@@ -345,7 +349,7 @@ export function LimitationDiagram({ visual: v }: { visual: LimitationVisual }) {
             className="fill-destructive"
           >
             256 ?
-          </text>
+          </SvgText>
           <Words x={550} y={420} text="Regular places" size={38} />
           <Words x={1240} y={420} text="Provisional places" size={38} />
         </>

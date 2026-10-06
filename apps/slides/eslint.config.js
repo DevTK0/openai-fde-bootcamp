@@ -1,11 +1,16 @@
 import { config } from "@workspace/eslint-config/react-internal"
 export default [
   ...config,
-  { ignores: ["dist/**"] },
+  { ignores: ["dist/**", ".editor-data/**"] },
   {
-    files: ["scripts/**/*.mjs"],
+    files: ["scripts/**/*.mjs", "server/**/*.mjs"],
     languageOptions: {
-      globals: { URL: "readonly", console: "readonly", process: "readonly" },
+      globals: {
+        URL: "readonly",
+        console: "readonly",
+        process: "readonly",
+        Buffer: "readonly",
+      },
     },
   },
 ]
