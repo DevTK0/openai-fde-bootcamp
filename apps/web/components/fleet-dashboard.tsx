@@ -1,18 +1,16 @@
 "use client"
 
 import { useState } from "react"
+import { Pick, Notice, Metric, Plot, Records } from "@/components/report-ui"
 import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts"
+  OperationsDashboard,
+  OperationsSources,
+} from "@/components/operations-dashboard"
+import { operationsManifest } from "@/lib/operations"
+import operationsPassengers from "@/lib/operations-passengers.json"
+import { RelationshipsDashboard } from "@/components/relationships-dashboard"
 import {
   Activity,
-  ArrowDownToLine,
   ArrowUpRight,
   BusFront,
   CalendarDays,
@@ -22,10 +20,8 @@ import {
   Database,
   FileSpreadsheet,
   Gauge,
-  Info,
   LayoutDashboard,
   MessageSquareText,
-  Search,
   Wrench,
 } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
@@ -37,29 +33,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartLegend,
-  ChartLegendContent,
-} from "@workspace/ui/components/chart"
-import { Input } from "@workspace/ui/components/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table"
 import {
   Tabs,
   TabsList,
@@ -89,9 +62,7 @@ import {
   sum,
   vehicles,
   groupSum,
-  csvExport,
   type Dataset,
-  type Row,
 } from "@/lib/fleet"
 
 const sections = [
@@ -101,6 +72,13 @@ const sections = [
     icon: LayoutDashboard,
     description:
       "A clear view of cost, use, and maintenance across the selected fleet.",
+  },
+  {
+    id: "relationships",
+    label: "Relationships",
+    icon: ChartNoAxesCombined,
+    description:
+      "Explore how use, cost, component condition, and passenger experience connect.",
   },
   {
     id: "maintenance",
@@ -114,7 +92,7 @@ const sections = [
     label: "Operations",
     icon: Activity,
     description:
-      "Vehicle use and selected service observations · 5–16 October 2026.",
+      "172 operating vehicles · 24 services · detailed journeys, queues, and resources for 5–16 October 2026.",
   },
   {
     id: "planning",
@@ -145,339 +123,6 @@ const sections = [
       "Explore every imported table, source field, and coverage note.",
   },
 ] as const
-const colors = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-]
-function Pick({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string
-  value: string
-  options: { value: string; label: string }[]
-  onChange: (v: string) => void
-}) {
-  return (
-    <Select
-      value={value}
-      onValueChange={(v) => {
-        if (v !== null) onChange(v)
-      }}
-    >
-      <SelectTrigger
-        aria-label={label}
-        className="h-9 max-w-full min-w-40 bg-card"
-      >
-        <SelectValue>
-          {options.find((o) => o.value === value)?.label ?? value}
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="end">
-        {options.map((o) => (
-          <SelectItem value={o.value} key={o.value}>
-            {o.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
-}
-function Notice({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-start gap-3 rounded-lg border bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
-      <Info className="mt-0.5 size-4 shrink-0 text-primary" />
-      <div>{children}</div>
-    </div>
-  )
-}
-function Metric({
-  title,
-  value,
-  detail,
-}: {
-  title: string
-  value: string
-  detail: string
-}) {
-  return (
-    <Card className="gap-3 shadow-none">
-      <CardHeader>
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-3xl font-semibold tracking-tight tabular-nums">
-          {value}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="text-xs text-muted-foreground">
-        {detail}
-      </CardContent>
-    </Card>
-  )
-}
-type Series = { key: string; label: string }
-function Plot({
-  title,
-  description,
-  rows,
-  series,
-  area = false,
-}: {
-  title: string
-  description: string
-  rows: Row[]
-  series: Series[]
-  area?: boolean
-}) {
-  const chartSeries = series.map((s, i) => ({ ...s, id: `series${i}` }))
-  const chartRows = rows.map((row) => ({
-    name: row.name,
-    ...Object.fromEntries(chartSeries.map((s) => [s.id, row[s.key]])),
-  }))
-  const config = Object.fromEntries(
-    chartSeries.map((s, i) => [
-      s.id,
-      { label: s.label, color: colors[i % colors.length] },
-    ])
-  )
-  const axes = (
-    <>
-      <CartesianGrid vertical={false} />
-      <XAxis
-        dataKey="name"
-        tickLine={false}
-        axisLine={false}
-        tickMargin={10}
-        minTickGap={18}
-      />
-      <YAxis
-        tickLine={false}
-        axisLine={false}
-        width={52}
-        tickFormatter={(v: number) =>
-          Math.abs(v) >= 1000 ? `${fmt(v / 1000, 1)}k` : fmt(v, 1)
-        }
-      />
-      <ChartTooltip content={<ChartTooltipContent />} />
-      <ChartLegend content={<ChartLegendContent />} />
-    </>
-  )
-  return (
-    <Card className="min-w-0 shadow-none">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer
-          config={config}
-          className="h-72 w-full"
-          aria-label={title}
-        >
-          {area ? (
-            <AreaChart data={chartRows} margin={{ left: 0, right: 12, top: 8 }}>
-              {axes}
-              {chartSeries.map((s) => (
-                <Area
-                  key={s.key}
-                  dataKey={s.id}
-                  type="monotone"
-                  fill={`var(--color-${s.id})`}
-                  fillOpacity={0.1}
-                  stroke={`var(--color-${s.id})`}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              ))}
-            </AreaChart>
-          ) : (
-            <BarChart data={chartRows} margin={{ left: 0, right: 12, top: 8 }}>
-              {axes}
-              {chartSeries.map((s) => (
-                <Bar
-                  key={s.key}
-                  dataKey={s.id}
-                  fill={`var(--color-${s.id})`}
-                  radius={[3, 3, 0, 0]}
-                  maxBarSize={36}
-                />
-              ))}
-            </BarChart>
-          )}
-        </ChartContainer>
-      </CardContent>
-    </Card>
-  )
-}
-function download(table: Dataset, rows: Row[]) {
-  const url = URL.createObjectURL(
-    new Blob([csvExport(table.columns, rows)], {
-      type: "text/csv;charset=utf-8",
-    })
-  )
-  const a = document.createElement("a")
-  a.href = url
-  a.download = `${table.title}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
-}
-function Records({
-  table,
-  rows = table.rows,
-}: {
-  table: Dataset
-  rows?: Row[]
-}) {
-  const [query, setQuery] = useState("")
-  const [page, setPage] = useState(0)
-  const [sort, setSort] = useState<{ key: string; desc: boolean } | null>(null)
-  const filtered = rows.filter((row) =>
-    Object.values(row).some((v) =>
-      String(v ?? "")
-        .toLowerCase()
-        .includes(query.toLowerCase())
-    )
-  )
-  if (sort)
-    filtered.sort((a, b) => {
-      const av = a[sort.key],
-        bv = b[sort.key]
-      const result =
-        av == null
-          ? bv == null
-            ? 0
-            : 1
-          : bv == null
-            ? -1
-            : typeof av === "number" && typeof bv === "number"
-              ? av - bv
-              : String(av).localeCompare(String(bv))
-      return result * (sort.desc ? -1 : 1)
-    })
-  const pages = Math.max(1, Math.ceil(filtered.length / 10)),
-    current = Math.min(page, pages - 1)
-  return (
-    <Card className="min-w-0 gap-4 overflow-hidden shadow-none">
-      <CardHeader>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <CardTitle>{table.title}</CardTitle>
-            <CardDescription className="mt-1 break-all">
-              {table.file} · {table.sheet}
-            </CardDescription>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => download(table, filtered)}
-          >
-            <ArrowDownToLine /> Export CSV
-          </Button>
-        </div>
-        <div className="relative mt-2 max-w-sm">
-          <Search className="absolute top-2.5 left-3 size-4 text-muted-foreground" />
-          <Input
-            aria-label={`Search ${table.title}`}
-            placeholder="Search all fields…"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              setPage(0)
-            }}
-            className="pl-9"
-          />
-        </div>
-      </CardHeader>
-      <CardContent className="min-w-0 px-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {table.columns.map((col) => (
-                <TableHead key={col}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      setSort({
-                        key: col,
-                        desc: sort?.key === col ? !sort.desc : false,
-                      })
-                    }
-                  >
-                    {col.replaceAll("_", " ")}
-                    {sort?.key === col ? (sort.desc ? " ↓" : " ↑") : ""}
-                  </Button>
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.slice(current * 10, current * 10 + 10).map((row, i) => (
-              <TableRow key={i}>
-                {table.columns.map((col) => (
-                  <TableCell
-                    key={col}
-                    className="max-w-96 min-w-28 px-4 py-3 align-top text-xs leading-relaxed whitespace-normal"
-                  >
-                    {row[col] == null ? (
-                      <span className="text-muted-foreground">—</span>
-                    ) : typeof row[col] === "number" ? (
-                      col.toLowerCase().includes("year") ? (
-                        String(row[col])
-                      ) : (
-                        fmt(row[col] as number, 6)
-                      )
-                    ) : (
-                      String(row[col])
-                    )}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-            {!filtered.length && (
-              <TableRow>
-                <TableCell
-                  colSpan={table.columns.length}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  No matching records. Try another search or filter.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        <div className="flex items-center justify-between gap-3 border-t px-5 pt-4 text-xs text-muted-foreground">
-          <span>
-            {fmt(filtered.length)} records · Page {current + 1} of {pages}
-          </span>
-          <div className="flex gap-1">
-            <Button
-              aria-label="Previous page"
-              variant="outline"
-              size="icon-sm"
-              disabled={current === 0}
-              onClick={() => setPage(current - 1)}
-            >
-              <ChevronLeft />
-            </Button>
-            <Button
-              aria-label="Next page"
-              variant="outline"
-              size="icon-sm"
-              disabled={current === pages - 1}
-              onClick={() => setPage(current + 1)}
-            >
-              <ChevronRight />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 function SourceChart({ table }: { table: Dataset }) {
   const numeric = table.columns.filter((col) =>
     table.rows.some((r) => typeof r[col] === "number")
@@ -633,7 +278,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
     }))
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 @lg/dashboard:grid-cols-2 @4xl/dashboard:grid-cols-4">
         <Metric
           title="Recorded maintenance cost"
           value={money(repair + routine + preventive)}
@@ -655,7 +300,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           detail="Repair charges divided by matched-period use"
         />
       </div>
-      <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-6 @4xl/dashboard:grid-cols-[1.6fr_1fr]">
         <Plot
           title="Maintenance spending over time"
           description="Monthly charges · SGD excluding tax"
@@ -674,7 +319,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           series={[{ key: "repair_cost_sgd", label: "Repair cost" }]}
         />
       </div>
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 @4xl/dashboard:grid-cols-2">
         <Plot
           title="Like-for-like annual repair spend"
           description="Always compares two complete October–September periods · SGD"
@@ -724,7 +369,7 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
   )
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
         <Metric
           title="Routine services"
           value={fmt(sum(rows, "scheduled_service_count"))}
@@ -770,12 +415,12 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
     </div>
   )
 }
-function Operations() {
+function SelectedOperations() {
   const daily = dataset("Daily usage").rows,
     observations = dataset("Service observations").rows
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
         <Metric
           title="Completed trips"
           value={fmt(sum(daily, "Completed trips"))}
@@ -792,7 +437,7 @@ function Operations() {
           detail="Selected observations, not network-wide performance"
         />
       </div>
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 @4xl/dashboard:grid-cols-2">
         <Plot
           title="Recorded distance by service"
           description="October extract · km · daily rows only, excluding duplicate weekly totals"
@@ -850,7 +495,7 @@ function Planning() {
         <TabsTrigger value="incident">Incident</TabsTrigger>
       </TabsList>
       <TabsContent value="workshop" className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
           <Metric
             title="Requested jobs"
             value={String(requests.length)}
@@ -924,7 +569,7 @@ function Planning() {
         />
       </TabsContent>
       <TabsContent value="incident" className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
           <Metric
             title="Protected evening buses"
             value={String(
@@ -972,7 +617,16 @@ function Passengers() {
   const reports = dataset("Passenger reports")
   return (
     <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-2">
+      <Notice>
+        Validated against all {fmt(operationsManifest.coverage.trips)} origin
+        departures:{" "}
+        {operationsPassengers.filter((c) => c.matches.length === 1).length} of{" "}
+        {operationsPassengers.length} reports match one trip using stop, journey
+        window, and supplied identifiers. Expected journeys use scheduled
+        departure; observed journeys use actual departure. Matching an event
+        does not establish a cause.
+      </Notice>
+      <div className="grid gap-6 @3xl/dashboard:grid-cols-2">
         <Plot
           title="Reports by channel"
           description="Six selected reports · not complaint rates"
@@ -1047,7 +701,7 @@ function Costs() {
         recommendations. Some scopes overlap; the replacement quote excludes
         finance, infrastructure, resale, and transition costs.
       </Notice>
-      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <div className="grid gap-6 @3xl/dashboard:grid-cols-[1.6fr_1fr]">
         <Plot
           title="Maintenance quote comparison"
           description="SGD excluding tax · full quoted package, not price per visit"
@@ -1093,12 +747,26 @@ function Explorer() {
   return (
     <div className="space-y-6">
       <Notice>
-        {data.tables.length} tables from five workbooks and three CSV files.
-        These include duplicate and overlapping views; source row counts must
-        not be summed as distinct events. Every field is available below, with
-        sorting, search, and filtered CSV export.
+        {data.tables.length} handout tables plus{" "}
+        {operationsManifest.tables.length} operations tables from 24 CSV files
+        and five workbooks. These include duplicate and overlapping views;
+        source row counts must not be summed as distinct events. All fields are
+        available below. Handout tables support sorting and filtered CSV export;
+        operations tables support server-side search, pagination, and full CSV
+        downloads.
       </Notice>
-      <SourcePicker tables={data.tables} visualize />
+      <Tabs defaultValue="handouts" className="gap-4">
+        <TabsList>
+          <TabsTrigger value="handouts">Handouts (40 tables)</TabsTrigger>
+          <TabsTrigger value="operations">Operations (21 tables)</TabsTrigger>
+        </TabsList>
+        <TabsContent value="handouts">
+          <SourcePicker tables={data.tables} visualize />
+        </TabsContent>
+        <TabsContent value="operations">
+          <OperationsSources />
+        </TabsContent>
+      </Tabs>
       <Card className="shadow-none">
         <CardHeader>
           <CardTitle>Monthly-history documentation</CardTitle>
@@ -1175,9 +843,9 @@ export function FleetDashboard() {
               workspace
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              5 workbooks · 3 CSV files
+              5 workbooks · 24 CSV files
               <br />
-              All 40 source tables available
+              40 handout tables + 21 operations tables
             </p>
           </div>
           <p className="mt-3 text-[10px] text-muted-foreground">
@@ -1190,15 +858,24 @@ export function FleetDashboard() {
           <div className="flex items-center gap-3">
             <SidebarTrigger />
             <Separator orientation="vertical" className="h-4" />
-            <span className="text-xs text-muted-foreground">Analytics</span>
+            <span className="hidden text-xs text-muted-foreground sm:inline">
+              Analytics
+            </span>
             <ChevronRight className="size-3 text-muted-foreground" />
             <span className="text-xs font-medium">{current.label}</span>
           </div>
-          <Badge variant="outline" className="hidden sm:flex">
-            <Database className="size-3" /> Source snapshot
-          </Badge>
+          <div className="flex shrink-0 items-center gap-3">
+            <Badge variant="outline" className="hidden sm:flex">
+              <Database className="size-3" /> Source snapshot
+            </Badge>
+          </div>
         </header>
-        <main className="mx-auto w-full max-w-400 space-y-6 p-4 lg:p-8">
+        <main
+          id="active-report"
+          data-report-title={current.label}
+          data-report-section={section}
+          className="@container/dashboard mx-auto w-full max-w-400 space-y-6 p-4 lg:p-8"
+        >
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div>
               <div className="mb-2 flex items-center gap-2 text-xs font-medium text-primary">
@@ -1259,14 +936,30 @@ export function FleetDashboard() {
           {section === "maintenance" && (
             <Maintenance vehicle={vehicle} period={period} />
           )}
-          {section === "operations" && <Operations />}
+          {section === "relationships" && <RelationshipsDashboard />}
+          {section === "operations" && (
+            <Tabs defaultValue="network" className="gap-6">
+              <TabsList>
+                <TabsTrigger value="network">Full operating cohort</TabsTrigger>
+                <TabsTrigger value="selected">
+                  Selected handout extracts
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="network">
+                <OperationsDashboard />
+              </TabsContent>
+              <TabsContent value="selected">
+                <SelectedOperations />
+              </TabsContent>
+            </Tabs>
+          )}
           {section === "planning" && <Planning />}
           {section === "passengers" && <Passengers />}
           {section === "costs" && <Costs />}
           {section === "explorer" && <Explorer />}
           <footer className="border-t pt-5 text-xs text-muted-foreground">
             LionLink · Selected exercise records · Singapore time (UTC+08) ·
-            Source: Data/
+            Sources: Data/ + lionlink-operations-source
           </footer>
         </main>
       </SidebarInset>

@@ -1,0 +1,439 @@
+{
+  "tables": [
+    {
+      "id": "control_actions",
+      "file": "data/control_actions.csv",
+      "columns": [
+        "action_id",
+        "service_date",
+        "issued_at",
+        "trip_id",
+        "action",
+        "vehicle_id",
+        "crew_id",
+        "referenced_update_ids",
+        "note"
+      ],
+      "count": 82,
+      "sha256": "5fc7dd799f54d372ea68f438f254032530fc78f9c0c4eef04ad3744a1067d652"
+    },
+    {
+      "id": "crew_duties",
+      "file": "data/crew_duties.csv",
+      "columns": [
+        "duty_id",
+        "service_date",
+        "crew_id",
+        "qualified_service_no",
+        "available_from",
+        "available_until",
+        "start_stop_id",
+        "protected_break_start",
+        "protected_break_end",
+        "maximum_continuous_duty_minutes",
+        "takeover_seconds",
+        "record_issued_at",
+        "basis"
+      ],
+      "count": 3272,
+      "sha256": "fd016e367b0078e62169695a4342bc958c7eaabd3b3368fa211c160703eaa46d"
+    },
+    {
+      "id": "origin_arrivals",
+      "file": "data/origin_arrivals.csv",
+      "columns": [
+        "arrival_record_id",
+        "service_date",
+        "route_id",
+        "stop_order",
+        "stop_id",
+        "arrived_at",
+        "arrivals_people",
+        "observation_method"
+      ],
+      "count": 26467,
+      "sha256": "8105f0efbb3b54f7f5501b8e4402b6748f0ed9be487c285249ea4f545a7699db"
+    },
+    {
+      "id": "planning_constraints",
+      "file": "data/planning_constraints.csv",
+      "columns": [
+        "constraint_id",
+        "scope",
+        "requirement"
+      ],
+      "count": 7,
+      "sha256": "b99e19e1c1b95d74daf49651606b16e5fa2191abd452e4e9387d2c28a3f6fb92"
+    },
+    {
+      "id": "queue_windows",
+      "file": "data/queue_windows.csv",
+      "columns": [
+        "queue_window_id",
+        "service_date",
+        "route_id",
+        "stop_order",
+        "stop_id",
+        "observation_start_at",
+        "observation_end_at",
+        "initial_queue_people",
+        "total_arrivals_people",
+        "total_boarded_people",
+        "remaining_queue_people",
+        "scope"
+      ],
+      "count": 13530,
+      "sha256": "2db209f4491ce7c3d47fcee96fb10a610d3461e2e1ff93947bc75e4491970610"
+    },
+    {
+      "id": "rail_links",
+      "file": "data/rail_links.csv",
+      "columns": [
+        "edge_id",
+        "line_code",
+        "line_name",
+        "from_station_id",
+        "to_station_id",
+        "bidirectional_topology",
+        "geometry_kind",
+        "source_url"
+      ],
+      "count": 169,
+      "sha256": "a4ca5920346933fc00580a3acb22a02490a7e66f5602681b4769afee2248b00b"
+    },
+    {
+      "id": "rail_stations",
+      "file": "data/rail_stations.csv",
+      "columns": [
+        "station_id",
+        "station_name",
+        "station_codes",
+        "line_codes",
+        "latitude",
+        "longitude",
+        "coordinate_method",
+        "snapshot_date"
+      ],
+      "count": 146,
+      "sha256": "7984406f23f8278a226f04d4d19ef3157e2962c3109c317d7261b68c2f596e21"
+    },
+    {
+      "id": "resource_updates",
+      "file": "data/resource_updates.csv",
+      "columns": [
+        "update_id",
+        "service_date",
+        "issued_at",
+        "resource_type",
+        "resource_id",
+        "location_stop_id",
+        "available_from",
+        "available_until",
+        "related_trip_id",
+        "statement"
+      ],
+      "count": 86,
+      "sha256": "e87471ed8582268c93a773b4636aabd0296003b44a8f5b067a1be980bfc24d41"
+    },
+    {
+      "id": "route_stops",
+      "file": "data/route_stops.csv",
+      "columns": [
+        "route_id",
+        "stop_order",
+        "source_stop_sequence",
+        "stop_id",
+        "distance_km",
+        "weekday_first",
+        "weekday_last",
+        "saturday_first",
+        "saturday_last",
+        "sunday_first",
+        "sunday_last",
+        "source_id"
+      ],
+      "count": 1353,
+      "sha256": "2d00f7621f35b1144ee2fc30fd1eb824a76e5310d2ad8190746b10a0d4ff6173"
+    },
+    {
+      "id": "routes",
+      "file": "data/routes.csv",
+      "columns": [
+        "route_id",
+        "service_no",
+        "direction",
+        "service_name",
+        "operator",
+        "origin_stop_id",
+        "destination_stop_id",
+        "stop_count",
+        "distance_km",
+        "loop_route",
+        "source_id"
+      ],
+      "count": 36,
+      "sha256": "4e6d999f3d6a237720601712e54fd595024af26252b323ecc8503ee0ab3d9e5a"
+    },
+    {
+      "id": "service_calendar",
+      "file": "data/service_calendar.csv",
+      "columns": [
+        "service_date",
+        "day_type",
+        "timezone",
+        "status"
+      ],
+      "count": 10,
+      "sha256": "fef641f3e6fa1b7c7495706dfcb701aed3e0eb728f954fda7f47abcbdf955edd"
+    },
+    {
+      "id": "service_patterns",
+      "file": "data/service_patterns.csv",
+      "columns": [
+        "route_id",
+        "version_id",
+        "morning_first_departure",
+        "departure_window_end",
+        "peak_start",
+        "peak_end",
+        "peak_headway_minutes",
+        "shoulder_headway_minutes",
+        "planned_running_seconds",
+        "minimum_terminal_seconds",
+        "timetable_basis"
+      ],
+      "count": 36,
+      "sha256": "042074150aad202e9d91965ec024e1b84c8bc16188d53a8fd061604e7344b8ff"
+    },
+    {
+      "id": "stop_calls",
+      "file": "data/stop_calls.csv",
+      "columns": [
+        "call_id",
+        "trip_id",
+        "service_date",
+        "route_id",
+        "stop_order",
+        "source_stop_sequence",
+        "stop_id",
+        "scheduled_arrival_at",
+        "actual_arrival_at",
+        "actual_departure_at",
+        "actual_vehicle_id",
+        "capacity_people",
+        "onboard_arriving",
+        "alighted_people",
+        "arrivals_since_previous_call",
+        "queue_before_people",
+        "boarded_people",
+        "queue_after_people",
+        "onboard_departing",
+        "boarding_cutoff_at"
+      ],
+      "count": 252380,
+      "sha256": "c5555a8223cc6104856467286d19bd636ed25ea6613de338089cc6c191bf1811"
+    },
+    {
+      "id": "stops",
+      "file": "data/stops.csv",
+      "columns": [
+        "stop_id",
+        "description",
+        "road_name",
+        "latitude",
+        "longitude",
+        "source_id"
+      ],
+      "count": 809,
+      "sha256": "f0b71056b6576bdbb9708d932ed37a2221ba4c6d6d476353ed269798c5528391"
+    },
+    {
+      "id": "terminal_movements",
+      "file": "data/terminal_movements.csv",
+      "columns": [
+        "movement_id",
+        "service_date",
+        "vehicle_id",
+        "crew_id",
+        "from_trip_id",
+        "to_trip_id",
+        "from_stop_id",
+        "to_stop_id",
+        "actual_start_at",
+        "actual_end_at",
+        "planning_distance_km",
+        "planning_seconds",
+        "basis"
+      ],
+      "count": 210,
+      "sha256": "316c9df774f623cbafbfe3b10f23e4aa875e2b0c68605856db0cbf28efa504e1"
+    },
+    {
+      "id": "timetable_records",
+      "file": "data/timetable_records.csv",
+      "columns": [
+        "version_id",
+        "issued_at",
+        "effective_from",
+        "effective_until",
+        "description"
+      ],
+      "count": 1,
+      "sha256": "8294a3159ef60c506255299d137bdf834db692b317c321dd2f7a28e590350312"
+    },
+    {
+      "id": "trips",
+      "file": "data/trips.csv",
+      "columns": [
+        "trip_id",
+        "service_date",
+        "timetable_version",
+        "route_id",
+        "service_no",
+        "planned_block_id",
+        "planned_vehicle_id",
+        "planned_crew_id",
+        "origin_stop_id",
+        "destination_stop_id",
+        "scheduled_departure_at",
+        "scheduled_arrival_at",
+        "actual_vehicle_id",
+        "actual_crew_id",
+        "actual_departure_at",
+        "actual_arrival_at",
+        "completion_state",
+        "published_distance_km"
+      ],
+      "count": 6900,
+      "sha256": "79c2ce540adf0389f6158218e1a52e76a4574f15b5953b89ced62cce50c98e97"
+    },
+    {
+      "id": "vehicle_readiness",
+      "file": "data/vehicle_readiness.csv",
+      "columns": [
+        "readiness_id",
+        "service_date",
+        "vehicle_id",
+        "issued_at",
+        "available_from",
+        "available_until",
+        "location_stop_id",
+        "release_state",
+        "capacity_people"
+      ],
+      "count": 1720,
+      "sha256": "10fb3ade6c5737597353204aee9a7bdad7fd5f8bcc3e13cb3dd36286539c2843"
+    },
+    {
+      "id": "vehicles",
+      "file": "data/vehicles.csv",
+      "columns": [
+        "vehicle_id",
+        "assigned_service_no",
+        "vehicle_type",
+        "capacity_people",
+        "wheelchair_spaces",
+        "capacity_basis"
+      ],
+      "count": 172,
+      "sha256": "4d6905c7f12add5d773c9964315cdb33e92806e60c0069c9b27ac87cbf2bdf68"
+    },
+    {
+      "id": "workshop_vehicles",
+      "file": "data/workshop/workshop_vehicles.csv",
+      "columns": [
+        "vehicle_id",
+        "vehicle_type",
+        "capacity_people",
+        "wheelchair_spaces",
+        "fleet_scope",
+        "facility_id",
+        "record_issued_at"
+      ],
+      "count": 8,
+      "sha256": "86d946ed98996c0274305182803d2dd4e21c6ada0439a42a972da387200280cd"
+    },
+    {
+      "id": "workshop_work_orders",
+      "file": "data/workshop/workshop_work_orders.csv",
+      "columns": [
+        "work_order_id",
+        "vehicle_id",
+        "opened_at",
+        "updated_at",
+        "facility_id",
+        "fault_summary",
+        "work_status",
+        "expected_completion_at",
+        "confirmed_release_at",
+        "release_status",
+        "workshop_note"
+      ],
+      "count": 8,
+      "sha256": "bbfdebf76120310f17a37d2aa61bfadc8fdb70fa0820053208eef155a15f2192"
+    }
+  ],
+  "documents": [
+    {
+      "file": "data/README.md",
+      "text": "# LionLink operating records\n\nThis exercise contains **real Singapore network geography and entirely fictional operating records**. Service numbers, ordered bus stops, bus stop coordinates and rail station relationships come from the attributed public network snapshot. All LionLink timetables, vehicles, drivers, passenger counts, control messages and service outcomes are synthetic. They do not describe SBS Transit, SMRT or any other real operator's performance.\n\nThe sample covers 24 bus services and their 36 published directional or loop patterns, retaining all 1,353 route-stop occurrences across 809 physical stops. There are ten fictional weekdays from 5 to 16 October 2026. Timetabled departures begin between 06:00 and 11:59; the records retain each journey's complete downstream calls, including arrivals after noon. This is a bounded morning cohort, not the whole bus system or a complete service day. Every date supplied is available for analysis; none is a hidden evaluation set.\n\nRun `python3 scripts/rebuild_database.py` from the package root to create the optional `lionlink-network.sqlite`. It contains the same nineteen core tables as the CSVs in this directory, with numeric columns and useful indexes. The separate `workshop/` supplement adds eight held workshop vehicles for the operating console; it is not included in the core database and does not add dispatchable buses to the 172-vehicle timetable. Read `DATA_DICTIONARY.md` for keys, units and observation limits. Stop codes are text: retain leading zeroes. `route_id` identifies a direction or loop, while `service_no` identifies the passenger-facing service. `stop_order` is the dense visit order; `source_stop_sequence` preserves the original source values, including gaps.\n\nPassenger records describe intended service-direction and route-position cohorts. They do not represent every person waiting at a shared stop. A repeated physical stop on a loop has separate cohorts for separate portions of the journey. Origin observations provide exact five-minute arrival batches for exercise replay; other stops provide counts between observed calls. Use each queue window's start/end and remaining queue rather than assuming all passengers boarded. The counting model groups boarding at a documented cutoff; it is not a second-by-second door simulation.\n\nTimetables and resource windows are exercise assumptions. A proposed operational change must respect the supplied planning constraints, vehicle capacity, terminal movements, crew availability and later assignments. Issued timestamps distinguish what a controller knew at a decision from what later observations revealed. No unlisted spare resource, unseen earlier journey or unspecified later commitment should be invented.\n\nRail data provides real station membership and adjacency as geographical context. Connecting station points with a straight line does not describe track alignment, train running time or an accessible walking transfer. The sample contains no observed train operations or passenger transfer outcomes. Geographical proximity alone is not evidence that two journeys are interchangeable.\n\nThese operating records are the shared fleet and service history for the Engineering and Customer Service handouts. Their selected vehicle records use these same `NW-V` identifiers and their passenger reports concern journeys within 5\u201316 October 2026. Request those handouts from IT / Data when needed. They are supplied separately and are not additional tables in this database. A selected maintenance history is not complete history for every vehicle, and a passenger account is not an independently verified explanation of a service event.\n\nThe rail-relief, maintenance-planning and festival handouts extend this same fleet into explicitly dated evening or future duties. Their own issued records supply the relevant commitments, locations and release conditions. Morning availability alone does not establish availability for those later duties.\n"
+    },
+    {
+      "file": "data/DATA_DICTIONARY.md",
+      "text": "# Data dictionary\n\nAll operating records are fictional. Public network fields retain their source identifiers. CSV and SQLite table names match. Timestamps use ISO 8601 with `+08:00`; durations are seconds unless a column explicitly says minutes. Counts are people, distances are kilometres and coordinates are WGS84 decimal degrees. Empty text means not supplied, not zero.\n\nThe table below describes the nineteen core CSV/SQLite tables. The separate `workshop/` register supplement is documented at the end and is not inside the core SQLite database.\n\n| Table | Grain / key | Meaning and joins |\n|---|---|---|\n| `routes` | `route_id` | One source direction or loop. `service_no`, `direction`, `service_name`, `operator`, origin/destination stop IDs, stop count, source route distance, loop flag and source ID. Operator attribution belongs to the network, not the synthetic performance. |\n| `stops` | `stop_id` | Public five-character bus stop code, description, road name, latitude, longitude and source ID. |\n| `route_stops` | `route_id`, `stop_order` | Complete source stop sequence. `source_stop_sequence` retains published gaps. `distance_km` is cumulative source distance, not straight-line distance. First/last service strings are source HHMM values, not a full timetable; after-midnight values may exceed 2400. |\n| `rail_stations` | `station_id` | Public station name and grouped station/line codes (`|` separated), coordinates, coordinate derivation and snapshot date. Interchange station IDs can combine multiple codes. |\n| `rail_links` | `edge_id` | Public adjacent station pairs with line code/name and source URL. `bidirectional_topology` concerns adjacency only; schematic geometry is not track distance or a train timetable. |\n| `service_calendar` | `service_date` | Supplied fictional dates, day type and timezone. |\n| `service_patterns` | `route_id` | Synthetic published headway assumptions, departure window, peak interval, running allowance and terminal minimum. `morning_first_departure` and period bounds are local clock times. A trip already scheduled before a period boundary keeps its previous headway to the next departure. The `trips` table is authoritative for the resulting timetable. |\n| `vehicles` | `vehicle_id` | Fictional vehicle, assigned service, SD/DD type, usable total-person capacity and wheelchair spaces. These capacities are exercise assumptions. |\n| `crew_duties` | `duty_id`; unique date/crew | Fictional qualifications (one service), availability, start location, protected break, takeover requirement, maximum continuous duty and record issue time. Duty includes vehicle tasks; breaks contain no tasks. IDs may repeat on different dates. |\n| `vehicle_readiness` | `readiness_id`; date/vehicle | Issued release state, availability, initial location and usable capacity. Subsequent commitments are in trips and movements. |\n| `trips` | `trip_id` | Published and observed departure/terminal-arrival times, planned block/vehicle/crew, actual vehicle/crew, route, service and terminal IDs. Arrival is before final terminal alighting. `completion_state` describes this supplied trip. `published_distance_km` is source route distance. |\n| `stop_calls` | `call_id`; trip/stop order | Complete visit chronology and passenger ledger. Every trip visits every source occurrence, including the final terminal. See accounting definitions below. |\n| `queue_windows` | `queue_window_id`; date/route/stop order | Exact scope of each intended route-position cohort, initial queue, arrivals, boardings and final remaining queue. Observation ends at the last supplied call; later arrivals are outside this total. |\n| `origin_arrivals` | `arrival_record_id` | Synthetic five-minute arrival batches at each route origin. All people in a row are assigned that row's timestamp for a reproducible coarse replay. Use only events within a queue window when reconciling totals. Extra arrivals after the last observed trip do not belong to that window. |\n| `terminal_movements` | `movement_id` | Actual non-service positioning between trips when terminal stop codes differ, with bus, driver, endpoints and times. Distance/time are explicitly synthetic planning allowances, not verified road journeys. There is no invented reverse passenger direction. |\n| `resource_updates` | `update_id` | Contemporaneous resource reports: `issued_at`, location, effective availability and related trip. `resource_id` may combine vehicle and crew with `|`. |\n| `control_actions` | `action_id` | Recorded dispatch instructions with issue time, trip, selected resources and referenced update IDs (`|` separated). Notes are operator statements within the fiction, not validated diagnoses. |\n| `planning_constraints` | `constraint_id` | Exercise requirements for proposals and retrospective comparisons. |\n| `timetable_records` | `version_id` | Issue time and effective dates of the synthetic timetable. |\n\n## Stop-call accounting\n\n`scheduled_arrival_at` is the published arrival at the stop occurrence. At the origin it includes a 120-second boarding window before published departure. `actual_arrival_at` and `actual_departure_at` delimit the observed stop dwell; `boarding_cutoff_at` is the counting cutoff: departure minus five seconds at origins, doors opening at intermediate stops. Boarding takes 1.2 seconds per person plus five seconds clearance. Origin batches board FIFO; a person can only start boarding after their arrival and the previous person finishes. Intermediate counts conservatively admit only the cohort present when doors open; people arriving during dwell enter the next observation interval. This is a deliberate aggregate-count approximation, not a door-level pedestrian simulation. Final terminals allow 45 seconds alighting and have no boarding for that completed trip.\n\n`onboard_arriving` is before alighting. `alighted_people` leave the vehicle; `boarded_people` then enter. `onboard_departing = onboard_arriving - alighted_people + boarded_people`, within `capacity_people`. Every trip starts empty and passengers remaining onboard alight at its final terminal. A passenger's individual destination is not provided; do not invent an OD matrix from aggregate alightings.\n\n`arrivals_since_previous_call` counts new arrivals in the route-position cohort since its previous cutoff, or since the window start for its first call. `queue_before_people` includes the previous remaining queue plus these new arrivals. `queue_after_people = queue_before_people - boarded_people`. Remaining passengers carry forward to the next observed call for this cohort; they are not counted again as new arrivals. No abandonment or route switching is modelled. Within a window, `initial_queue_people + total_arrivals_people = total_boarded_people + remaining_queue_people`.\n\nFor the queue ledger, order calls by `boarding_cutoff_at`, then `trip_id`, then `stop_order` to break exact ties. CSV row order groups a trip's visits for convenience. Two buses can dwell at the same stop at once: the earlier doors-opening cutoff reserves its observed cohort first even if that bus departs second. Do not reorder that queue ledger by departure time.\n\nOrdinary stop counts support occupancy, boarding, queue and service-regularity analysis. Exact individual waiting times outside the origin arrival batches are unavailable. Do not use window boundaries as proof that there was no earlier/later demand. Shared-stop totals may be summed only with their distinct cohort definitions intact, and must not be read as unique cross-service travellers.\n\n## Resource timing\n\nAfter terminal arrival, final alighting takes 45 seconds and minimum vehicle turnaround takes 420 seconds before the next departure, including the 120-second origin boarding window. Turnaround is not a driver rest break. Different terminal codes may require a listed movement; those movements follow turnaround, then a further 120-second boarding window is required. A five-minute driver takeover may overlap stationary turnaround. The driver doing a listed terminal movement is explicitly recorded and may differ from the next passenger trip's driver.\n\nThe continuous duty limit and protected breaks are fictional exercise rules. Availability windows are sufficient for the listed actual tasks; other periods of a driver's day are outside scope. Retrospective comparisons must retain later commitments and distinguish publication/issue time from effective time and eventual observation.\n\n## Related Engineering and passenger handouts\n\nThe separately supplied Engineering and Customer Service workbooks use the same operating vehicle identifiers and service dates as these tables. They are not extra tables in this SQLite database. Engineering contains selected histories for eight operating vehicles, with dated earlier lookback and work after supplied morning duties. Its `vehicle_id` matches `vehicles.vehicle_id`; work orders, services and inspections retain their own record identifiers.\n\nPassenger reports contain a `journey_window_start`, `journey_window_end` and `journey_time_basis`, plus available `reported_service_no`, `reported_vehicle_id` and `reported_stop_id`. The time basis distinguishes an expected departure from an observed departure. Service numbers match `trips.service_no`; reported fleet numbers refer to a vehicle, not a route number. Match the supplied date, window and identifiers to the relevant trip and stop record before treating a relationship as established. Preserve the distinction between planned and actual vehicles.\n\nThe evening incident and future planning handouts use this same fleet with explicit additional duty and release records. Read their issue times and coverage; an available morning vehicle is not automatically available later. Passenger accounts, mechanical findings and operating chronology provide different kinds of evidence and do not establish a shared cause by themselves.\n\n## Workshop-only register supplement\n\nThe `workshop/` directory adds two separate CSVs for a fictional held-only cohort. NW-W001 through NW-W008 do not belong to the 172 operating vehicles in the core tables and have no supplied trips or release records. The console may show 180 register entries, but only 172 belong to the operating cohort. Missing work orders never prove that a vehicle is released.\n\n`workshop_vehicles.csv` has one row per additional vehicle: `vehicle_id`, `vehicle_type`, `capacity_people`, `wheelchair_spaces`, `fleet_scope`, `facility_id` and `record_issued_at`. NW-WS01 is the fictional North Workshop and NW-WS02 the fictional Central Workshop; no real depot location is asserted.\n\n`workshop_work_orders.csv` has one row per work order: `work_order_id`, `vehicle_id`, `opened_at`, `updated_at`, `facility_id`, `fault_summary`, `work_status`, `expected_completion_at`, `confirmed_release_at`, `release_status` and `workshop_note`. The record is known only after its issue/update timestamp. Every supplied release status is `held`, and every confirmed release field is empty. An estimated completion remains an estimate when its timestamp passes; do not invent a later release or work-stage update.\n"
+    },
+    {
+      "file": "data/workshop/README.md",
+      "text": "# Workshop register supplement\n\nThese eight fictional vehicles (NW-W001\u2013NW-W008) are a separate held workshop cohort. They are not among the 172 vehicles in the operating timetable and have no supplied passenger trips, readiness releases or crew assignments. The combined console register has 180 vehicles, of which these eight remain held.\n\n`workshop_vehicles.csv` supplies type, nominal capacity, workshop location and issue time. `workshop_work_orders.csv` supplies the current known workshop snapshot, issue/update timestamps, work stage and an estimated completion. The two workshop names are fictional and have no implied real depot coordinates.\n\nEvery `confirmed_release_at` is empty and every `release_status` is `held`. An expected completion date is not a release, even when the simulated clock passes it. No progress or release beyond the last recorded update is supplied. These vehicles must not be treated as unlimited spare buses.\n\nThis supplement is separate from the nineteen canonical CSV tables and `lionlink-network.sqlite`; those files remain unchanged. All workshop faults, estimates and records are synthetic and do not describe a real operator's maintenance.\n"
+    }
+  ],
+  "source": "lionlink-operations-source",
+  "scope": "Departures 06:00\u201311:59, 5\u201316 October 2026; complete downstream calls retained.",
+  "dates": [
+    "2026-10-05",
+    "2026-10-06",
+    "2026-10-07",
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-12",
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16"
+  ],
+  "services": [
+    "22",
+    "54",
+    "56",
+    "57",
+    "70",
+    "73",
+    "76",
+    "130",
+    "132",
+    "133",
+    "141",
+    "159",
+    "162",
+    "163",
+    "231",
+    "232",
+    "235",
+    "238",
+    "261",
+    "262",
+    "265",
+    "269",
+    "410W",
+    "410G"
+  ],
+  "coverage": {
+    "vehicles": 172,
+    "workshopVehicles": 8,
+    "trips": 6900,
+    "stopCalls": 252380,
+    "services": 24,
+    "routes": 36,
+    "stops": 809
+  }
+}
