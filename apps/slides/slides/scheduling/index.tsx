@@ -318,14 +318,16 @@ const Page3: Page = () => (
       {"Three routes had all the late departures."}
     </h1>
     <p className="mt-5 text-[29px] leading-snug text-muted-foreground">
-      {"The worst affected route had 24 late departures out of 280."}
+      {
+        "Departures over five minutes late, out of all departures on each route."
+      }
     </p>
     <figure
       aria-label="Three routes had all the late departures."
       className="my-4 min-h-0 w-full flex-1"
     >
       <div
-        aria-label="Three routes had all the late departures. The worst affected route had 24 late departures out of 280."
+        aria-label="Three routes had all the late departures. Departures over five minutes late, out of all departures on each route."
         className="relative h-full w-full"
       >
         <div className="absolute top-[63.182px] left-[508.092px] h-[443.09px] w-[16px] text-foreground">
@@ -356,24 +358,24 @@ const Page3: Page = () => (
         </p>
         <div className="absolute top-[106.771px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[106.771px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[104.745px] left-[1528.073px] m-0 h-[58.572px] w-[189.938px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
-          <PageNumber />
+        <p className="absolute top-[104.745px] left-[1418px] m-0 h-[58.572px] w-[300px] text-center text-[length:42px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+          {"24 of 280"}
         </p>
         <p className="absolute top-[270.787px] left-[220.732px] m-0 h-[35.387px] w-[246.516px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Next most affected"}
         </p>
         <div className="absolute top-[259.305px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[259.305px] left-[516.092px] h-[69.148px] w-[619.45px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[257.278px] left-[1536.698px] m-0 h-[58.572px] w-[181.313px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
-          <PageNumber />
+        <p className="absolute top-[257.278px] left-[1418px] m-0 h-[58.572px] w-[300px] text-center text-[length:42px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+          {"17 of 280"}
         </p>
         <p className="absolute top-[423.318px] left-[285.092px] m-0 h-[35.387px] w-[182.156px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-foreground">
           {"Third affected"}
         </p>
         <div className="absolute top-[411.836px] left-[516.092px] h-[69.148px] w-[874.517px] [border-radius:4.068px] bg-muted"></div>
         <div className="absolute top-[411.836px] left-[516.092px] h-[69.148px] w-[255.067px] [border-radius:4.068px] bg-destructive"></div>
-        <p className="absolute top-[409.81px] left-[1561.839px] m-0 h-[58.572px] w-[156.172px] text-center text-[length:48.81px] leading-[1.2] font-[600] whitespace-pre text-destructive">
-          <PageNumber />
+        <p className="absolute top-[409.81px] left-[1418px] m-0 h-[58.572px] w-[300px] text-center text-[length:42px] leading-[1.2] font-[600] whitespace-pre text-destructive">
+          {"7 of 220"}
         </p>
         <p className="absolute top-[504.668px] left-[504.873px] m-0 h-[35.387px] w-[22.438px] text-center text-[length:29.49px] leading-[1.2] font-[450] whitespace-pre text-muted-foreground">
           {"0"}

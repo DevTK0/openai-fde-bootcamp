@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest"
-import { isValidElement, type ReactNode } from "react"
+import { createElement, isValidElement, type ReactNode } from "react"
+import { renderToStaticMarkup } from "react-dom/server"
 import { readFileSync } from "node:fs"
 import groups from "./deck-groups.json"
 
@@ -46,6 +47,7 @@ describe("native Open Slide authoring contract", () => {
       // Native edits target JSX locations inside each deck's index.tsx.
       expect(source).not.toMatch(/createDeck\(|SlideCanvas|editor\/store/)
       expect(source).toMatch(/export default \[/)
+      expect(source.match(/<PageNumber\s*\/>/g)).toHaveLength(pages.length)
       for (const Page of pages) {
         const elements = tags(Page())
         expect(elements).toContain("h1")
@@ -56,4 +58,16 @@ describe("native Open Slide authoring contract", () => {
       }
       expect(source).not.toContain("�")
     })
+})
+
+it("shows route departure counts rather than page numbers in the chart", async () => {
+  const { default: pages } = await import("../slides/scheduling/index")
+  const Page = pages[2]
+  if (!Page) throw new Error("Missing route delay slide")
+  const html = renderToStaticMarkup(createElement(Page))
+  const figure = html.match(/<figure\b[\s\S]*?<\/figure>/)?.[0]
+  expect(figure).toContain("24 of 280")
+  expect(figure).toContain("17 of 280")
+  expect(figure).toContain("7 of 220")
+  expect(figure).not.toContain("1 / 1")
 })
