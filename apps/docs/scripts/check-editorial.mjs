@@ -7,6 +7,8 @@ const navigation =
 const failures = [];
 for (const file of await readdir(content, { recursive: true })) {
   if (!/\.mdx?$/.test(file)) continue;
+  // Fieldnotes documents a working app, not the fleet evidence guide.
+  if (file === "fieldnotes-tutorial.md") continue;
   const lines = (await readFile(new URL(file, content), "utf8")).split("\n");
   lines.forEach((line, index) => {
     if (navigation.test(line))
