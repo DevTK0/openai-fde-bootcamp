@@ -5,8 +5,24 @@ import {
   readOperationsDownload,
   sourceTable,
 } from "@/lib/operations-server"
+import { DatabaseBusyError } from "@/lib/database"
+
 export const runtime = "nodejs"
 export async function GET(request: Request) {
+  try {
+    return await operationsResponse(request)
+  } catch (error) {
+    if (error instanceof DatabaseBusyError) {
+      return Response.json(
+        { error: error.message },
+        { status: 503, headers: { "Retry-After": "1" } }
+      )
+    }
+    throw error
+  }
+}
+
+async function operationsResponse(request: Request) {
   const params = new URL(request.url).searchParams
   const view = params.get("view") ?? "summary"
   if (view === "summary") {

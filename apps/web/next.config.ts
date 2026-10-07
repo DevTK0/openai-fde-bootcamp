@@ -4,7 +4,10 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],
   outputFileTracingRoot: process.cwd() + "/../..",
   outputFileTracingIncludes: {
-    "/api/operations": ["../../data/operations/lionlink-network.sqlite"],
+    "/api/operations": [
+      "../../data/operations/lionlink-network.sqlite",
+      "./lib/database-worker.mjs",
+    ],
     "/dashboard": ["../../data/operations/lionlink-network.sqlite"],
   },
   // Allow the VM proxy and the collaborative browser development hostname.

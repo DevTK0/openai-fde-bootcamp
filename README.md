@@ -117,8 +117,10 @@ have different column layouts, so SQLite stores their rows as JSON values in
 The server loads handouts for the dashboard page and queries operations through
 `/api/operations`. Reports aggregate the current relational records. Passenger and
 boarding views join their recorded trip links to the current trips and stop calls.
-Each request opens a read-only database transaction. There is no runtime fallback to
-JSON files. Reload the page to see database changes in the handout views.
+Each request opens a read-only database transaction. Operations searches and report
+queries run in worker threads, with at most four reads in flight per server process.
+Additional reads receive HTTP 503 with `Retry-After: 1`. Services, dates, and coverage
+come from the current database rows. There is no runtime fallback to JSON files. Reload the page to see database changes in the handout views.
 
 The compressed CSV downloads are original source attachments stored in SQLite.
 They preserve the supplied bytes and do not change when you edit operational rows.
@@ -142,6 +144,7 @@ Set `DASHBOARD_DATABASE_PATH` to an absolute path to use another compatible data
 The default path is relative to the web app directory used by the pnpm scripts.
 The production image includes the database and uses Node 24.21.0. Both the dashboard
 page and operations API include the database in their Next.js deployment traces.
+The operations trace also includes `apps/web/lib/database-worker.mjs`.
 
 Run `pnpm check` to verify the migration. The web tests compare the old fixtures with
 SQLite reports, pagination, downloads, handouts, and passenger evidence. They also edit

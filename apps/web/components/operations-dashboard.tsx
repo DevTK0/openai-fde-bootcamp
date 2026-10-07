@@ -140,7 +140,10 @@ export function OperationsDashboard() {
               value={service}
               onChange={setService}
               options={[
-                { value: "all", label: "All 24 services" },
+                {
+                  value: "all",
+                  label: `All ${manifest.services.length} services`,
+                },
                 ...manifest.services.map((s) => ({
                   value: s,
                   label: `Service ${s}`,
@@ -152,7 +155,7 @@ export function OperationsDashboard() {
               value={date}
               onChange={setDate}
               options={[
-                { value: "all", label: "All ten weekdays" },
+                { value: "all", label: `All ${manifest.dates.length} dates` },
                 ...manifest.dates.map((d) => ({ value: d, label: d })),
               ]}
             />
