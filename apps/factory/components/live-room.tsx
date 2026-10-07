@@ -59,6 +59,7 @@ export function LiveRoom() {
   const [title, setTitle] = useState("")
   const [speaker, setSpeaker] = useState("Employee")
   const [draft, setDraft] = useState("")
+  const [answers, setAnswers] = useState<Record<string, string>>({})
   const [partial, setPartial] = useState("")
   const [microphone, setMicrophone] = useState<Microphone>("off")
   const [pending, setPending] = useState<PendingSegment[]>([])
@@ -104,9 +105,15 @@ export function LiveRoom() {
   useEffect(() => {
     const saved = sessionStorage.getItem("factory-access")
     if (!saved) return
+    const sessionId = session.current
     void api(saved)
-      .then(() => setAccess(saved))
-      .catch(() => sessionStorage.removeItem("factory-access"))
+      .then(() => {
+        if (sessionId === session.current) setAccess(saved)
+      })
+      .catch(() => {
+        if (sessionId === session.current)
+          sessionStorage.removeItem("factory-access")
+      })
   }, [api])
   useEffect(() => {
     if (!access) return
@@ -244,8 +251,10 @@ export function LiveRoom() {
                 event.preventDefault()
                 setBusy(true)
                 setError("")
+                const sessionId = ++session.current
                 void api(token)
                   .then(() => {
+                    if (sessionId !== session.current) return
                     sessionStorage.setItem("factory-access", token)
                     setAccess(token)
                     setToken("")
@@ -340,6 +349,12 @@ export function LiveRoom() {
                 setSnapshot(null)
                 setMicrophone("off")
                 setPending([])
+                setAnswers({})
+                setDraft("")
+                setTitle("")
+                setSelected(null)
+                typedCommand.current = null
+                createCommand.current = null
               }}
             >
               Disconnect
@@ -719,12 +734,25 @@ export function LiveRoom() {
                 key={request.id}
                 request={request}
                 busy={busy}
+                answer={answers[request.id] ?? ""}
+                onAnswerChange={(answer) =>
+                  setAnswers((current) => ({
+                    ...current,
+                    [request.id]: answer,
+                  }))
+                }
                 act={(command) =>
                   mutate(command)
-                    .then(() => true)
+                    .then(() => {
+                      if (command.kind === "answer")
+                        setAnswers((current) =>
+                          current[command.requestId] === command.answer
+                            ? { ...current, [command.requestId]: "" }
+                            : current
+                        )
+                    })
                     .catch((e: unknown) => {
                       setError(message(e))
-                      return false
                     })
                 }
               />
@@ -739,13 +767,16 @@ export function LiveRoom() {
 function RequestDetail({
   request,
   busy,
+  answer,
+  onAnswerChange,
   act,
 }: {
   request: FactoryRequest
   busy: boolean
-  act: (command: Command) => Promise<boolean>
+  answer: string
+  onAnswerChange: (answer: string) => void
+  act: (command: Command) => Promise<void>
 }) {
-  const [answer, setAnswer] = useState("")
   const state = request.state
   return (
     <Card>
@@ -776,12 +807,7 @@ function RequestDetail({
             className="space-y-3"
             onSubmit={(event) => {
               event.preventDefault()
-              void act({ kind: "answer", requestId: request.id, answer }).then(
-                (saved) => {
-                  if (saved)
-                    setAnswer((current) => (current === answer ? "" : current))
-                }
-              )
+              void act({ kind: "answer", requestId: request.id, answer })
             }}
           >
             <Label htmlFor="answer">{state.question}</Label>
@@ -790,7 +816,7 @@ function RequestDetail({
               required
               maxLength={12000}
               value={answer}
-              onChange={(event) => setAnswer(event.target.value)}
+              onChange={(event) => onAnswerChange(event.target.value)}
             />
             <Button type="submit" disabled={busy || !answer.trim()}>
               Answer and continue

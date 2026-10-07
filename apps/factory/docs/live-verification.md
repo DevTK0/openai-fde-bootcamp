@@ -35,3 +35,9 @@ The fixes retain newer drafts by checking the submitted command identity. Room s
 Before the follow-up fix, analyser samples with RMS 0.008 produced no commit on stop or after silence. Samples with RMS 0.03 committed once, but a subsequent delta before acknowledgement triggered a duplicate commit. All three checks failed for those reasons before the production change.
 
 The fixed tests provide audio samples before committing and transcript events afterward. They cover delayed acknowledgements, a new utterance while an earlier commit remains outstanding, ordered final delivery, and resource cleanup. `pnpm check` passes with 27 factory tests, and `pnpm --filter factory build` passes. These checks use fake audio resources and supplied protocol events, not a live provider connection.
+
+## Session ownership regression checks
+
+The reviewer and owner reproduced a late automatic-login failure deleting a newer token, and request selection erasing an unsent clarification. Manual login now advances the existing session generation. Restore completion can only update the generation that started it. Clarification drafts belong to request IDs in the parent component and clear on successful unchanged submission or disconnect.
+
+Four additional component cases cover stale restore success and failure, authenticated commands retaining the new token, unsent and failed clarification saves across request selection, and cleared drafts after disconnect and reconnect. `pnpm check` passes with 31 factory tests. `pnpm --filter factory build` passes.

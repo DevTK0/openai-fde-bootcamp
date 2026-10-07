@@ -218,3 +218,109 @@ it("preserves clarification edits made during a pending answer save", async () =
   await act(async () => save.resolve(Response.json(room)))
   expect(answer).toHaveProperty("value", "Monthly report too")
 })
+
+it.each([200, 401])(
+  "retains the new session when an old restore returns %s late",
+  async (status) => {
+    const old = deferredResponse()
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(async (_url, init) =>
+        new Headers(init?.headers).get("Authorization") === "Bearer old-token"
+          ? old.promise
+          : Response.json(snapshot())
+      )
+    )
+    sessionStorage.setItem("factory-access", "old-token")
+    render(<LiveRoom />)
+    fireEvent.change(screen.getByLabelText("Factory access token"), {
+      target: { value: "new-token" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Connect to factory" }))
+    await screen.findByRole("button", { name: "Start listening" })
+    expect(sessionStorage.getItem("factory-access")).toBe("new-token")
+    await act(async () =>
+      old.resolve(
+        Response.json(status === 200 ? snapshot(roomB) : { error: "Expired" }, {
+          status,
+        })
+      )
+    )
+    expect(sessionStorage.getItem("factory-access")).toBe("new-token")
+    expect(screen.queryByText("Existing Room B transcript")).toBeNull()
+    fireEvent.change(
+      screen.getByRole("textbox", { name: "Or add to the transcript" }),
+      { target: { value: "Use the new session" } }
+    )
+    fireEvent.click(screen.getByRole("button", { name: "Add to conversation" }))
+    await waitFor(() => {
+      const post = vi
+        .mocked(fetch)
+        .mock.calls.find(([, init]) => init?.method === "POST")
+      expect(new Headers(post?.[1]?.headers).get("Authorization")).toBe(
+        "Bearer new-token"
+      )
+    })
+  }
+)
+it.each([false, true])(
+  "retains clarification across selection and clears on disconnect, failed save $0",
+  async (failedSave) => {
+    const request: Snapshot["requests"][number] = {
+      id: "44444444-4444-4444-8444-444444444444",
+      conversationId: roomA.id,
+      triggerSegmentId: "55555555-5555-4555-8555-555555555555",
+      context: [],
+      createdAt: "2026-01-01",
+      updatedAt: "2026-01-01",
+      attempt: 1,
+      answers: [],
+      state: { kind: "clarification", question: "Which report?" },
+    }
+    const data: Snapshot = {
+      ...snapshot(),
+      requests: [
+        request,
+        {
+          ...request,
+          id: "66666666-6666-4666-8666-666666666666",
+          state: { kind: "queued" },
+        },
+      ],
+    }
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(async (_url, init) =>
+        init?.method === "POST"
+          ? Response.json({ error: "Unavailable" }, { status: 503 })
+          : Response.json(data)
+      )
+    )
+    await connect()
+    fireEvent.click(screen.getByRole("button", { name: /Needs your input/ }))
+    fireEvent.change(screen.getByRole("textbox", { name: "Which report?" }), {
+      target: { value: "Preserve the monthly report" },
+    })
+    if (failedSave) {
+      fireEvent.click(
+        screen.getByRole("button", { name: "Answer and continue" })
+      )
+      await screen.findByRole("alert")
+    }
+    fireEvent.click(screen.getByRole("button", { name: /Queued/ }))
+    fireEvent.click(screen.getByRole("button", { name: /Needs your input/ }))
+    expect(
+      screen.getByRole("textbox", { name: "Which report?" })
+    ).toHaveProperty("value", "Preserve the monthly report")
+    fireEvent.click(screen.getByRole("button", { name: "Disconnect" }))
+    fireEvent.change(screen.getByLabelText("Factory access token"), {
+      target: { value: "new-token" },
+    })
+    fireEvent.click(screen.getByRole("button", { name: "Connect to factory" }))
+    await screen.findByRole("button", { name: "Start listening" })
+    fireEvent.click(screen.getByRole("button", { name: /Needs your input/ }))
+    expect(
+      screen.getByRole("textbox", { name: "Which report?" })
+    ).toHaveProperty("value", "")
+  }
+)
