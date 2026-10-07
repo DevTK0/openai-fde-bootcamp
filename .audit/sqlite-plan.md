@@ -9,7 +9,7 @@
 - [x] Migrate client callers and delete runtime snapshot imports.
 - [x] Verify database parity, real API behavior, automated UI interactions, checks and production packaging. Visual browser verification is inconclusive because the T3 preview timed out.
 - [x] Scrap. Skip because the architecture passed verification.
-- [ ] Hand back the verified change.
+- [x] Hand back the verified change in PR #24, with visual verification explicitly unconfirmed.
 
 ## Design A
 
@@ -31,7 +31,11 @@ Compare database output to the pre-migration fixtures, including all 21 table ty
 
 - [x] Worktree. Isolated task branch and runtime.
 - [x] PRs. Reviewed the diff and comments guidance.
-- [ ] Commits. Commit the verified migration and rebase onto current main.
-- [ ] Forge. Push and open one PR against main.
-- [ ] Readiness. Read back the PR and check feedback.
+- [x] Commits. Commit the verified migration and rebase onto current main.
+- [x] Forge. Push and open one PR against main.
+- [x] Readiness. Read back the PR and check feedback.
 - [x] Babysit. Skip because no ongoing CI supervision was requested.
+
+PR: https://github.com/DevTK0/openai-fde-bootcamp/pull/24
+
+Final workspace check passed after rebasing onto current main. The PR is open and linked to the thread. There were no review comments or threads at publication; automated reviews were still pending.
