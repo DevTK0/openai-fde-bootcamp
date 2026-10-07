@@ -38,17 +38,24 @@ const emptyFilters: EvidenceFilters = {
 export function Workspace({
   initialRevisions,
   initialRevision,
+  initialUnavailableRevisions,
+  initialNotice,
 }: {
   initialRevisions: Revision[]
   initialRevision?: string
+  initialUnavailableRevisions: string[]
+  initialNotice: string
 }) {
+  const [unavailableRevisions, setUnavailableRevisions] = useState(
+    initialUnavailableRevisions
+  )
   const [revisions, setRevisions] = useState(initialRevisions)
   const [revision, setRevision] = useState(
     initialRevision ?? initialRevisions[0]?.id ?? ""
   )
   const [filters, setFilters] = useState(emptyFilters)
   const [problemId, setProblemId] = useState("repair-spend")
-  const [notice, setNotice] = useState("")
+  const [notice, setNotice] = useState(initialNotice)
   const [uploading, setUploading] = useState(false)
   const [table, setTable] = useState({ id: "", serial: 0 })
   const problem = problems.find((item) => item.id === problemId) ?? problems[0]
@@ -66,10 +73,12 @@ export function Workspace({
   }
   async function refresh() {
     try {
-      const result = await requestJson<{ revisions: Revision[] }>(
-        "/api/workspace"
-      )
+      const result = await requestJson<{
+        revisions: Revision[]
+        unavailableRevisions: string[]
+      }>("/api/workspace")
       setRevisions(result.revisions)
+      setUnavailableRevisions(result.unavailableRevisions)
       setNotice("Revision list refreshed.")
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Refresh failed")
@@ -161,6 +170,7 @@ export function Workspace({
               </Button>
               <Button
                 variant="outline"
+                nativeButton={false}
                 render={<a href="/evidence/example-bundle.json" download />}
               >
                 Download sample JSON
@@ -203,6 +213,12 @@ export function Workspace({
               </p>
             </div>
           </details>
+          {unavailableRevisions.length > 0 && (
+            <p role="alert" className="text-sm break-all">
+              Some saved revisions could not be read. Contact the dataset owner
+              to restore these revisions: {unavailableRevisions.join(", ")}
+            </p>
+          )}
           {notice && (
             <p role="status" className="rounded-md bg-muted p-3 text-sm">
               {notice}
@@ -210,7 +226,25 @@ export function Workspace({
           )}
         </section>
         <div className="grid items-start gap-6 lg:grid-cols-[250px_minmax(0,1fr)]">
-          <aside className="space-y-5" aria-label="Stakeholder questions">
+          <div className="space-y-2 lg:hidden">
+            <Label>Choose a decision</Label>
+            <Pick
+              label="Decision question"
+              value={problem.id}
+              options={problems.map((item) => ({
+                value: item.id,
+                label: `${item.group} · ${item.title}`,
+              }))}
+              onChange={(value) => {
+                setProblemId(value)
+                setTable({ id: "", serial: 0 })
+              }}
+            />
+          </div>
+          <aside
+            className="hidden space-y-5 lg:block"
+            aria-label="Stakeholder questions"
+          >
             <div>
               <h2 className="font-semibold">Choose a decision</h2>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -411,15 +445,16 @@ export function Workspace({
                   scope={scope}
                   initialTable={
                     table.id ||
-                    [...analysis.data.tables].sort((a, b) => {
-                      const score = (title: string) =>
-                        problem.query
-                          .split(" ")
-                          .filter((term) =>
-                            title.toLowerCase().includes(term.toLowerCase())
-                          ).length
-                      return score(b.title) - score(a.title)
-                    })[0]?.id ||
+                    analysis.data.tables.find(
+                      (item) => item.id === problem.preferredTable
+                    )?.id ||
+                    analysis.data.tables.find(
+                      (item) =>
+                        item.kind ===
+                        (problem.group === "Maintenance"
+                          ? "maintenance"
+                          : "operations")
+                    )?.id ||
                     ""
                   }
                 />

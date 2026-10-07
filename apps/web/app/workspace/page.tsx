@@ -5,18 +5,29 @@ import { seedSummary } from "@/lib/evidence/seed"
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ revision?: string }>
+  searchParams: Promise<{ revision?: string | string[] }>
 }) {
   const { revision } = await searchParams
   await connection()
-  const revisions = await listBundles()
+  const { revisions, unavailableRevisions } = await listBundles()
+  const available = [
+    seedSummary,
+    ...revisions.filter((item) => item.id !== seedSummary.id),
+  ]
+  const selected =
+    typeof revision === "string"
+      ? available.find((item) => item.id === revision)?.id
+      : undefined
   return (
     <Workspace
-      initialRevision={revision}
-      initialRevisions={[
-        seedSummary,
-        ...revisions.filter((revision) => revision.id !== seedSummary.id),
-      ]}
+      initialRevision={selected}
+      initialNotice={
+        revision !== undefined && !selected
+          ? "Requested revision is unavailable. Showing the supplied fixture instead."
+          : ""
+      }
+      initialUnavailableRevisions={unavailableRevisions}
+      initialRevisions={available}
     />
   )
 }

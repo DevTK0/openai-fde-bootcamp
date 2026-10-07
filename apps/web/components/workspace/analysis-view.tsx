@@ -94,7 +94,7 @@ export function AnalysisView({
                   value: point.value,
                 }))}
                 series={[{ key: "value", label: metric.label }]}
-                area
+                area={metric.series.length > 1}
               />
             ) : (
               <Card>

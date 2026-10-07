@@ -50,10 +50,12 @@ export function RecordsPanel({
   const source = analysis.sources.find((item) => item.id === table?.sourceId)
   const numericColumns =
     resource.status === "ready"
-      ? resource.data.columns.filter((column) =>
-          resource.data.rows.some(
-            (row) => typeof row.values[column] === "number"
-          )
+      ? resource.data.columns.filter(
+          (column) =>
+            column === numericColumn ||
+            resource.data.rows.some(
+              (row) => typeof row.values[column] === "number"
+            )
         )
       : []
   const chartColumn = numericColumns.includes(numericColumn)
@@ -81,6 +83,7 @@ export function RecordsPanel({
               setTableId(value)
               setPage(0)
               setSearch("")
+              setNumericColumn("")
             }}
           />
           <Input

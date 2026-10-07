@@ -8,10 +8,12 @@ export type Problem = {
   limit: string
   request: string
   query: string
+  preferredTable: string
 }
 export const problems: Problem[] = [
   {
     id: "service-reliability",
+    preferredTable: "operations",
     group: "Scheduling",
     title: "What affects service reliability?",
     stakeholder: "Service planners and dispatch",
@@ -26,6 +28,7 @@ export const problems: Problem[] = [
   },
   {
     id: "workshop-scheduling",
+    preferredTable: "fleet-14",
     group: "Scheduling",
     title: "Do workshop bookings fit capacity?",
     stakeholder: "Workshop supervisors and schedulers",
@@ -40,6 +43,7 @@ export const problems: Problem[] = [
   },
   {
     id: "festival-allocation",
+    preferredTable: "fleet-20",
     group: "Scheduling",
     title: "Where might the festival plan have gaps?",
     stakeholder: "Event operations and fleet planners",
@@ -53,6 +57,7 @@ export const problems: Problem[] = [
   },
   {
     id: "incident-relief",
+    preferredTable: "fleet-31",
     group: "Scheduling",
     title: "Can relief buses clear the queue?",
     stakeholder: "Incident controllers",
@@ -67,12 +72,13 @@ export const problems: Problem[] = [
   },
   {
     id: "repair-spend",
+    preferredTable: "fleet-37",
     group: "Maintenance",
     title: "What is driving repair cost?",
     stakeholder: "Engineering and finance",
     decision: "Which vehicles and periods deserve a work-order review?",
     hypothesis:
-      "Exposure, repeat faults, parts prices or vehicle age may explain the increase.",
+      "Exposure, repeat faults, parts prices or vehicle age may explain differences in repair costs.",
     limit:
       "Historical eight-bus records, operating fleet and workshop cohorts differ. Repair increases are part of maintenance increases.",
     request:
@@ -81,6 +87,7 @@ export const problems: Problem[] = [
   },
   {
     id: "investment-options",
+    preferredTable: "fleet-34",
     group: "Maintenance",
     title: "Which maintenance investments make sense?",
     stakeholder: "Finance and fleet leadership",
@@ -96,6 +103,7 @@ export const problems: Problem[] = [
   },
   {
     id: "fleet-availability",
+    preferredTable: "fleet-12",
     group: "Maintenance",
     title: "Which buses are confirmed available?",
     stakeholder: "Workshop and dispatch",
@@ -109,6 +117,7 @@ export const problems: Problem[] = [
   },
   {
     id: "hvac-comfort",
+    preferredTable: "fleet-39",
     group: "Maintenance",
     title: "What explains cooling faults?",
     stakeholder: "Engineering and customer experience",
@@ -123,6 +132,7 @@ export const problems: Problem[] = [
   },
   {
     id: "crowding",
+    preferredTable: "operations",
     group: "Ridership",
     title: "Where is boarding capacity constrained?",
     stakeholder: "Service planners and customer experience",
@@ -137,6 +147,7 @@ export const problems: Problem[] = [
   },
   {
     id: "capacity-use",
+    preferredTable: "operations",
     group: "Ridership",
     title: "How does demand vary by day?",
     stakeholder: "Network and capacity planners",
@@ -150,6 +161,7 @@ export const problems: Problem[] = [
   },
   {
     id: "customer-growth",
+    preferredTable: "fleet-33",
     group: "Ridership",
     title: "Can the evidence show customer growth?",
     stakeholder: "Commercial and customer experience",

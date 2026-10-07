@@ -12,7 +12,10 @@ import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Badge } from "@workspace/ui/components/badge"
 import type { EvidenceContext } from "@/lib/evidence/context"
-import type { EvidenceAnalysis } from "@/lib/evidence/analysis"
+import type {
+  EvidenceAnalysis,
+  EvidenceRowDetail,
+} from "@/lib/evidence/analysis"
 import type { Problem } from "./problems"
 import { useResource } from "./use-resource"
 
@@ -33,7 +36,7 @@ export function ContextPanel({
   const [expanded, setExpanded] = useState<number | null>(null)
   function download(context: EvidenceContext) {
     const url = URL.createObjectURL(
-      new Blob([JSON.stringify({ problem, ...context }, null, 2)], {
+      new Blob([JSON.stringify(context)], {
         type: "application/json",
       })
     )
@@ -54,7 +57,7 @@ export function ContextPanel({
       </CardHeader>
       <CardContent className="space-y-4">
         <form
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
           onSubmit={(event) => {
             event.preventDefault()
             setSubmitted(query)
@@ -97,6 +100,17 @@ export function ContextPanel({
               {resource.data.limits.maxRows} rows and{" "}
               {resource.data.limits.maxDocuments} passages.
             </p>
+            <p className="text-xs text-muted-foreground">
+              Evidence scope: vehicle {resource.data.filters.vehicle || "all"};
+              service {resource.data.filters.service || "all"}; from{" "}
+              {resource.data.filters.from || "start"}; to{" "}
+              {resource.data.filters.to || "end"}. {resource.data.scopeNote}
+            </p>
+            {resource.data.truncation.truncated && (
+              <p className="text-xs text-muted-foreground">
+                {resource.data.truncation.note}
+              </p>
+            )}
             <div className="grid gap-3 lg:grid-cols-2">
               {resource.data.evidence.map((item, index) => (
                 <div
@@ -147,17 +161,23 @@ export function ContextPanel({
                           )?.reference
                         }
                       </p>
-                      <p className="break-words whitespace-pre-wrap">
-                        {item.type === "document"
-                          ? analysis.sources
+                      {item.type === "document" ? (
+                        <p className="break-words whitespace-pre-wrap">
+                          {
+                            analysis.sources
                               .find(
                                 (source) => source.id === item.citation.sourceId
                               )
                               ?.text.split(/\n\s*\n/)[
                               item.citation.paragraph - 1
                             ]
-                          : item.text}
-                      </p>
+                          }
+                        </p>
+                      ) : (
+                        <CitedRow
+                          url={`/api/workspace/${item.citation.revision}?${new URLSearchParams(resource.data.filters)}&view=row&table=${encodeURIComponent(item.citation.tableId)}&row=${encodeURIComponent(item.citation.rowId)}`}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -175,5 +195,36 @@ export function ContextPanel({
         )}
       </CardContent>
     </Card>
+  )
+}
+
+function CitedRow({ url }: { url: string }) {
+  const resource = useResource<EvidenceRowDetail>(url)
+  if (resource.status === "loading")
+    return <p role="status">Loading complete record…</p>
+  if (resource.status === "error") return <p role="alert">{resource.error}</p>
+  return (
+    <div className="space-y-2">
+      <p className="font-medium">Complete cited record</p>
+      <p>
+        {resource.data.title} · {resource.data.row.id}
+      </p>
+      <dl className="space-y-2">
+        {resource.data.columns.map((column) => (
+          <div key={column}>
+            <dt className="font-medium">{column}</dt>
+            <dd className="break-words whitespace-pre-wrap">
+              {resource.data.row.values[column] === null ||
+              resource.data.row.values[column] === undefined
+                ? "Not recorded"
+                : String(resource.data.row.values[column])}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      {resource.data.caveats.map((caveat) => (
+        <p key={caveat}>{caveat}</p>
+      ))}
+    </div>
   )
 }
