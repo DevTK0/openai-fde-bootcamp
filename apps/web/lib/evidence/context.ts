@@ -40,25 +40,36 @@ function resolveScope(
   }
   known.service = [...new Set(known.service)]
   known.vehicle = [...new Set(known.vehicle)]
-  // Keep quantities whole. Ranking words are deliberately not scope tokens.
-  const rawTokens =
+  type ScopeToken = {
+    kind: "date" | "entity" | "word" | "symbol"
+    value: string
+  }
+  const matches = (kind: EntityKind, id: string) =>
+    known[kind].filter((v) => v.toLowerCase() === id)
+  // Normalize once so date scope is independent of quotes and entity lists.
+  const tokens: ScopeToken[] = (
     question.match(
       /"[^"\n]+"|'[^'\n]+'|[a-z0-9]+(?:[-_.,][a-z0-9]+)*%?|[:=#/&,]/gi
     ) ?? []
-  const tokens = rawTokens.map((token) => token.toLowerCase())
-  const value = (token: string) => token.replace(/^["']|["']$/g, "")
-  const matches = (kind: EntityKind, id: string) =>
-    known[kind].filter((v) => v.toLowerCase() === id)
+  ).map((raw) => {
+    const value = raw.replace(/^["']|["']$/g, "").toLowerCase()
+    const kind = /^\d{4}-\d{2}(?:-\d{2})?$/.test(value)
+      ? "date"
+      : /^[a-z0-9"']/i.test(raw)
+        ? /[0-9"']/.test(raw) ||
+          /^[A-Z]+(?:[-_][A-Z]+)*$/.test(raw) ||
+          matches("service", value).length ||
+          matches("vehicle", value).length
+          ? "entity"
+          : "word"
+        : "symbol"
+    return { kind, value }
+  })
   const references: { kind: EntityKind | "route"; id: string }[] = []
   const consumed = new Set<number>()
   const issues: string[] = []
-  const isReference = (token: string, index: number) =>
-    /[0-9"']/.test(token) ||
-    /^[A-Z]+$/.test(rawTokens[index] ?? "") ||
-    known.service.some((v) => v.toLowerCase() === token) ||
-    known.vehicle.some((v) => v.toLowerCase() === token)
   for (let i = 0; i < tokens.length; i++) {
-    const label = tokens[i]
+    const label = tokens[i]?.value
     const kind =
       label && /^services?$/.test(label)
         ? "service"
@@ -71,48 +82,57 @@ function resolveScope(
     consumed.add(i)
     let cursor = i + 1
     let marked = false
-    while (/^(?:id|number|no|[:=#])$/.test(tokens[cursor] ?? "")) {
+    while (/^(?:id|number|no|[:=#])$/.test(tokens[cursor]?.value ?? "")) {
       marked = true
       consumed.add(cursor)
       cursor++
     }
     const first = tokens[cursor]
-    if (!first || (!marked && !isReference(first, cursor))) continue
+    if (!first) continue
+    if (first.kind === "date") {
+      issues.push(`Date-shaped ${kind} identifiers require structured filters.`)
+      continue
+    }
+    if (!marked && first.kind !== "entity") continue
     while (tokens[cursor]) {
       const token = tokens[cursor]
       if (!token) break
-      references.push({ kind, id: value(token) })
+      references.push({ kind, id: token.value })
       consumed.add(cursor)
       const connector = tokens[cursor + 1]
       const next = tokens[cursor + 2]
       if (
         !connector ||
-        !/^(?:and|or|\/|&|,)$/.test(connector) ||
+        !/^(?:and|or|\/|&|,)$/.test(connector.value) ||
         !next ||
-        !isReference(next, cursor + 2)
+        next.kind !== "entity"
       )
         break
       cursor += 2
     }
   }
-  const dates: string[] = []
+  const dates = tokens
+    .filter((token) => token.kind === "date")
+    .map((token) => token.value)
   for (const [index, token] of tokens.entries()) {
     if (consumed.has(index)) continue
-    if (/^\d{4}-\d{2}(?:-\d{2})?$/.test(token)) {
-      dates.push(token)
-      continue
-    }
     // Bare numeric values have no entity intent. Nonnumeric exact IDs can infer
     // scope only when their namespace is unique.
-    if (!/[a-z]/.test(token)) continue
+    if (!/[a-z]/.test(token.value)) continue
     const kinds = (["service", "vehicle"] as const).filter(
-      (kind) => matches(kind, value(token)).length
+      (kind) => matches(kind, token.value).length
     )
     if (kinds.length > 1)
-      issues.push(`Ambiguous identifier ${token}; specify service or vehicle.`)
-    else if (kinds[0]) references.push({ kind: kinds[0], id: value(token) })
-    else if (/[a-z]/.test(token) && /\d/.test(token) && /[-_]/.test(token))
-      issues.push(`Unrecognized identifier ${token}.`)
+      issues.push(
+        `Ambiguous identifier ${token.value}; specify service or vehicle.`
+      )
+    else if (kinds[0]) references.push({ kind: kinds[0], id: token.value })
+    else if (
+      /[a-z]/.test(token.value) &&
+      /\d/.test(token.value) &&
+      /[-_]/.test(token.value)
+    )
+      issues.push(`Unrecognized identifier ${token.value}.`)
   }
   if (references.some((reference) => reference.kind === "route"))
     issues.push(

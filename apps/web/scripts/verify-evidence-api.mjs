@@ -121,6 +121,14 @@ scoped.tables[1].rows.push({
   id: "other-service",
   values: { ...scoped.tables[1].rows[0].values, service: "34", boardings: 900 },
 })
+scoped.tables[1].rows.push({
+  id: "next-day",
+  values: {
+    ...scoped.tables[1].rows[0].values,
+    date: "2026-10-06",
+    boardings: 700,
+  },
+})
 const scopedRevision = (await request("/api/workspace", post(scoped))).body
   .revision.id
 const query = async (question) =>
@@ -133,21 +141,45 @@ assert.equal(
   (await query("passenger boardings service 12")).metrics.find(
     (m) => m.id === "boardings"
   ).value,
-  200
+  900
 )
 assert.equal(
   (await query("passenger boardings")).metrics.find((m) => m.id === "boardings")
     .value,
-  1100
+  1800
 )
 for (const question of [
   "passenger boardings service 999999",
+  "passenger boardings vehicle BUS-A",
+  "passenger boardings vehicle BUS_A",
+  'passenger boardings vehicle id "2026-10-05"',
+  "passenger boardings service 2026-10-05",
   "passenger boardings services 12 and 34",
 ]) {
   const unresolved = await query(question)
   assert.deepEqual(unresolved.metrics, [])
   assert.equal(unresolved.status, "insufficient")
   assert.ok(unresolved.unresolvedScope.length)
+}
+for (const date of ["2026-10-05", '"2026-10-05"', "'2026-10-05'"]) {
+  for (const connector of ["on", "and"]) {
+    const result = await query(
+      `passenger boardings service 12 ${connector} ${date}`
+    )
+    assert.deepEqual(result.unresolvedScope, [])
+    assert.equal(result.filters.from, "2026-10-05")
+    assert.equal(result.filters.to, "2026-10-05")
+    assert.equal(result.metrics.find((m) => m.id === "boardings").value, 200)
+  }
+}
+for (const date of [
+  '"2026-02-30"',
+  "'2026-02-30'",
+  '"2026-10-05" and "2026-10-06"',
+]) {
+  const result = await query(`passenger boardings service 12 and ${date}`)
+  assert.ok(result.unresolvedScope.length)
+  assert.deepEqual(result.metrics, [])
 }
 const grammarBundle = structuredClone(fixture)
 grammarBundle.name = "Typed reference and quantity verification"
