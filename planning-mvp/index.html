@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f7f5">
+  <title>LionLink · Planning Studio</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="visualization/route-viewer.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="rail">
+      <a class="brand" href="#top" aria-label="LionLink Planning Studio home"><span class="brand-mark">L</span><span>LIONLINK<small>PLANNING STUDIO</small></span></a>
+      <div class="rail-label">WORKSPACE</div>
+      <button class="rail-item selected" type="button"><span>◫</span>Planning desk</button>
+      <div class="rail-bottom"><span class="live-dot"></span>Offline training mode</div>
+    </aside>
+    <main id="top">
+      <header class="topbar"><div class="crumb">Operations <span>/</span> Planning studio</div><div class="snapshot"><span class="snapshot-dot"></span> Training snapshot <b>·</b> 05 Oct 2026</div></header>
+      <section class="intro">
+        <div><div class="eyebrow">SERVICE PLANNING · SINGAPORE</div><h1>Plan around passenger need.</h1><p>Explore demand, service trade-offs and resource feasibility before a planner approves a change.</p></div>
+        <a class="intro-tag" href="#allocation-visuals"><span class="tag-icon">↘</span><span><b>Explore allocation visuals</b><small>Ripple · timeline · trade-off · replay</small></span></a>
+      </section>
+      <section class="scenario-section" aria-labelledby="scenario-heading">
+        <div class="section-heading"><div><div class="eyebrow">START WITH A SCENARIO</div><h2 id="scenario-heading">What are you planning for?</h2></div><span class="step-count"><i>01</i> / 03</span></div>
+        <div class="scenario-grid" role="group" aria-label="Choose planning scenario">
+          <button class="scenario-card active" data-scenario="new" type="button"><span class="scenario-icon purple">↗</span><span class="scenario-copy"><b>Plan a new route</b><small>Fill a coverage gap with service that fits demand.</small><em>DEMAND &amp; COVERAGE <span>→</span></em></span></button>
+          <button class="scenario-card" data-scenario="existing" type="button"><span class="scenario-icon blue">⟳</span><span class="scenario-copy"><b>Optimise a route</b><small>Move capacity where passengers need it most.</small><em>NETWORK BALANCE <span>→</span></em></span></button>
+          <button class="scenario-card" data-scenario="maintenance" type="button"><span class="scenario-icon orange">⌁</span><span class="scenario-copy"><b>Bus in maintenance</b><small>Protect departures while a vehicle is unavailable.</small><em>DISRUPTION PLAN <span>→</span></em></span></button>
+          <button class="scenario-card" data-scenario="connection" type="button"><span class="scenario-icon green">⇄</span><span class="scenario-copy"><b>Missing connection</b><small>Improve the onward journey beyond the bus stop.</small><em>JOURNEY ACCESS <span>→</span></em></span></button>
+        </div>
+      </section>
+      <section class="workbench">
+        <div class="workbench-main">
+          <div class="work-title"><div><div class="eyebrow" id="workflow-label">NEW ROUTE · DECISION FLOW</div><h2 id="scenario-title">Test a new service</h2></div><button id="reset" class="quiet-button" type="button">↻ <span>Reset scenario</span></button></div>
+          <div class="flow-steps" id="flow-steps" aria-label="Planning workflow"></div>
+          <section class="decision-visuals" id="allocation-visuals" aria-label="Allocation decision visualizations"><div class="decision-visuals-title"><div><div class="eyebrow">INTERACTIVE ALLOCATION WORKBENCH</div><h2>Watch the trade-offs change</h2></div><span>Live what-if · sample data + assumptions</span></div>
+            <article class="decision-visual-card ripple-card"><div class="decision-visual-head"><div><div class="eyebrow">NETWORK RIPPLE</div><h3>Capacity moves, pressure shifts</h3></div><span id="ripple-status" class="visual-status">SCENARIO</span></div><div id="ripple-view" class="ripple-view"></div><p id="ripple-copy" class="visual-footnote"></p></article>
+            <article class="decision-visual-card timeline-card"><div class="decision-visual-head"><div><div class="eyebrow">PEAK-HOUR PRESSURE</div><h3>Scrub through the morning</h3></div><button id="timeline-play-toggle" class="quiet-button" type="button" aria-pressed="false">▶ Play</button></div><div id="timeline-view" class="timeline-view"></div><label class="timeline-scrub" for="timeline-range"><span id="timeline-time-label">06:30</span><input id="timeline-range" type="range" min="0" max="5" value="0" step="1"><b id="timeline-pressure-label"></b></label><div id="timeline-detail" class="timeline-detail"></div></article>
+            <article class="decision-visual-card balance-card"><div class="decision-visual-head"><div><div class="eyebrow">ALLOCATION TRADE-OFF</div><h3>Benefit vs donor impact</h3></div></div><div id="balance-view" class="balance-view"></div></article>
+            <article class="decision-visual-card replay-card"><div class="decision-visual-head"><div><div class="eyebrow">SCENARIO REPLAY</div><h3>Before and after at the same time</h3></div><span id="replay-time" class="visual-status">06:30</span></div><div id="replay-view" class="replay-view"></div><p class="visual-footnote">Demand follows the selected time step; after-state capacity reflects the selected allocation option.</p></article>
+            <article class="decision-visual-card ribbon-card"><div class="decision-visual-head"><div><div class="eyebrow">STOP-BY-STOP CROWDING</div><h3>Where boardings concentrate</h3></div><span id="ribbon-total" class="visual-status"></span></div><div id="crowding-ribbon" class="crowding-ribbon"></div><p id="ribbon-footnote" class="visual-footnote"></p></article>
+          </section>
+          <div class="planner-grid">
+            <div class="planner-form">
+              <div class="panel-head"><div><b id="panel-title">Shape the service</b><small id="panel-subtitle">Set a planning window and passenger demand.</small></div><span class="editable-chip">EDITABLE</span></div>
+              <div id="form-fields" class="form-fields"></div>
+              <div class="form-foot"><span><span class="info-dot">i</span> Change an input to explore the trade-off.</span><span id="input-source">Training inputs</span></div>
+            </div>
+            <div class="forecast-panel">
+              <div class="panel-head"><div><b>Demand &amp; capacity outlook</b><small id="forecast-caption">Illustrative planning window</small></div><span class="forecast-pill"><span class="live-dot"></span> SCENARIO</span></div>
+              <div class="metrics-row" id="metrics"></div>
+              <div class="chart-title"><span>Passengers &amp; usable capacity</span><span id="chart-period">AM PEAK · PER HOUR</span></div>
+              <div id="chart" class="chart" role="img" aria-label="Passenger demand and service capacity comparison"></div>
+              <div class="chart-legend"><span><i class="legend-demand"></i> Forecast demand</span><span><i class="legend-capacity"></i> Usable capacity</span><span id="chart-note">Based on editable assumptions</span></div>
+              <div class="insight" id="insight"></div>
+            </div>
+          </div>
+          <section class="allocation-sim" aria-labelledby="allocation-sim-title">
+            <div class="allocation-sim-head"><div><div class="eyebrow">LIVE WHAT-IF · RESOURCE ALLOCATION</div><h3 id="allocation-sim-title">See the plan play out</h3><p id="allocation-sim-caption">Animated scenario from the selected route, date and allocation option.</p></div><button id="allocation-play-toggle" class="quiet-button" type="button" aria-pressed="true">Ⅱ Pause simulation</button></div>
+            <div id="allocation-sim-view" class="allocation-sim-view" role="img" aria-label="Animated bus allocation between routes and demand versus capacity comparison"></div>
+            <div id="allocation-sim-metrics" class="allocation-sim-metrics"></div>
+            <div class="allocation-sim-foot">Scenario replay uses the selected date’s synthetic passenger sample plus the current editable assumptions. It is not connected to live buses, GPS or dispatch systems.</div>
+          </section>
+
+          <section class="route-scene" aria-labelledby="route-scene-title">
+            <div class="route-scene-head">
+              <div><div class="eyebrow">BLENDER MODEL · ALLOCATION SCENARIO</div><h3 id="route-scene-title">See both routes in 3D</h3><p>Receiving and donor routes · capacity changes · passenger hotspots · scenario replay</p></div>
+              <button id="route-view-reset" class="quiet-button" type="button">Reset view</button>
+            </div>
+            <div class="route-scene-stage"><div class="route-scene-frame"><canvas id="route-canvas" aria-label="Interactive 3D route scene. Drag to rotate, scroll to zoom, and click a stop marker for details."></canvas><div class="route-scene-chip"><i></i><span id="route-scene-label">Service 235 · Direction 1</span></div></div><aside class="passenger-count-panel" aria-live="polite"><div><b>Passengers on bus</b><small>Observed mean load at the bus’s current route position</small></div><div id="passenger-counts" class="passenger-counts"></div><small class="passenger-count-note">Load resets to zero at each terminal stop. Counts are sample averages, not live passenger totals.</small></aside></div>
+            <div class="route-multi-picker"><b>Routes in this scene</b><small>Click one or more services to add their routes and moving buses.</small><div id="scene-route-picker" class="scene-route-picker" role="group" aria-label="Select multiple bus routes for the 3D scene"></div></div>
+            <div class="route-3d-tools"><label class="route-tool-field"><span>Replay</span><select id="route-replay-mode"><option value="before-after">Before / after</option><option value="allocation">Allocation view</option></select></label><label class="route-tool-check"><input id="route-disruption-toggle" type="checkbox"><span>Simulate breakdown &amp; return to nearest interchange</span></label><span id="route-3d-status" class="route-3d-status">Illustrative allocation scenario</span><span class="route-load-key"><i class="load-green"></i> lower load <i class="load-amber"></i> moderate <i class="load-red"></i> high</span><small class="route-load-note">Segment color uses observed mean onboard load; before/after colors are a proportional scenario adjustment.</small></div>
+            <div id="route-relief-options" class="route-relief-options"><small>Distance is approximate straight-line map distance, not road distance or dispatch travel time.</small></div>
+            <div id="fleet-status-panel" class="fleet-status-panel" aria-label="Synthetic demo fleet inventory"><b>Demo fleet status <small>Synthetic mock counts</small></b><span>Replacement stock <strong id="fleet-spare-count">3</strong></span><span>Broken down / returning <strong id="fleet-broken-count">0</strong></span><span>In maintenance <strong id="fleet-maintenance-count">5</strong></span><span>Replacement buses deployed <strong id="fleet-deployed-count">0</strong></span></div>
+            <div class="route-overlay-tools" aria-label="Map data layers">
+              <label><input id="overlay-crowd" type="checkbox" checked><span class="overlay-key crowd-key">••</span><span><b>Waiting passengers</b><small>1 stick figure ≈ 3 people · count = average queue before the bus</small></span></label>
+              <label><input id="overlay-late" type="checkbox" checked><span class="overlay-key late-key"></span><span><b>Prior late arrivals</b><small>Ring size = share ≥1 minute late on earlier sample dates</small></span></label>
+              <label><input id="overlay-reports" type="checkbox" checked><span class="overlay-key report-key">PC</span><span><b>Passenger reports</b><small>Case IDs at the reported stop; selected reports only</small></span></label>
+              <span id="overlay-summary" class="overlay-summary">Loading stop call history…</span>
+            </div>
+            <div class="route-scene-controls">
+              <div class="route-playback-row"><label for="bus-progress"><span><b id="selected-stop-title">Selected stop</b><small id="selected-stop-detail">Click any stop marker to inspect its demand and history.</small></span></label><span class="route-playback-tools"><button id="bus-play-toggle" class="quiet-button" type="button" aria-pressed="true">Ⅱ Pause buses</button><span class="bus-progress-label"><b>Morning time scrubber</b><small id="bus-progress-value">0%</small></span></span></div>
+              <input id="bus-progress" type="range" min="0" max="100" step="1" value="0" aria-label="Morning simulation time. Move both route buses and passenger pressure through the planning period">
+              <div class="route-stop-detail" id="route-stop-detail" aria-live="polite"><b>Stop details</b><span>Select a route stop to see observed boardings and prior lateness sample.</span></div>
+              <div class="route-scene-disclosure"><span>Passenger counts are boarding events, not unique riders. Breakdown, replacement, and nearest-bus markers are simulated; vehicle, crew, and dispatch availability are not verified.</span><span>Route/stop geography: public map sources · Operations: synthetic exercise data.</span></div>
+            </div>
+          </section>
+          <div class="options-section"><div class="options-heading"><div><div class="eyebrow">COMPARE FEASIBLE PATHS</div><h3>Allocation options</h3></div><span class="option-note">Ranked by passenger impact and resource fit</span></div><div id="options" class="options-grid"></div></div>
+          <div id="flow-detail" class="flow-detail"></div>
+        </div>
+        <aside class="approval-card">
+          <div class="approval-top"><div class="eyebrow">PLANNER REVIEW</div><span class="review-status" id="review-status">DRAFT PLAN</span></div>
+          <h3>Decision summary</h3><p class="approval-lede" id="approval-lede">Review the service case and its resource implications.</p>
+          <div id="summary-list" class="summary-list"></div>
+          <label class="label" for="planner-note">Planner note</label><textarea id="planner-note" rows="3" placeholder="Add the reason for your decision…"></textarea>
+          <button id="approve" class="approve-button" type="button">Approve this plan <span>→</span></button>
+          <button id="save-draft" class="draft-button" type="button">Save as draft</button>
+          <div class="approval-foot"><span class="lock-icon">♧</span> Approval stays with the operating team.</div>
+        </aside>
+      </section>
+      <section class="data-note"><span class="data-note-icon">i</span><div><b>About this training snapshot</b><p>Passenger counts, schedules, buses and crew in the LionLink records are synthetic exercise data. This prototype uses a bounded morning sample to illustrate planning logic; it is not a live forecast or a validated dispatch recommendation. Route and stop geography is sourced separately. Confirm local rules, data quality and service targets with the client before piloting.</p></div><button id="data-details" type="button">Data scope <span>↗</span></button></section>
+      <footer><span>© 2026 LionLink Planning Studio · Hackathon prototype</span><span>Build with evidence <i>·</i> Keep humans in control</span></footer>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="scope-dialog"><div class="dialog-head"><div><div class="eyebrow">EVIDENCE &amp; ASSUMPTIONS</div><h2>Data scope</h2></div><button id="close-dialog" type="button" aria-label="Close">×</button></div><div class="scope-content"><p><b>Supplied evidence:</b> operating candidate files contain directional routes, stop sequences, vehicle capacities and release windows, crew duties, timetables, trips, and passenger queue / origin arrival records. The operating records are synthetic and cover ten fictional weekdays, 5–16 Oct 2026.</p><p><b>Map overlays:</b> crowd figures use the average recorded queue before and after boarding on the selected date and animate as the bus reaches each stop. The lateness ring aggregates earlier supplied stop calls at that route position and measures the share arriving at least one minute after schedule. This is an observed lateness indicator, not a breakdown probability.</p><p><b>Illustrative logic:</b> hourly demand is a roll-up of five-minute origin-arrival batches for the selected date and route. Remaining-queue pressure uses recorded route-position cohorts. Bus requirements use route cycle time ÷ headway, rounded up. Scenario adjustments, event lifts, changed frequency, maintenance downtime, connection delay and cost are editable assumptions.</p><p><b>Not established by this dataset:</b> full-network demand, reliable future forecasting accuracy, exact bus/driver availability for proposed plans, passenger journey outcomes, route-linked breakdown risk, real operator costs, or the client’s service thresholds. The allocation options are planning scenarios for review.</p><p>Use <code>planning-workflows.md</code> in the project folder for the complete four-scenario flow reference.</p></div></dialog>
+  <script src="snapshot.js"></script>
+  <script src="visualization/route-data.js"></script>
+  <script src="visualization/stop-overlay-data.js"></script>
+  <script src="visualization/bus-model.js"></script>
+  <script src="visualization/route-viewer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
