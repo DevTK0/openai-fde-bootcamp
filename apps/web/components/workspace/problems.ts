@@ -80,9 +80,9 @@ export const problems: Problem[] = [
     hypothesis:
       "Exposure, repeat faults, parts prices or vehicle age may explain differences in repair costs.",
     limit:
-      "Historical eight-bus records, operating fleet and workshop cohorts differ. Repair increases are part of maintenance increases.",
+      "Compare matched vehicle cohorts and periods. Repair costs may already be included in maintenance totals.",
     request:
-      "Matched mileage, coded work orders, parts prices and vehicle age for both years.",
+      "Matched mileage, coded work orders, parts prices and vehicle age for each comparison period.",
     query: "repair cost maintenance",
   },
   {
@@ -154,7 +154,7 @@ export const problems: Problem[] = [
     decision: "Where should capacity match recurring demand?",
     hypothesis: "Weekday patterns or transfer arrivals may change utilisation.",
     limit:
-      "One departure and a short observation window cannot establish network demand.",
+      "Limited departures or short observation windows cannot establish network demand.",
     request:
       "Matched departures across weeks, occupancy, capacity and special-event indicators.",
     query: "boardings capacity demand",
@@ -169,7 +169,7 @@ export const problems: Problem[] = [
     hypothesis:
       "Reliability and comfort may affect repeat travel, but this remains untested.",
     limit:
-      "Boardings are events, not unique customers. Six passenger reports do not measure retention.",
+      "Boardings are events, not unique customers. Passenger accounts alone do not measure retention.",
     request:
       "Retained aggregate ridership, fares, revenue and service history. Unique acquisition and retention remain unidentifiable without existing suitable records.",
     query: "customer passengers boardings retention",

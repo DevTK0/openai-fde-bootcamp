@@ -2,12 +2,10 @@
 
 # openai-fde
 
-A fleet dashboard, stakeholder presentations, and a software factory for shipping
+A fleet decision workspace, historical reports, stakeholder presentations, and a software factory for shipping
 changes with Codex.
 
-The **LionLink dashboard** lets you explore fleet history, maintenance, incidents,
-and operating costs. The **slide decks** turn that data into stakeholder
-presentations. Both use fictional sample data.
+The **decision workspace** analyses imported evidence with scoped charts, record inspection, and cited evidence search. The historical **LionLink dashboard** and **slide decks** use fixed fictional exercise data.
 
 ## Run it locally
 
@@ -20,7 +18,8 @@ pnpm dev
 
 Then open:
 
-- [Fleet dashboard](http://localhost:3000/dashboard)
+- [Decision workspace](http://localhost:3000/workspace)
+- [Historical fleet dashboard](http://localhost:3000/dashboard)
 - [Slide decks](http://127.0.0.1:3001/slides/)
 - [Documentation](http://127.0.0.1:3002/docs/)
 
@@ -85,7 +84,30 @@ You can also run `pnpm lint`, `pnpm typecheck`, or `pnpm test` individually.
 Repository conventions and instructions for coding agents live in
 [AGENTS.md](AGENTS.md).
 
-## LionLink dashboards
+## Analyse new evidence
+
+Open `/workspace`, choose a stakeholder question, and select **Import new evidence**.
+Download the sample JSON bundle from the page, adapt its sources and records, then
+upload it. Valid imports create immutable revisions and update charts without a
+rebuild. Choose a revision and filter by vehicle, service, and date to inspect
+metrics, their definitions, source caveats, and contributing records. The selected
+revision stays in the URL across reloads.
+
+`EVIDENCE_DATA_DIR` selects the persistent import directory. Its default is
+`apps/web/data/evidence` when the app runs from its workspace. Keep that directory
+across restarts. Behind a trusted proxy, set `EVIDENCE_PUBLIC_ORIGIN` to the public
+application origin so same-origin uploads pass validation.
+
+Evidence search retrieves bounded local context with row and source citations.
+It exposes missing evidence and exports the retrieved context. It does not use a
+language model to generate answers or establish root causes. Imported revisions
+do not update historical reports or slide conclusions.
+
+See the [workspace guide](apps/web/components/workspace/README.md) for the UI and
+browser verification, and the [evidence API and import contract](apps/web/lib/evidence/README.md)
+for JSON fields, limits, metric scope, persistence, and deployment access requirements.
+
+## Historical LionLink dashboards
 
 Visit `/dashboard` for fleet history, maintenance, October operations, workshop and
 festival planning, the incident baseline, passenger accounts, and quoted cost options.
@@ -114,8 +136,8 @@ in this repository. The apps use the checked-in snapshots directly.
 
 ## Refresh slide evidence
 
-The checked-in snapshots are fixed exercise fixtures. This repository no longer
-includes a workflow to import new source data. Replacing the fixtures requires
+The historical reports and slide snapshots are fixed exercise fixtures. New JSON
+bundles belong in `/workspace`. Replacing the historical fixtures requires
 coordinated updates to the operations manifest, compressed source tables, report
 aggregates, passenger matches, and boarding history.
 

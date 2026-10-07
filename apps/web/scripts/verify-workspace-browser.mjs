@@ -95,6 +95,14 @@ try {
     .click()
   await metric("boardings", "200")
   await metric("queued_calls", "20")
+  assert.deepEqual(
+    await page.locator("[data-metric]").evaluateAll((cards) =>
+      cards.map((card) => card.getAttribute("data-metric"))
+    ),
+    ["boardings", "queued_calls", "completion"]
+  )
+  await page.getByText("Passenger boardings over time", { exact: true }).waitFor()
+  await page.getByText("Calls with a queue over time", { exact: true }).waitFor()
   await page
     .locator("[data-report-chart] svg.recharts-surface")
     .first()
@@ -108,6 +116,21 @@ try {
   await page
     .getByRole("button", { name: "Search evidence", exact: true })
     .click()
+  await page.getByRole("button", { name: "Export context", exact: true }).waitFor()
+  let failNextSearch = true
+  await page.route(/\/api\/workspace\//, async (route) => {
+    if (new URL(route.request().url()).searchParams.get("view") === "context" && failNextSearch) {
+      failNextSearch = false
+      return route.fulfill({ status: 502, contentType: "text/html", body: "Gateway down" })
+    }
+    return route.continue()
+  })
+  await page.getByRole("button", { name: "Search evidence", exact: true }).click()
+  await page.getByRole("alert").filter({ hasText: "Request failed (502)" }).waitFor()
+  await page.getByRole("button", { name: "Search evidence", exact: true }).click()
+  await page.getByRole("button", { name: "Export context", exact: true }).waitFor()
+  assert.equal(await page.getByRole("alert").count(), 0)
+  await page.unrouteAll({ behavior: "wait" })
   await page
     .getByRole("button", { name: /Open citation.*maintenance.*row-1/ })
     .click()
@@ -262,7 +285,7 @@ try {
   await page.screenshot({ path: `${output}/mobile.png`, fullPage: true })
   assert.deepEqual(errors, [])
   console.log(
-    "PASS: upload, literal metrics, revision restoration, charts, citations, scoped export, missing evidence, filters, invalid/duplicate imports, mobile"
+    "PASS: upload, literal metrics, revision restoration, charts, same-query retry recovery, citations, scoped export, missing evidence, filters, invalid/duplicate imports, mobile"
   )
 } catch (error) {
   await page

@@ -29,9 +29,10 @@ export function ContextPanel({
   problem: Problem
 }) {
   const [query, setQuery] = useState(problem.query)
-  const [submitted, setSubmitted] = useState(problem.query)
+  const [submitted, setSubmitted] = useState({ query: problem.query, attempt: 0 })
   const resource = useResource<EvidenceContext>(
-    `/api/workspace/${analysis.revision}?${scope}&view=context&q=${encodeURIComponent(submitted)}`
+    `/api/workspace/${analysis.revision}?${scope}&view=context&q=${encodeURIComponent(submitted.query)}`,
+    submitted.attempt
   )
   const [expanded, setExpanded] = useState<number | null>(null)
   function download(context: EvidenceContext) {
@@ -60,7 +61,7 @@ export function ContextPanel({
           className="flex flex-wrap gap-2"
           onSubmit={(event) => {
             event.preventDefault()
-            setSubmitted(query)
+            setSubmitted((previous) => ({ query, attempt: previous.attempt + 1 }))
             setExpanded(null)
           }}
         >

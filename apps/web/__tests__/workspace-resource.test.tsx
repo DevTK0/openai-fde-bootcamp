@@ -48,3 +48,25 @@ it("shows the HTTP status for a non-JSON proxy failure", async () => {
   )
   await expect(requestJson("/failed")).rejects.toThrow("Request failed (502)")
 })
+
+
+it("recovers the same request after a transient failure", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn()
+      .mockResolvedValueOnce(new Response("Gateway down", { status: 502 }))
+      .mockResolvedValueOnce(Response.json({ value: 42 }))
+  )
+  const { result, rerender } = renderHook(
+    ({ attempt }) => useResource<{ value: number }>("/same-query", attempt),
+    { initialProps: { attempt: 0 } }
+  )
+  await waitFor(() => expect(result.current).toEqual({
+    status: "error", error: "Request failed (502)",
+  }))
+  rerender({ attempt: 1 })
+  expect(result.current.status).toBe("loading")
+  await waitFor(() => expect(result.current).toEqual({
+    status: "ready", data: { value: 42 },
+  }))
+})

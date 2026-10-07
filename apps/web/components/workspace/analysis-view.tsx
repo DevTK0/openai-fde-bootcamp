@@ -26,13 +26,17 @@ export function AnalysisView({
   problem: Problem
   inspect: (id: string) => void
 }) {
-  const ids =
+  const ids: EvidenceAnalysis["metrics"][number]["id"][] =
     problem.group === "Maintenance"
       ? ["repair_cost", "repair_rate", "repair_hours"]
       : problem.group === "Scheduling"
         ? ["completion", "on_time", "queued_calls"]
         : ["boardings", "queued_calls", "completion"]
-  const metrics = analysis.metrics.filter((metric) => ids.includes(metric.id))
+  const byId = new Map(analysis.metrics.map((metric) => [metric.id, metric]))
+  const metrics = ids.flatMap((id) => {
+    const metric = byId.get(id)
+    return metric ? [metric] : []
+  })
   return (
     <div className="space-y-5">
       <p className="text-xs text-muted-foreground">

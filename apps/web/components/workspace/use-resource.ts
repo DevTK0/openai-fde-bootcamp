@@ -27,9 +27,10 @@ export async function requestJson<T>(
   }
   return response.json()
 }
-export function useResource<T>(url: string): Resource<T> {
+export function useResource<T>(url: string, attempt = 0): Resource<T> {
   const [result, setResult] = useState<{
     url: string
+    attempt: number
     state: Resource<T>
   } | null>(null)
   useEffect(() => {
@@ -38,12 +39,13 @@ export function useResource<T>(url: string): Resource<T> {
     let active = true
     requestJson<T>(url, { signal: controller.signal }).then(
       (data) => {
-        if (active) setResult({ url, state: { status: "ready", data } })
+        if (active) setResult({ url, attempt, state: { status: "ready", data } })
       },
       (error: unknown) => {
         if (active)
           setResult({
             url,
+            attempt,
             state: {
               status: "error",
               error: error instanceof Error ? error.message : "Request failed",
@@ -55,6 +57,8 @@ export function useResource<T>(url: string): Resource<T> {
       active = false
       controller.abort()
     }
-  }, [url])
-  return result?.url === url ? result.state : { status: "loading" }
+  }, [url, attempt])
+  return result?.url === url && result.attempt === attempt
+    ? result.state
+    : { status: "loading" }
 }
