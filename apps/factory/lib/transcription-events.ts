@@ -39,9 +39,6 @@ export function orderedTranscripts(callbacks: {
   const delivered = new Set<string>()
   let previous: string | null = null
   return {
-    get uncommittedIds() {
-      return [...partials.keys()].filter((id) => !committed.has(id))
-    },
     get pending() {
       return committed.size
     },

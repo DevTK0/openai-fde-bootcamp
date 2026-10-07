@@ -22,7 +22,6 @@ export async function startTranscription(options: {
   let lastVoice = 0
   let turnStarted = 0
   let outstanding = 0
-  const committedPartials = new Set<string>()
   const cleanup = () => {
     if (closed) return
     closed = true
@@ -40,27 +39,15 @@ export async function startTranscription(options: {
   }
   const transcript = orderedTranscripts({
     final: (turn) => {
-      committedPartials.delete(turn.id)
       outstanding = Math.max(0, outstanding - 1)
       options.onFinal(turn)
     },
-    partial: (text) => {
-      if (
-        text.trim() &&
-        transcript.uncommittedIds.some((id) => !committedPartials.has(id))
-      ) {
-        if (!speaking) turnStarted = Date.now()
-        speaking = true
-        lastVoice = Date.now()
-      }
-      options.onPartial(text)
-    },
+    partial: options.onPartial,
     error: fail,
   })
   const commit = () => {
     if (!speaking || channel.readyState !== "open") return
     speaking = false
-    transcript.uncommittedIds.forEach((id) => committedPartials.add(id))
     outstanding += 1
     channel.send(JSON.stringify({ type: "input_audio_buffer.commit" }))
   }
@@ -151,7 +138,7 @@ export async function startTranscription(options: {
         samples.reduce((sum, value) => sum + value * value, 0) / samples.length
       )
       const now = Date.now()
-      if (energy > 0.015) {
+      if (energy > 0.005) {
         if (!speaking) turnStarted = now
         speaking = true
         lastVoice = now

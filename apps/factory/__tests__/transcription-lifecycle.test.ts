@@ -151,19 +151,29 @@ it("does not resume listening or install an audio analyser after setup is cancel
   expect(Peer.instances[0]?.channel.readyState).toBe("closed")
 })
 
-it.each(["stop", "silence"])(
-  "commits quiet speech on %s and does not commit its late deltas again",
-  async (ending) => {
+it.each([
+  { ending: "stop", energy: 0.008 },
+  { ending: "silence", energy: 0.008 },
+  { ending: "stop", energy: 0.03 },
+  { ending: "silence", energy: 0.03 },
+])(
+  "commits audio at $energy on $ending without recommitting late deltas before acknowledgement",
+  async ({ ending, energy }) => {
     vi.useFakeTimers()
     setup()
     vi.stubGlobal("fetch", async () => new Response("answer"))
+    let level = energy
     vi.stubGlobal(
       "AudioContext",
       class {
         async close() {}
         async resume() {}
         createAnalyser() {
-          return { fftSize: 1024, getFloatTimeDomainData: () => undefined }
+          return {
+            fftSize: 1024,
+            getFloatTimeDomainData: (samples: Float32Array) =>
+              samples.fill(level),
+          }
         }
         createMediaStreamSource() {
           return { connect: () => undefined }
@@ -177,11 +187,8 @@ it.each(["stop", "silence"])(
       channel?.dispatchEvent(
         new MessageEvent("message", { data: JSON.stringify(event) })
       )
-    receive({
-      type: "conversation.item.input_audio_transcription.delta",
-      item_id: "quiet",
-      delta: "Please add a download button",
-    })
+    await vi.advanceTimersByTimeAsync(300)
+    level = 0
     const stopped = ending === "stop" ? session.stop() : undefined
     if (ending === "silence") await vi.advanceTimersByTimeAsync(1000)
     expect(channel?.send).toHaveBeenCalledWith(
@@ -192,6 +199,25 @@ it.each(["stop", "silence"])(
       item_id: "quiet",
       delta: "!",
     })
+    await vi.advanceTimersByTimeAsync(1000)
+    expect(channel?.send).toHaveBeenCalledTimes(1)
+    if (ending === "silence") {
+      level = energy
+      await vi.advanceTimersByTimeAsync(300)
+      level = 0
+      await vi.advanceTimersByTimeAsync(1000)
+      expect(channel?.send).toHaveBeenCalledTimes(2)
+      receive({
+        type: "input_audio_buffer.committed",
+        item_id: "next",
+        previous_item_id: "quiet",
+      })
+      receive({
+        type: "conversation.item.input_audio_transcription.completed",
+        item_id: "next",
+        transcript: "And keep the filter.",
+      })
+    }
     receive({
       type: "input_audio_buffer.committed",
       item_id: "quiet",
@@ -210,11 +236,16 @@ it.each(["stop", "silence"])(
     await vi.advanceTimersByTimeAsync(1000)
     await stopped
     if (ending === "silence") await session.stop()
-    expect(channel?.send).toHaveBeenCalledOnce()
-    expect(callbacks.onFinal).toHaveBeenCalledWith({
+    expect(channel?.send).toHaveBeenCalledTimes(ending === "silence" ? 2 : 1)
+    expect(callbacks.onFinal).toHaveBeenNthCalledWith(1, {
       id: "quiet",
       text: "Please add a download button.",
     })
+    if (ending === "silence")
+      expect(callbacks.onFinal).toHaveBeenNthCalledWith(2, {
+        id: "next",
+        text: "And keep the filter.",
+      })
     expect(callbacks.onError).not.toHaveBeenCalled()
     expect(channel?.readyState).toBe("closed")
   }

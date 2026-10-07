@@ -16,7 +16,7 @@ The owner checked code revision `17a39d7c30c6a6f7f7fb9588ce4050990c3d3f44` on Oc
 
 Failed clarification answers remain in the form. Typed transcript retries and unchanged conversation creation retries reuse their command IDs. Disconnect is disabled while listening or while finalized speech is unsaved. Navigation warns when speech may be lost. Room selection pauses polling and capture until its snapshot loads. A failed selection keeps the previously loaded room active. Only failed requests offer retry, matching the server state machine. Structured server errors display their message.
 
-The lifecycle tests supply transcript deltas and commit acknowledgements directly. These tests do not establish whether that event ordering matches the live provider. Review findings about quiet speech and delta-before-acknowledgement behavior require separate provider lifecycle verification.
+The [official transcription guide](https://developers.openai.com/api/docs/guides/realtime-transcription) requires client-side voice activity detection for `gpt-live-transcribe`. The client now uses measured audio alone to decide when to commit. Transcript deltas only update the displayed partial text. The local RMS threshold is 0.005; lower levels remain below that detector threshold. Microphone calibration and recognition quality require real audio verification.
 
 The shared textarea came from `pnpm dlx shadcn@latest add textarea -c apps/web`. The review claim that it was hand-written is incorrect.
 
@@ -29,3 +29,9 @@ The follow-up owner reproduced three failures in `LiveRoom` component tests befo
 The fixes retain newer drafts by checking the submitted command identity. Room selection uses the existing busy state so polling, capture, and mutations wait for navigation. Clarification saves also preserve newer edits.
 
 `pnpm check` passes with 25 factory tests. Six component tests exercise pending-save edits, unchanged submitted text, successful room selection, failed room selection, and clarification edits through the rendered controls. `pnpm --filter factory build` passes. The component checks mock the network and transcription adapter; live browser and provider verification remain separate gates.
+
+## Audio commit regression checks
+
+Before the follow-up fix, analyser samples with RMS 0.008 produced no commit on stop or after silence. Samples with RMS 0.03 committed once, but a subsequent delta before acknowledgement triggered a duplicate commit. All three checks failed for those reasons before the production change.
+
+The fixed tests provide audio samples before committing and transcript events afterward. They cover delayed acknowledgements, a new utterance while an earlier commit remains outstanding, ordered final delivery, and resource cleanup. `pnpm check` passes with 27 factory tests, and `pnpm --filter factory build` passes. These checks use fake audio resources and supplied protocol events, not a live provider connection.
