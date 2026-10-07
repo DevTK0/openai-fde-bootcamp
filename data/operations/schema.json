@@ -1,0 +1,878 @@
+{
+  "tables": [
+    {
+      "name": "control_actions",
+      "sql": "CREATE TABLE \"control_actions\" (\"action_id\" TEXT, \"service_date\" TEXT, \"issued_at\" TEXT, \"trip_id\" TEXT, \"action\" TEXT, \"vehicle_id\" TEXT, \"crew_id\" TEXT, \"referenced_update_ids\" TEXT, \"note\" TEXT)",
+      "columns": [
+        {
+          "name": "action_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "issued_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "trip_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "action",
+          "type": "TEXT"
+        },
+        {
+          "name": "vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "crew_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "referenced_update_ids",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "crew_duties",
+      "sql": "CREATE TABLE \"crew_duties\" (\"duty_id\" TEXT, \"service_date\" TEXT, \"crew_id\" TEXT, \"qualified_service_no\" TEXT, \"available_from\" TEXT, \"available_until\" TEXT, \"start_stop_id\" TEXT, \"protected_break_start\" TEXT, \"protected_break_end\" TEXT, \"maximum_continuous_duty_minutes\" INTEGER, \"takeover_seconds\" INTEGER, \"record_issued_at\" TEXT, \"basis\" TEXT)",
+      "columns": [
+        {
+          "name": "duty_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "crew_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "qualified_service_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_until",
+          "type": "TEXT"
+        },
+        {
+          "name": "start_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "protected_break_start",
+          "type": "TEXT"
+        },
+        {
+          "name": "protected_break_end",
+          "type": "TEXT"
+        },
+        {
+          "name": "maximum_continuous_duty_minutes",
+          "type": "INTEGER"
+        },
+        {
+          "name": "takeover_seconds",
+          "type": "INTEGER"
+        },
+        {
+          "name": "record_issued_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "basis",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "origin_arrivals",
+      "sql": "CREATE TABLE \"origin_arrivals\" (\"arrival_record_id\" TEXT, \"service_date\" TEXT, \"route_id\" TEXT, \"stop_order\" INTEGER, \"stop_id\" TEXT, \"arrived_at\" TEXT, \"arrivals_people\" INTEGER, \"observation_method\" TEXT)",
+      "columns": [
+        {
+          "name": "arrival_record_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stop_order",
+          "type": "INTEGER"
+        },
+        {
+          "name": "stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "arrived_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "arrivals_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "observation_method",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "planning_constraints",
+      "sql": "CREATE TABLE \"planning_constraints\" (\"constraint_id\" TEXT, \"scope\" TEXT, \"requirement\" TEXT)",
+      "columns": [
+        {
+          "name": "constraint_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "scope",
+          "type": "TEXT"
+        },
+        {
+          "name": "requirement",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "queue_windows",
+      "sql": "CREATE TABLE \"queue_windows\" (\"queue_window_id\" TEXT, \"service_date\" TEXT, \"route_id\" TEXT, \"stop_order\" INTEGER, \"stop_id\" TEXT, \"observation_start_at\" TEXT, \"observation_end_at\" TEXT, \"initial_queue_people\" INTEGER, \"total_arrivals_people\" INTEGER, \"total_boarded_people\" INTEGER, \"remaining_queue_people\" INTEGER, \"scope\" TEXT)",
+      "columns": [
+        {
+          "name": "queue_window_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stop_order",
+          "type": "INTEGER"
+        },
+        {
+          "name": "stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "observation_start_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "observation_end_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "initial_queue_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "total_arrivals_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "total_boarded_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "remaining_queue_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "scope",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "rail_links",
+      "sql": "CREATE TABLE \"rail_links\" (\"edge_id\" TEXT, \"line_code\" TEXT, \"line_name\" TEXT, \"from_station_id\" TEXT, \"to_station_id\" TEXT, \"bidirectional_topology\" TEXT, \"geometry_kind\" TEXT, \"source_url\" TEXT)",
+      "columns": [
+        {
+          "name": "edge_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "line_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "line_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "from_station_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "to_station_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "bidirectional_topology",
+          "type": "TEXT"
+        },
+        {
+          "name": "geometry_kind",
+          "type": "TEXT"
+        },
+        {
+          "name": "source_url",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "rail_stations",
+      "sql": "CREATE TABLE \"rail_stations\" (\"station_id\" TEXT, \"station_name\" TEXT, \"station_codes\" TEXT, \"line_codes\" TEXT, \"latitude\" REAL, \"longitude\" REAL, \"coordinate_method\" TEXT, \"snapshot_date\" TEXT)",
+      "columns": [
+        {
+          "name": "station_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "station_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "station_codes",
+          "type": "TEXT"
+        },
+        {
+          "name": "line_codes",
+          "type": "TEXT"
+        },
+        {
+          "name": "latitude",
+          "type": "REAL"
+        },
+        {
+          "name": "longitude",
+          "type": "REAL"
+        },
+        {
+          "name": "coordinate_method",
+          "type": "TEXT"
+        },
+        {
+          "name": "snapshot_date",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "resource_updates",
+      "sql": "CREATE TABLE \"resource_updates\" (\"update_id\" TEXT, \"service_date\" TEXT, \"issued_at\" TEXT, \"resource_type\" TEXT, \"resource_id\" TEXT, \"location_stop_id\" TEXT, \"available_from\" TEXT, \"available_until\" TEXT, \"related_trip_id\" TEXT, \"statement\" TEXT)",
+      "columns": [
+        {
+          "name": "update_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "issued_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "resource_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "resource_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "location_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_until",
+          "type": "TEXT"
+        },
+        {
+          "name": "related_trip_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "statement",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "route_stops",
+      "sql": "CREATE TABLE \"route_stops\" (\"route_id\" TEXT, \"stop_order\" INTEGER, \"source_stop_sequence\" INTEGER, \"stop_id\" TEXT, \"distance_km\" REAL, \"weekday_first\" TEXT, \"weekday_last\" TEXT, \"saturday_first\" TEXT, \"saturday_last\" TEXT, \"sunday_first\" TEXT, \"sunday_last\" TEXT, \"source_id\" TEXT)",
+      "columns": [
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stop_order",
+          "type": "INTEGER"
+        },
+        {
+          "name": "source_stop_sequence",
+          "type": "INTEGER"
+        },
+        {
+          "name": "stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "distance_km",
+          "type": "REAL"
+        },
+        {
+          "name": "weekday_first",
+          "type": "TEXT"
+        },
+        {
+          "name": "weekday_last",
+          "type": "TEXT"
+        },
+        {
+          "name": "saturday_first",
+          "type": "TEXT"
+        },
+        {
+          "name": "saturday_last",
+          "type": "TEXT"
+        },
+        {
+          "name": "sunday_first",
+          "type": "TEXT"
+        },
+        {
+          "name": "sunday_last",
+          "type": "TEXT"
+        },
+        {
+          "name": "source_id",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "routes",
+      "sql": "CREATE TABLE \"routes\" (\"route_id\" TEXT, \"service_no\" TEXT, \"direction\" INTEGER, \"service_name\" TEXT, \"operator\" TEXT, \"origin_stop_id\" TEXT, \"destination_stop_id\" TEXT, \"stop_count\" INTEGER, \"distance_km\" REAL, \"loop_route\" TEXT, \"source_id\" TEXT)",
+      "columns": [
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "direction",
+          "type": "INTEGER"
+        },
+        {
+          "name": "service_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "operator",
+          "type": "TEXT"
+        },
+        {
+          "name": "origin_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "destination_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stop_count",
+          "type": "INTEGER"
+        },
+        {
+          "name": "distance_km",
+          "type": "REAL"
+        },
+        {
+          "name": "loop_route",
+          "type": "TEXT"
+        },
+        {
+          "name": "source_id",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "service_calendar",
+      "sql": "CREATE TABLE \"service_calendar\" (\"service_date\" TEXT, \"day_type\" TEXT, \"timezone\" TEXT, \"status\" TEXT)",
+      "columns": [
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "day_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "timezone",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "service_patterns",
+      "sql": "CREATE TABLE \"service_patterns\" (\"route_id\" TEXT, \"version_id\" TEXT, \"morning_first_departure\" TEXT, \"departure_window_end\" TEXT, \"peak_start\" TEXT, \"peak_end\" TEXT, \"peak_headway_minutes\" INTEGER, \"shoulder_headway_minutes\" INTEGER, \"planned_running_seconds\" INTEGER, \"minimum_terminal_seconds\" INTEGER, \"timetable_basis\" TEXT)",
+      "columns": [
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "version_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "morning_first_departure",
+          "type": "TEXT"
+        },
+        {
+          "name": "departure_window_end",
+          "type": "TEXT"
+        },
+        {
+          "name": "peak_start",
+          "type": "TEXT"
+        },
+        {
+          "name": "peak_end",
+          "type": "TEXT"
+        },
+        {
+          "name": "peak_headway_minutes",
+          "type": "INTEGER"
+        },
+        {
+          "name": "shoulder_headway_minutes",
+          "type": "INTEGER"
+        },
+        {
+          "name": "planned_running_seconds",
+          "type": "INTEGER"
+        },
+        {
+          "name": "minimum_terminal_seconds",
+          "type": "INTEGER"
+        },
+        {
+          "name": "timetable_basis",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "stop_calls",
+      "sql": "CREATE TABLE \"stop_calls\" (\"call_id\" TEXT, \"trip_id\" TEXT, \"service_date\" TEXT, \"route_id\" TEXT, \"stop_order\" INTEGER, \"source_stop_sequence\" INTEGER, \"stop_id\" TEXT, \"scheduled_arrival_at\" TEXT, \"actual_arrival_at\" TEXT, \"actual_departure_at\" TEXT, \"actual_vehicle_id\" TEXT, \"capacity_people\" INTEGER, \"onboard_arriving\" INTEGER, \"alighted_people\" INTEGER, \"arrivals_since_previous_call\" INTEGER, \"queue_before_people\" INTEGER, \"boarded_people\" INTEGER, \"queue_after_people\" INTEGER, \"onboard_departing\" INTEGER, \"boarding_cutoff_at\" TEXT)",
+      "columns": [
+        {
+          "name": "call_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "trip_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "stop_order",
+          "type": "INTEGER"
+        },
+        {
+          "name": "source_stop_sequence",
+          "type": "INTEGER"
+        },
+        {
+          "name": "stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "scheduled_arrival_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_arrival_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_departure_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "capacity_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "onboard_arriving",
+          "type": "INTEGER"
+        },
+        {
+          "name": "alighted_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "arrivals_since_previous_call",
+          "type": "INTEGER"
+        },
+        {
+          "name": "queue_before_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "boarded_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "queue_after_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "onboard_departing",
+          "type": "INTEGER"
+        },
+        {
+          "name": "boarding_cutoff_at",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "stops",
+      "sql": "CREATE TABLE \"stops\" (\"stop_id\" TEXT, \"description\" TEXT, \"road_name\" TEXT, \"latitude\" REAL, \"longitude\" REAL, \"source_id\" TEXT)",
+      "columns": [
+        {
+          "name": "stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "description",
+          "type": "TEXT"
+        },
+        {
+          "name": "road_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "latitude",
+          "type": "REAL"
+        },
+        {
+          "name": "longitude",
+          "type": "REAL"
+        },
+        {
+          "name": "source_id",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "terminal_movements",
+      "sql": "CREATE TABLE \"terminal_movements\" (\"movement_id\" TEXT, \"service_date\" TEXT, \"vehicle_id\" TEXT, \"crew_id\" TEXT, \"from_trip_id\" TEXT, \"to_trip_id\" TEXT, \"from_stop_id\" TEXT, \"to_stop_id\" TEXT, \"actual_start_at\" TEXT, \"actual_end_at\" TEXT, \"planning_distance_km\" REAL, \"planning_seconds\" INTEGER, \"basis\" TEXT)",
+      "columns": [
+        {
+          "name": "movement_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "crew_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "from_trip_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "to_trip_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "from_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "to_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_start_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_end_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "planning_distance_km",
+          "type": "REAL"
+        },
+        {
+          "name": "planning_seconds",
+          "type": "INTEGER"
+        },
+        {
+          "name": "basis",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "timetable_records",
+      "sql": "CREATE TABLE \"timetable_records\" (\"version_id\" TEXT, \"issued_at\" TEXT, \"effective_from\" TEXT, \"effective_until\" TEXT, \"description\" TEXT)",
+      "columns": [
+        {
+          "name": "version_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "issued_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "effective_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "effective_until",
+          "type": "TEXT"
+        },
+        {
+          "name": "description",
+          "type": "TEXT"
+        }
+      ]
+    },
+    {
+      "name": "trips",
+      "sql": "CREATE TABLE \"trips\" (\"trip_id\" TEXT, \"service_date\" TEXT, \"timetable_version\" TEXT, \"route_id\" TEXT, \"service_no\" TEXT, \"planned_block_id\" TEXT, \"planned_vehicle_id\" TEXT, \"planned_crew_id\" TEXT, \"origin_stop_id\" TEXT, \"destination_stop_id\" TEXT, \"scheduled_departure_at\" TEXT, \"scheduled_arrival_at\" TEXT, \"actual_vehicle_id\" TEXT, \"actual_crew_id\" TEXT, \"actual_departure_at\" TEXT, \"actual_arrival_at\" TEXT, \"completion_state\" TEXT, \"published_distance_km\" REAL)",
+      "columns": [
+        {
+          "name": "trip_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "timetable_version",
+          "type": "TEXT"
+        },
+        {
+          "name": "route_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_block_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_crew_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "origin_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "destination_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "scheduled_departure_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "scheduled_arrival_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_crew_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_departure_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_arrival_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "completion_state",
+          "type": "TEXT"
+        },
+        {
+          "name": "published_distance_km",
+          "type": "REAL"
+        }
+      ]
+    },
+    {
+      "name": "vehicle_readiness",
+      "sql": "CREATE TABLE \"vehicle_readiness\" (\"readiness_id\" TEXT, \"service_date\" TEXT, \"vehicle_id\" TEXT, \"issued_at\" TEXT, \"available_from\" TEXT, \"available_until\" TEXT, \"location_stop_id\" TEXT, \"release_state\" TEXT, \"capacity_people\" INTEGER)",
+      "columns": [
+        {
+          "name": "readiness_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "service_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "issued_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_until",
+          "type": "TEXT"
+        },
+        {
+          "name": "location_stop_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "release_state",
+          "type": "TEXT"
+        },
+        {
+          "name": "capacity_people",
+          "type": "INTEGER"
+        }
+      ]
+    },
+    {
+      "name": "vehicles",
+      "sql": "CREATE TABLE \"vehicles\" (\"vehicle_id\" TEXT, \"assigned_service_no\" TEXT, \"vehicle_type\" TEXT, \"capacity_people\" INTEGER, \"wheelchair_spaces\" INTEGER, \"capacity_basis\" TEXT)",
+      "columns": [
+        {
+          "name": "vehicle_id",
+          "type": "TEXT"
+        },
+        {
+          "name": "assigned_service_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "vehicle_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "capacity_people",
+          "type": "INTEGER"
+        },
+        {
+          "name": "wheelchair_spaces",
+          "type": "INTEGER"
+        },
+        {
+          "name": "capacity_basis",
+          "type": "TEXT"
+        }
+      ]
+    }
+  ],
+  "indexes": [
+    "CREATE INDEX ix_crew_duties_service_date_crew_id ON crew_duties (service_date, crew_id)",
+    "CREATE INDEX ix_origin_arrivals_service_date_route_id_arrived_at ON origin_arrivals (service_date, route_id, arrived_at)",
+    "CREATE INDEX ix_queue_windows_service_date_route_id_stop_order ON queue_windows (service_date, route_id, stop_order)",
+    "CREATE INDEX ix_rail_links_from_station_id_to_station_id ON rail_links (from_station_id,to_station_id)",
+    "CREATE INDEX ix_rail_stations_station_id ON rail_stations (station_id)",
+    "CREATE INDEX ix_route_stops_route_id_stop_order ON route_stops (route_id, stop_order)",
+    "CREATE INDEX ix_routes_route_id ON routes (route_id)",
+    "CREATE INDEX ix_stop_calls_route_id_service_date_stop_order ON stop_calls (route_id, service_date, stop_order)",
+    "CREATE INDEX ix_stop_calls_stop_id_actual_departure_at ON stop_calls (stop_id, actual_departure_at)",
+    "CREATE INDEX ix_stop_calls_trip_id_stop_order ON stop_calls (trip_id, stop_order)",
+    "CREATE INDEX ix_stops_stop_id ON stops (stop_id)",
+    "CREATE INDEX ix_trips_actual_vehicle_id_actual_departure_at ON trips (actual_vehicle_id, actual_departure_at)",
+    "CREATE INDEX ix_trips_service_date_route_id ON trips (service_date, route_id)",
+    "CREATE INDEX ix_trips_trip_id ON trips (trip_id)"
+  ]
+}

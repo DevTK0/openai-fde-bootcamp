@@ -109,8 +109,15 @@ The dashboard combines two sources with different coverage:
 The operations snapshot is checked in under `apps/web/data/operations/`, including
 compressed source tables, report aggregates, and a manifest with source definitions
 and checksums. Running the app does not require the external source directory.
-The original handout files and Python conversion scripts are no longer included
-in this repository. The apps use the checked-in snapshots directly.
+The original handout files and source snapshot conversion pipeline are no longer
+included in this repository. The apps use the checked-in snapshots directly.
+
+A standalone SQLite export of the nineteen core operations tables is available at
+`data/operations/lionlink-network.sqlite` for local analysis and future applications.
+It follows the source schema in `data/operations/schema.json`; the two workshop
+supplement tables remain separate. Rebuild it from the checked-in compressed CSVs
+with `python3 scripts/build-operations-sqlite.py`. Use `--force` to replace an
+existing export.
 
 ## Refresh slide evidence
 
