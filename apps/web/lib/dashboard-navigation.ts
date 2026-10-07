@@ -17,13 +17,13 @@ export const dashboardWorkspaces = [
         id: "overview",
         label: "Fleet overview",
         description:
-          "Recorded costs, vehicle use, and availability across the fleet.",
+          "Recorded vehicle use and service history across the fleet.",
       },
       {
         id: "vehicles",
         label: "Vehicle register",
         description:
-          "Operating vehicles and their recorded engineering readiness.",
+          "Operating vehicles, service assignments, and fleet characteristics.",
       },
     ],
   },
@@ -80,7 +80,7 @@ export const dashboardWorkspaces = [
         id: "maintenance",
         label: "Maintenance history",
         description:
-          "Completed services, repairs, inspections, and vehicle hold hours.",
+          "Maintenance spending, completed services, repairs, inspections, and vehicle hold hours.",
       },
       {
         id: "workshop",
@@ -92,7 +92,7 @@ export const dashboardWorkspaces = [
         id: "workshop-register",
         label: "Workshop register",
         description:
-          "Work orders and the separately held workshop vehicle cohort.",
+          "Work orders, engineering readiness, and the separately held workshop vehicle cohort.",
       },
     ],
   },

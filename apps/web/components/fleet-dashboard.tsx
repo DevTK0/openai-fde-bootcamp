@@ -62,8 +62,14 @@ function SourcePicker({
     />
   )
 }
-function Overview({ vehicle, period }: { vehicle: string; period: string }) {
-  const { data, filterHistory, vehicles } = useDashboard()
+function MaintenanceSummary({
+  vehicle,
+  period,
+}: {
+  vehicle: string
+  period: string
+}) {
+  const { filterHistory, vehicles } = useDashboard()
   const rows = filterHistory(vehicle, period)
   const repair = sum(rows, "repair_cost_sgd"),
     routine = sum(rows, "scheduled_service_cost_sgd"),
@@ -87,7 +93,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
     }))
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 @lg/dashboard:grid-cols-2 @4xl/dashboard:grid-cols-4">
+      <div className="grid gap-4 @lg/dashboard:grid-cols-3">
         <Metric
           title="Recorded maintenance cost"
           value={money(repair + routine + preventive)}
@@ -97,11 +103,6 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           title="Corrective repairs"
           value={fmt(sum(rows, "repair_count"))}
           detail={`${money(repair)} in recorded repair charges`}
-        />
-        <Metric
-          title="Recorded distance"
-          value={`${fmt(km)} km`}
-          detail={`${fmt(sum(rows, "recorded_operating_hours"), 1)} operating hours`}
         />
         <Metric
           title="Repair cost / 1,000 km"
@@ -168,13 +169,30 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           ]}
         />
       </div>
+    </div>
+  )
+}
+function Overview({ vehicle, period }: { vehicle: string; period: string }) {
+  const { data, filterHistory } = useDashboard()
+  const rows = filterHistory(vehicle, period)
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 @lg/dashboard:grid-cols-2">
+        <Metric
+          title="Recorded distance"
+          value={`${fmt(sum(rows, "recorded_km"))} km`}
+          detail="Selected vehicle and historical period"
+        />
+        <Metric
+          title="Operating hours"
+          value={fmt(sum(rows, "recorded_operating_hours"), 1)}
+          detail="Recorded use in the selected period"
+        />
+      </div>
       <FleetServiceHistory />
       <SourcePicker
         tables={data.tables.filter(
-          (t) =>
-            t.sheet === "Fleet" ||
-            t.sheet === "Monthly usage" ||
-            t.id === "monthly_vehicle_history"
+          (t) => t.sheet === "Fleet" || t.sheet === "Monthly usage"
         )}
         operations={["vehicles"]}
       />
@@ -192,10 +210,14 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
         "Inspections",
         "Selected observations",
         "Monthly maintenance",
-      ].includes(t.sheet) || t.id === "selected_component_observations"
+      ].includes(t.sheet) ||
+      ["selected_component_observations", "monthly_vehicle_history"].includes(
+        t.id
+      )
   )
   return (
     <div className="space-y-6">
+      <MaintenanceSummary vehicle={vehicle} period={period} />
       <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
         <Metric
           title="Routine services"
@@ -492,7 +514,7 @@ function DashboardReport({
         <OperationsSources
           key={view}
           initialTable="vehicles"
-          allowedTables={["vehicles", "vehicle_readiness"]}
+          allowedTables={["vehicles"]}
         />
       )
     case "day-schedule":
@@ -546,7 +568,11 @@ function DashboardReport({
         <OperationsSources
           key={view}
           initialTable="workshop_work_orders"
-          allowedTables={["workshop_work_orders", "workshop_vehicles"]}
+          allowedTables={[
+            "workshop_work_orders",
+            "workshop_vehicles",
+            "vehicle_readiness",
+          ]}
         />
       )
     case "service-planning":
@@ -654,8 +680,12 @@ export function FleetDashboard({
                   ? `${vehicles.length} selected vehicles`
                   : vehicle}
               </span>
-              <span>·</span>
-              <span>SGD excluding tax</span>
+              {current.id === "maintenance" && (
+                <>
+                  <span>·</span>
+                  <span>SGD excluding tax</span>
+                </>
+              )}
             </div>
           )}
           <DashboardReport

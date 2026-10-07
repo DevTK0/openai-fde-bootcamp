@@ -6,7 +6,6 @@ import { Button } from "@workspace/ui/components/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
@@ -73,10 +72,6 @@ export function FleetServiceHistory() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle>Service history</CardTitle>
-            <CardDescription>
-              All bus services on one map. Choose an operating date
-              independently of the maintenance filters above.
-            </CardDescription>
           </div>
           <div className="flex items-center gap-2">
             <Pick
@@ -100,11 +95,6 @@ export function FleetServiceHistory() {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-xs text-muted-foreground">
-          Historical exercise records · All times Singapore UTC+08 · Movement
-          between stops is estimated. Passenger icons show dated departures, not
-          live queues.
-        </p>
         {!date ? (
           <p>No operating dates are available.</p>
         ) : current?.kind === "error" ? (
