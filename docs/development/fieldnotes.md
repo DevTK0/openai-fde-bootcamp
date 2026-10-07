@@ -12,7 +12,8 @@ Fieldnotes is served by `apps/web` at `/fieldnotes`. It uses the same shadcn sid
    ```
 
 3. Start `pnpm --filter web dev`. Open `/fieldnotes` on the printed HTTPS preview origin.
-4. Click **New chat**, then **Play**, and grant microphone permission.
+4. Click **New chat** and choose the intended microphone.
+5. Click **Play**, grant microphone permission, and speak a test sentence. Confirm that your words appear before presenting.
 
 The API key needs access to `gpt-live-1` and `gpt-5.6-terra`. Set `FIELDNOTES_SPEC_MODEL` to change the Responses model used for specification generation. The key remains on the server. Restart the server after changing environment variables if the development server does not reload them.
 
@@ -22,35 +23,31 @@ Run this app behind the VM's private access boundary. The browser cookie separat
 
 ## Verify changes
 
-Run `pnpm check`. The Fieldnotes tests cover persistence across database reopen, ownership, retry deduplication, stale generation, ended-state enforcement, API failures, media cleanup, mute, and final transcript draining. Tests mock the external OpenAI transport, but use real SQLite databases and route handlers.
+Run `pnpm check`. The Fieldnotes tests cover persistence, ownership, deletion, session numbering, retry deduplication, stale generation, forced regeneration, API failures, and microphone lifecycle. Tests mock the external OpenAI transport, but use real SQLite databases and route handlers.
 
 Use the [tutorial](../../apps/docs/src/content/docs/fieldnotes-tutorial.md) to verify the actual UI. Check these outcomes:
 
-1. Create and rename a chat. Reload and open it from the sidebar.
-2. Play a presentation. Confirm transcript text and a generated specification appear.
-3. Mute and unmute. Confirm the microphone track changes and the connection stays open.
-4. Send a scope correction. Confirm the saved specification includes it.
-5. Download `product-spec.md`. Compare its contents with the saved draft.
-6. Cancel the stop confirmation, then confirm it. Check that capture ends, the final notes remain, and further messages are disabled.
-7. Check a narrow viewport and dark mode. Verify that the sidebar and specification are reachable without horizontal overflow.
-8. Deny microphone permission and test an API failure. Confirm a useful error and retained notes.
+1. Create a chat. Right-click its name, choose **Rename**, save the name, and verify it after reload.
+2. Press **Play**. Confirm that the equalizer sits between **Stop** and **Mute**, responds to sound, and stays flat for silent input.
+3. Confirm that speech appears in the notes. A connected session and detected sound alone do not prove transcription.
+4. Mute and unmute. Confirm that the microphone track changes and the connection stays open. Switch inputs and verify that the old track stops.
+5. Present two features and send a correction to one. Confirm that the document describes those features, integrates the correction, and omits separate Clarifications, Open questions, and Acceptance criteria sections.
+6. Click **Update specification** without adding input. Confirm that a new draft is saved from the existing notes. Repeat with an ended session.
+7. Download `product-spec.md` and compare its contents with the saved draft.
+8. Cancel the stop confirmation, then confirm it. Check that capture ends, final notes remain, and further messages are disabled.
+9. Create a disposable session. Cancel its delete confirmation and confirm that it remains. Delete it, reload, and confirm that it is gone.
+10. Keep an unsent message in one session while renaming or deleting a different disposable session. Confirm that the selected session and message remain unchanged.
+11. Check a narrow viewport and dark mode. Verify that the session list and specification remain reachable without horizontal overflow.
+12. Deny microphone permission and test an API failure. Confirm a useful error and retained notes.
 
 If the verification browser cannot access a microphone, use a known audio fixture as a `MediaStream` input to the real WebRTC connection and report that substitution. This proves transport and transcription, but not the physical microphone permission path. Do not claim a mock provider is a live API test.
 
-## Architecture and tradeoffs
+## Investigate missing speech
 
-The browser owns WebRTC and microphone tracks. The Next.js API exchanges its SDP offer with `POST /v1/live/sessions`. Transcript fragments retain event IDs, speaker identity, and session-relative timing. The browser saves batches every four seconds and requests a specification update after new input, with at least twelve seconds between completed automatic generations. Written clarifications request an immediate update.
+1. Confirm the selected microphone and the browser's microphone permission.
+2. Ask for a short test sentence. Compare the input indicator with the captured transcript.
+3. Inspect the session's latest `captureDiagnostics` in the local database. Compare successive samples to see whether sent packet and byte counts increase.
+4. Check received event counts, transcript parse errors, and service errors. Do not treat transmitted bytes as proof that words were transcribed.
+5. After a disconnection, reconnect with **Play** and verify new transcript text before continuing.
 
-SQLite owns the chat lifecycle and draft revisions. Input events have stable IDs so retrying a failed save cannot duplicate text. Generated drafts carry the input revision they describe; a late response cannot overwrite a newer draft. The previous draft survives generation failures. Ending a chat rejects further input on the server, while draft generation can still be retried.
-
-A browser-only IndexedDB design with hosted delegation would move persistence and tool-result coordination into the UI. Server-owned SQLite keeps those rules testable in one place and makes state survive application restarts. The tradeoff is a single-node deployment with a writable filesystem. It does not support ephemeral serverless instances or multiple independent database copies.
-
-The Live session handles speech. A separate Responses request writes the Markdown from saved evidence, so a draft update does not depend on a spoken model turn. There is no raw-audio storage or screen capture. Transcription and generated acceptance criteria require human review.
-
-The implementation follows the official [GPT-Live WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc) and [session lifecycle](https://developers.openai.com/api/docs/guides/live-conversations) documentation. Keep event names and shutdown behavior aligned with those contracts.
-
-Microphone capture exposes measured WebRTC input levels and device selection. The equalizer displays recent input levels; it does not synthesize activity from connection state. Confirm speech in the transcript before presenting. Session rows use the shared shadcn context menu for rename and permanent deletion. Deletion is owner-scoped and requires a confirmation in the UI. Per-owner counters preserve session numbering after deletion.
-
-For capture troubleshooting, each session keeps its latest WebRTC diagnostic sample in SQLite. Samples contain microphone level and peak, device label, audio format, sent packet/byte counts, packet loss, received event counts, and service errors. They contain no raw audio. Compare these counters with saved user transcript events to distinguish quiet input, transport problems, and missing transcription. Deleting a session removes its diagnostics with its notes.
-
-Specifications contain a heading and description for each presented feature. Written corrections update that feature directly; unresolved details and separate clarification/open-question sections are omitted. Manual Update specification regenerates from saved notes even when the input revision has not changed, so existing sessions can adopt the current format. Automatic generation still skips unchanged input.
+See the [Fieldnotes technical reference](fieldnotes-reference.md) for diagnostic fields, model configuration, prompt ownership, and persistence behavior.
