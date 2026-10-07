@@ -1,33 +1,27 @@
 "use client"
 
+import { DatasetTabs } from "@/components/dataset-tabs"
 import { useDashboard } from "@/components/dashboard-provider"
 
 import { Plot } from "@workspace/ui/components/report-chart"
 
 import { useState } from "react"
-import { Pick, Notice, Metric, Records } from "@/components/report-ui"
+import { Pick, Metric, Records } from "@/components/report-ui"
 import {
   OperationsDashboard,
   OperationsSources,
 } from "@/components/operations-dashboard"
-import { RelationshipsDashboard } from "@/components/relationships-dashboard"
 import {
   Activity,
-  ArrowUpRight,
   BusFront,
   CalendarDays,
   ChartNoAxesCombined,
-  ChevronLeft,
   ChevronRight,
-  Database,
-  FileSpreadsheet,
-  Gauge,
   LayoutDashboard,
   MessageSquareText,
   Wrench,
 } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
-import { Button } from "@workspace/ui/components/button"
 import {
   Card,
   CardContent,
@@ -44,7 +38,6 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -54,206 +47,66 @@ import {
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar"
 import { Separator } from "@workspace/ui/components/separator"
-import {
-  fmt,
-  money,
-  num,
-  sum,
-  groupSum,
-  type Dataset,
-} from "@/lib/fleet"
+import { fmt, money, num, sum, groupSum, type Dataset } from "@/lib/fleet"
 
 const sections = [
   {
     id: "overview",
     label: "Fleet overview",
     icon: LayoutDashboard,
-    description:
-      "A clear view of cost, use, and maintenance across the selected fleet.",
-  },
-  {
-    id: "relationships",
-    label: "Relationships",
-    icon: ChartNoAxesCombined,
-    description:
-      "Explore how use, cost, component condition, and passenger experience connect.",
   },
   {
     id: "maintenance",
     label: "Maintenance",
     icon: Wrench,
-    description:
-      "Repair history, routine servicing, and recorded component findings.",
   },
   {
     id: "operations",
     label: "Operations",
     icon: Activity,
-    description:
-      "172 operating vehicles · 24 services · detailed journeys, queues, and resources for 5–16 October 2026.",
   },
   {
     id: "planning",
     label: "Workshop & planning",
     icon: CalendarDays,
-    description:
-      "Workshop requests, festival allocations, and the evening incident baseline.",
   },
   {
     id: "passengers",
     label: "Passenger reports",
     icon: MessageSquareText,
-    description:
-      "Six selected accounts, preserved alongside their reported journey details.",
   },
   {
     id: "costs",
     label: "Cost options",
     icon: ChartNoAxesCombined,
-    description:
-      "Compare proposed quotes with clearly separated historical expenditure.",
-  },
-  {
-    id: "explorer",
-    label: "Data explorer",
-    icon: Database,
-    description:
-      "Explore every imported table, source field, and coverage note.",
   },
 ] as const
-function SourceChart({ table }: { table: Dataset }) {
-  const numeric = table.columns.filter((col) =>
-    table.rows.some((r) => typeof r[col] === "number")
-  )
-  const [field, setField] = useState(numeric[0] ?? "__count")
-  const [category, setCategory] = useState(table.columns[0]!)
-  const [offset, setOffset] = useState(0)
-  const countMode = field === "__count"
-  const chartRows = countMode
-    ? groupSum(
-        table.rows.map((r) => ({ ...r, __count: 1 })),
-        category,
-        ["__count"]
-      ).map((r) => ({ name: r.name!, value: r.__count! }))
-    : table.rows.map((r, i) => ({
-        name: `${i + 1} · ${r[category] ?? "Not supplied"}`,
-        value: r[field] ?? null,
-      }))
-  const pageCount = Math.max(1, Math.ceil(chartRows.length / 20))
-  const page = Math.min(offset, pageCount - 1)
-  return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-3">
-        <Pick
-          label="Chart measure"
-          value={field}
-          onChange={(v) => {
-            setField(v)
-            setOffset(0)
-          }}
-          options={[
-            { value: "__count", label: "Record count by category" },
-            ...numeric.map((c) => ({
-              value: c,
-              label: c.replaceAll("_", " "),
-            })),
-          ]}
-        />
-        <Pick
-          label="Chart labels"
-          value={category}
-          onChange={(v) => {
-            setCategory(v)
-            setOffset(0)
-          }}
-          options={table.columns.map((c) => ({
-            value: c,
-            label: c.replaceAll("_", " "),
-          }))}
-        />
-        <Button
-          variant="outline"
-          size="icon-sm"
-          aria-label="Previous chart records"
-          disabled={page === 0}
-          onClick={() => setOffset(page - 1)}
-        >
-          <ChevronLeft />
-        </Button>
-        <span className="text-xs text-muted-foreground">
-          Chart {page + 1} / {pageCount}
-        </span>
-        <Button
-          variant="outline"
-          size="icon-sm"
-          aria-label="Next chart records"
-          disabled={page >= pageCount - 1}
-          onClick={() => setOffset(page + 1)}
-        >
-          <ChevronRight />
-        </Button>
-      </div>
-      <Plot
-        title={
-          countMode ? `Records by ${category}` : field.replaceAll("_", " ")
-        }
-        description={
-          countMode
-            ? "Counts source records in each category; overlapping tables are not combined."
-            : "Individual source values in source order · up to 20 records per chart · blanks remain missing, not zero. Units follow the selected field."
-        }
-        rows={chartRows.slice(page * 20, page * 20 + 20)}
-        series={[
-          {
-            key: "value",
-            label: countMode ? "Records" : field.replaceAll("_", " "),
-          },
-        ]}
-      />
-    </div>
-  )
-}
 function SourcePicker({
   tables,
-  visualize = false,
+  operations = [],
 }: {
   tables: Dataset[]
-  visualize?: boolean
+  operations?: string[]
 }) {
-  const [id, setId] = useState(tables[0]!.id)
-  const table = tables.find((t) => t.id === id) ?? tables[0]!
   return (
-    <div className="space-y-4">
-      <Pick
-        label="Source table"
-        value={table.id}
-        options={tables.map((t) => ({
-          value: t.id,
-          label: `${t.sheet} · ${t.title}`,
-        }))}
-        onChange={setId}
-      />
-      {visualize && <SourceChart key={`chart-${table.id}`} table={table} />}
-      <Records key={table.id} table={table} />
-      <Card className="shadow-none">
-        <CardHeader>
-          <CardTitle>Source notes & coverage</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-xs leading-relaxed text-muted-foreground">
-          {table.notes.map((note, i) => (
-            <p key={i}>{note}</p>
-          ))}
-          <p>
-            Blank cells mean not supplied or not applicable. Dates and times are
-            Singapore local time (UTC+08).
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <DatasetTabs
+      items={[
+        ...tables.map((table) => ({
+          id: table.id,
+          label: table.title,
+          content: <Records table={table} />,
+        })),
+        ...operations.map((id) => ({
+          id,
+          label: id.replaceAll("_", " "),
+          content: <OperationsSources initialTable={id} allowedTables={[id]} />,
+        })),
+      ]}
+    />
   )
 }
 function Overview({ vehicle, period }: { vehicle: string; period: string }) {
-  const { dataset, filterHistory, vehicles } = useDashboard()
+  const { data, filterHistory, vehicles } = useDashboard()
   const rows = filterHistory(vehicle, period)
   const repair = sum(rows, "repair_cost_sgd"),
     routine = sum(rows, "scheduled_service_cost_sgd"),
@@ -291,12 +144,12 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
         <Metric
           title="Recorded distance"
           value={`${fmt(km)} km`}
-          detail={`${fmt(sum(rows, "recorded_operating_hours"), 1)} operating hours · matched period`}
+          detail={`${fmt(sum(rows, "recorded_operating_hours"), 1)} operating hours`}
         />
         <Metric
           title="Repair cost / 1,000 km"
           value={money(km ? (repair / km) * 1000 : 0)}
-          detail="Repair charges divided by matched-period use"
+          detail="SGD per 1,000 km"
         />
       </div>
       <div className="grid gap-6 @4xl/dashboard:grid-cols-[1.6fr_1fr]">
@@ -311,30 +164,44 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
             { key: "additional_preventive_cost_sgd", label: "Preventive" },
           ]}
         />
-        <Plot
-          title="Repair spending by vehicle"
-          description="Selected period · ranked by recorded cost (SGD)"
-          rows={ranked}
-          series={[{ key: "repair_cost_sgd", label: "Repair cost" }]}
-        />
+        <Tabs defaultValue="period" className="min-w-0 gap-3">
+          <TabsList aria-label="Repair spending view">
+            <TabsTrigger value="period">Selected period</TabsTrigger>
+            <TabsTrigger value="annual">Annual comparison</TabsTrigger>
+          </TabsList>
+          <TabsContent value="period">
+            <Plot
+              title="Repair spending by vehicle"
+              description="Selected period · ranked by recorded cost (SGD)"
+              rows={ranked}
+              series={[{ key: "repair_cost_sgd", label: "Repair cost" }]}
+            />
+          </TabsContent>
+          <TabsContent value="annual">
+            <Plot
+              title="Like-for-like annual repair spend"
+              description="October–September · SGD"
+              rows={comparison}
+              series={[
+                { key: "earlier", label: "2024–25" },
+                { key: "latest", label: "2025–26" },
+              ]}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
-      <div className="grid gap-6 @4xl/dashboard:grid-cols-2">
-        <Plot
-          title="Like-for-like annual repair spend"
-          description="Always compares two complete October–September periods · SGD"
-          rows={comparison}
-          series={[
-            { key: "earlier", label: "2024–25" },
-            { key: "latest", label: "2025–26" },
-          ]}
-        />
+      <div>
         <Plot
           title="Recorded vehicle unavailability"
-          description="Selected period · vehicle hold hours, not passenger delay"
+          description="Vehicle hold hours"
           rows={groupSum(rows, "vehicle_id", [
             "repair_unavailable_hours",
             "scheduled_maintenance_unavailable_hours",
-          ])}
+          ]).sort(
+            (a, b) =>
+              num(b, "repair_unavailable_hours") -
+              num(a, "repair_unavailable_hours")
+          )}
           series={[
             { key: "repair_unavailable_hours", label: "Repair holds" },
             {
@@ -344,28 +211,30 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           ]}
         />
       </div>
-      <Notice>
-        The monthly ledger is the single source for these totals. Workbook
-        summaries, annual repair summaries, and selected visits overlap this
-        ledger and are not added again. This is a selected eight-bus sample, not
-        the 172-vehicle fleet.
-      </Notice>
-      <Records
-        table={dataset("Fleet")}
-        rows={dataset("Fleet").rows.filter(
-          (r) => vehicle === "all" || r["Vehicle ID"] === vehicle
+      <SourcePicker
+        tables={data.tables.filter(
+          (t) =>
+            t.sheet === "Fleet" ||
+            t.sheet === "Monthly usage" ||
+            t.id === "monthly_vehicle_history"
         )}
+        operations={["vehicles"]}
       />
     </div>
   )
 }
 function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
-  const { data, filterHistory, vehicles } = useDashboard()
+  const { data, filterHistory } = useDashboard()
   const rows = filterHistory(vehicle, period)
-  const tables = data.tables.filter((t) =>
-    ["Repairs", "Servicing", "Inspections", "Selected observations"].includes(
-      t.sheet
-    )
+  const tables = data.tables.filter(
+    (t) =>
+      [
+        "Repairs",
+        "Servicing",
+        "Inspections",
+        "Selected observations",
+        "Monthly maintenance",
+      ].includes(t.sheet) || t.id === "selected_component_observations"
   )
   return (
     <div className="space-y-6">
@@ -378,7 +247,7 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
         <Metric
           title="Additional preventive visits"
           value={fmt(sum(rows, "additional_preventive_visits"))}
-          detail="Separate from required routine services"
+          detail="Preventive visits"
         />
         <Metric
           title="Maintenance hold hours"
@@ -387,7 +256,7 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
               sum(rows, "scheduled_maintenance_unavailable_hours"),
             1
           )}
-          detail="Repair and scheduled holds do not overlap"
+          detail="Hours"
         />
       </div>
       <Plot
@@ -404,13 +273,6 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
           { key: "additional_preventive_visits", label: "Preventive visits" },
         ]}
       />
-      <Notice>
-        Historical filters apply to the chart and metrics above. Detailed
-        extracts below retain their own dates and all vehicles. Repair jobs are
-        not breakdown counts; repeated symptoms do not establish a shared cause.
-        Estimated completion and routine-service completion do not establish
-        vehicle release.
-      </Notice>
       <SourcePicker tables={tables} />
     </div>
   )
@@ -425,29 +287,23 @@ function SelectedOperations() {
         <Metric
           title="Completed trips"
           value={fmt(sum(daily, "Completed trips"))}
-          detail="Supplied ten weekday morning cohorts"
+          detail={`${daily.length} daily records`}
         />
         <Metric
           title="Recorded use"
           value={`${fmt(sum(daily, "Recorded total km"))} km`}
-          detail={`${fmt(sum(daily, "Recorded operating hours"), 1)} running hours including listed positioning`}
+          detail={`${fmt(sum(daily, "Recorded operating hours"), 1)} running hours`}
         />
         <Metric
           title="Selected trip observations"
           value={String(observations.length)}
-          detail="Selected observations, not network-wide performance"
+          detail="Trip observations"
         />
       </div>
-      <div className="grid gap-6 @4xl/dashboard:grid-cols-2">
-        <Plot
-          title="Recorded distance by service"
-          description="October extract · km · daily rows only, excluding duplicate weekly totals"
-          rows={groupSum(daily, "Service no", ["Recorded total km"])}
-          series={[{ key: "Recorded total km", label: "Distance (km)" }]}
-        />
+      <div>
         <Plot
           title="Selected departure and arrival delays"
-          description="Minutes · negative values indicate early arrival"
+          description="Minutes"
           rows={observations.map((r) => ({
             name: r["Service observation ID"]!,
             departure: num(r, "Departure delay seconds") / 60,
@@ -459,11 +315,6 @@ function SelectedOperations() {
           ]}
         />
       </div>
-      <Notice>
-        The October extract is a partial operating window, not a complete month.
-        Morning release records end at 16:00 and cannot establish evening
-        availability. Service delay is not automatically a mechanical fault.
-      </Notice>
       <SourcePicker
         tables={data.tables.filter((t) =>
           [
@@ -479,7 +330,7 @@ function SelectedOperations() {
   )
 }
 function Planning() {
-  const { data, dataset, vehicles } = useDashboard()
+  const { data, dataset } = useDashboard()
   const requests = dataset("Maintenance planning", "Requested maintenance").rows
   const allocations = dataset(
     "Festival allocation",
@@ -507,7 +358,7 @@ function Planning() {
             title="Available bays"
             value={String(
               dataset("Maintenance planning", "Bay and staffing capacity")
-                .rows[0]!["Available bays"]
+                .rows[0]?.["Available bays"] ?? "Not supplied"
             )}
             detail="09:00–17:00 · Hougang staging"
           />
@@ -515,14 +366,14 @@ function Planning() {
             title="Available technicians"
             value={String(
               dataset("Maintenance planning", "Bay and staffing capacity")
-                .rows[0]!["Available technicians"]
+                .rows[0]?.["Available technicians"] ?? "Not supplied"
             )}
-            detail="Capacity at a time, staffed in shifts"
+            detail="Technicians per shift"
           />
         </div>
         <Plot
           title="Requested workshop resources"
-          description="Both requests start at 09:00: overlapping requests exceed the one-bay / two-technician capacity"
+          description="Bays and technicians"
           rows={requests.map((r) => ({
             name: r["Vehicle ID"]!,
             bays: r["Required bays"]!,
@@ -533,19 +384,19 @@ function Planning() {
             { key: "technicians", label: "Requested technicians" },
           ]}
         />
-        <Notice>
-          Requests need rescheduling and complete service cover. Only NW-V005 is
-          offered as additional cover. Tentative end times are not confirmed
-          Engineering releases.
-        </Notice>
         <SourcePicker
           tables={data.tables.filter((t) => t.sheet === "Maintenance planning")}
+          operations={[
+            "workshop_work_orders",
+            "workshop_vehicles",
+            "planning_constraints",
+          ]}
         />
       </TabsContent>
       <TabsContent value="festival" className="space-y-6">
         <Plot
           title="Proposed departure capacity by route"
-          description="9 November · passenger places across proposed departures, not unique passengers"
+          description="Passenger capacity by route"
           rows={groupSum(
             allocations
               .filter((r) => r["Route ID"])
@@ -560,12 +411,6 @@ function Planning() {
           )}
           series={[{ key: "capacity", label: "Proposed passenger places" }]}
         />
-        <Notice>
-          Allocations are conditional. NW-V005 is the only named unallocated
-          additional bus and crew; NW-V009 and NW-V050 have other protected
-          bookings. No attendance or actual boarding figures are supplied. Do
-          not add the two routes as unique people.
-        </Notice>
         <SourcePicker
           tables={data.tables.filter((t) => t.sheet === "Festival allocation")}
         />
@@ -589,25 +434,20 @@ function Planning() {
             title="Initial waiting people"
             value={String(
               dataset("Incident baseline", "Relief decision requirements")
-                .rows[0]!["Initial waiting people"]
+                .rows[0]?.["Initial waiting people"] ?? "Not supplied"
             )}
-            detail="Planning baseline at 17:00 · one wheelchair user"
+            detail="Planning baseline at 17:00"
           />
         </div>
         <Plot
           title="Assumed relief queue arrivals"
-          description="Planning arrivals per half-hour; these are not observed outcomes or remaining queue counts"
+          description="Planned arrivals per half-hour"
           rows={arrivals.map((r) => ({
             name: String(r["Window start"]).slice(11, 16),
             arrivals: r["Arrivals people"]!,
           }))}
           series={[{ key: "arrivals", label: "Assumed arrivals" }]}
         />
-        <Notice>
-          Only the 17:00 baseline is supplied. The estimated 17:30 completion is
-          not authority to dispatch. Contracted departures already have
-          dedicated resources; they are not extra spare vehicles.
-        </Notice>
         <SourcePicker
           tables={data.tables.filter((t) => t.sheet === "Incident baseline")}
         />
@@ -616,101 +456,28 @@ function Planning() {
   )
 }
 function Passengers() {
-  const { dataset, operationsPassengers, operationsManifest } = useDashboard()
-  const reports = dataset("Passenger reports")
-  return (
-    <div className="space-y-6">
-      <Notice>
-        Validated against all {fmt(operationsManifest.coverage.trips)} origin
-        departures:{" "}
-        {operationsPassengers.filter((c) => c.matches.length === 1).length} of{" "}
-        {operationsPassengers.length} reports match one trip using stop, journey
-        window, and supplied identifiers. Expected journeys use scheduled
-        departure; observed journeys use actual departure. Matching an event
-        does not establish a cause.
-      </Notice>
-      <div className="grid gap-6 @3xl/dashboard:grid-cols-2">
-        <Plot
-          title="Reports by channel"
-          description="Six selected reports · not complaint rates"
-          rows={groupSum(
-            reports.rows.map((r) => ({ ...r, count: 1 })),
-            "Channel",
-            ["count"]
-          )}
-          series={[{ key: "count", label: "Reports" }]}
-        />
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle>Read the journey, then the evidence</CardTitle>
-            <CardDescription>
-              5–14 October 2026 · Singapore local time
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-5 text-sm leading-relaxed">
-            <p>
-              Reports describe comfort, delayed departures, a vehicle
-              substitution, and a boarding queue. Individual experiences are
-              reported, not independently verified.
-            </p>
-            <p className="text-muted-foreground">
-              Receipt time differs from journey time. A blank reported service
-              or vehicle is unknown; it has not been inferred here. Match the
-              journey window and stop to Operations before drawing conclusions.
-            </p>
-            <Badge variant="secondary">
-              Selected accounts · no causal attribution
-            </Badge>
-          </CardContent>
-        </Card>
-      </div>
-      <Records table={reports} />
-      {reports.rows.map((r) => (
-        <Card key={String(r["Case ID"])} className="gap-3 shadow-none">
-          <CardHeader>
-            <div className="flex justify-between">
-              <CardTitle>
-                {String(r["Case ID"])} ·{" "}
-                {r["Reported service no"]
-                  ? `Service ${r["Reported service no"]}`
-                  : `Vehicle ${r["Reported vehicle ID"]}`}
-              </CardTitle>
-              <Badge variant="outline">{String(r.Channel)}</Badge>
-            </div>
-            <CardDescription>
-              {String(r["Journey window start"])} –{" "}
-              {String(r["Journey window end"]).slice(11)} ·{" "}
-              {String(r["Journey time basis"])}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-sm leading-relaxed">
-            “{String(r["Passenger report"])}”
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  )
-}
-function Costs() {
   const { dataset } = useDashboard()
+  const reports = dataset("Passenger reports")
+  return <Records table={reports} />
+}
+
+function Costs() {
+  const { data, dataset } = useDashboard()
   const options = dataset("Cost options")
+  const replacement = options.rows.find(
+    (r) => r.Option === "Fleet replacement option"
+  )
   const maintenance = options.rows.filter(
     (r) => r.Option !== "Fleet replacement option"
   )
   return (
     <div className="space-y-6">
-      <Notice>
-        These are proposed quotes issued 16 October 2026, valid 19 October–16
-        November. They are not incurred costs, guaranteed savings, or additive
-        recommendations. Some scopes overlap; the replacement quote excludes
-        finance, infrastructure, resale, and transition costs.
-      </Notice>
       <div className="grid gap-6 @3xl/dashboard:grid-cols-[1.6fr_1fr]">
         <Plot
           title="Maintenance quote comparison"
-          description="SGD excluding tax · full quoted package, not price per visit"
+          description="Quoted price · SGD excluding tax"
           rows={maintenance.map((r) => ({
-            name: r["Option ID"]!,
+            name: r.Option!,
             quote: r["Quoted price SGD"]!,
           }))}
           series={[{ key: "quote", label: "Quoted SGD" }]}
@@ -719,87 +486,29 @@ function Costs() {
           <CardHeader>
             <CardDescription>Separate capital option · NW-V020</CardDescription>
             <CardTitle className="text-4xl tracking-tight">
-              {money(
-                num(
-                  options.rows.find(
-                    (r) => r.Option === "Fleet replacement option"
-                  )!,
-                  "Quoted price SGD"
-                )
-              )}
+              {replacement
+                ? money(num(replacement, "Quoted price SGD"))
+                : "Not supplied"}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-5 text-sm">
             <Badge variant="secondary">Indicative replacement quote</Badge>
-            <p className="text-muted-foreground">
-              10-month lead time. A same-capacity double-deck vehicle. The
-              supplied history does not establish that replacement is
-              economical.
-            </p>
-            <p>
-              Capital and maintenance quotes are shown separately to preserve a
-              useful comparison scale.
-            </p>
+            <p>Lead time · 10 months</p>
           </CardContent>
         </Card>
       </div>
-      <Records table={options} />
-    </div>
-  )
-}
-function Explorer() {
-  const { data, operationsManifest } = useDashboard()
-  return (
-    <div className="space-y-6">
-      <Notice>
-        {data.tables.length} handout tables plus{" "}
-        {operationsManifest.tables.length} operations tables from 24 CSV files
-        and five workbooks. These include duplicate and overlapping views;
-        source row counts must not be summed as distinct events. All fields are
-        available below. Handout tables support sorting and filtered CSV export;
-        operations tables support server-side search, pagination, and full CSV
-        downloads.
-      </Notice>
-      <Tabs defaultValue="handouts" className="gap-4">
-        <TabsList>
-          <TabsTrigger value="handouts">Handouts (40 tables)</TabsTrigger>
-          <TabsTrigger value="operations">Operations (21 tables)</TabsTrigger>
-        </TabsList>
-        <TabsContent value="handouts">
-          <SourcePicker tables={data.tables} visualize />
-        </TabsContent>
-        <TabsContent value="operations">
-          <OperationsSources />
-        </TabsContent>
-      </Tabs>
-      <Card className="shadow-none">
-        <CardHeader>
-          <CardTitle>Monthly-history documentation</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="0">
-            <TabsList>
-              {data.documents.map((doc, i) => (
-                <TabsTrigger key={doc.file} value={String(i)}>
-                  {doc.file.split("/").pop()}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {data.documents.map((doc, i) => (
-              <TabsContent key={doc.file} value={String(i)}>
-                <pre className="mt-4 max-h-96 overflow-auto font-sans text-xs leading-relaxed whitespace-pre-wrap text-muted-foreground">
-                  {doc.text}
-                </pre>
-              </TabsContent>
-            ))}
-          </Tabs>
-        </CardContent>
-      </Card>
+      <SourcePicker
+        tables={data.tables.filter(
+          (t) =>
+            t.file.includes("06_cost_options") ||
+            t.id === "repair_spend_by_vehicle"
+        )}
+      />
     </div>
   )
 }
 export function FleetDashboard() {
-  const { data, vehicles } = useDashboard()
+  const { vehicles } = useDashboard()
   const [section, setSection] = useState<string>("overview")
   const [vehicle, setVehicle] = useState("all")
   const [period, setPeriod] = useState("latest")
@@ -832,7 +541,9 @@ export function FleetDashboard() {
               <SidebarMenuItem key={s.id}>
                 <SidebarMenuButton
                   isActive={section === s.id}
-                  onClick={() => setSection(s.id)}
+                  onClick={() => {
+                    setSection(s.id)
+                  }}
                   className="h-10 gap-3 px-3 data-active:bg-primary/10 data-active:text-primary"
                 >
                   <s.icon className="size-4" />
@@ -842,22 +553,6 @@ export function FleetDashboard() {
             ))}
           </SidebarMenu>
         </SidebarContent>
-        <SidebarFooter className="p-5">
-          <div className="rounded-lg border bg-card p-3">
-            <div className="mb-2 flex items-center gap-2 text-xs font-medium">
-              <FileSpreadsheet className="size-4 text-primary" /> Local data
-              workspace
-            </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              5 workbooks · 24 CSV files
-              <br />
-              40 handout tables + 21 operations tables
-            </p>
-          </div>
-          <p className="mt-3 text-[10px] text-muted-foreground">
-            FICTIONAL EXERCISE DATA · SGD
-          </p>
-        </SidebarFooter>
       </Sidebar>
       <SidebarInset className="min-w-0 bg-muted/35">
         <header className="flex h-16 items-center justify-between gap-3 border-b bg-background px-4 lg:px-8">
@@ -870,11 +565,6 @@ export function FleetDashboard() {
             <ChevronRight className="size-3 text-muted-foreground" />
             <span className="text-xs font-medium">{current.label}</span>
           </div>
-          <div className="flex shrink-0 items-center gap-3">
-            <Badge variant="outline" className="hidden sm:flex">
-              <Database className="size-3" /> Source snapshot
-            </Badge>
-          </div>
         </header>
         <main
           id="active-report"
@@ -884,56 +574,51 @@ export function FleetDashboard() {
         >
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div>
-              <div className="mb-2 flex items-center gap-2 text-xs font-medium text-primary">
-                <Gauge className="size-4" /> LIONLINK OPERATIONS
-              </div>
               <h1 className="text-3xl font-semibold tracking-tight">
                 {current.label}
               </h1>
-              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-                {current.description}
-              </p>
             </div>
-            {historical && (
-              <div className="flex flex-wrap gap-2">
-                <Pick
-                  label="Vehicle"
-                  value={vehicle}
-                  onChange={setVehicle}
-                  options={[
-                    { value: "all", label: "All 8 vehicles" },
-                    ...vehicles.map((v) => ({ value: v, label: v })),
-                  ]}
-                />
-                <Pick
-                  label="Historical period"
-                  value={period}
-                  onChange={setPeriod}
-                  options={[
-                    { value: "latest", label: "Oct 2025 – Sep 2026" },
-                    { value: "earlier", label: "Oct 2024 – Sep 2025" },
-                    { value: "all", label: "All 24 months" },
-                  ]}
-                />
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-2">
+              {historical && (
+                <div className="flex flex-wrap gap-2">
+                  <Pick
+                    label="Vehicle"
+                    value={vehicle}
+                    onChange={setVehicle}
+                    options={[
+                      {
+                        value: "all",
+                        label: `All ${vehicles.length} vehicles`,
+                      },
+                      ...vehicles.map((v) => ({ value: v, label: v })),
+                    ]}
+                  />
+                  <Pick
+                    label="Historical period"
+                    value={period}
+                    onChange={setPeriod}
+                    options={[
+                      { value: "latest", label: "Oct 2025 – Sep 2026" },
+                      { value: "earlier", label: "Oct 2024 – Sep 2025" },
+                      { value: "all", label: "All 24 months" },
+                    ]}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           {historical && (
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <CalendarDays className="size-3.5" />
               <span>Complete monthly history</span>
               <span>·</span>
-              <span>{vehicle === "all" ? "8 selected vehicles" : vehicle}</span>
+              <span>
+                {vehicle === "all"
+                  ? `${vehicles.length} selected vehicles`
+                  : vehicle}
+              </span>
               <span>·</span>
               <span>SGD excluding tax</span>
-              <Button
-                variant="link"
-                size="sm"
-                className="ml-auto h-auto p-0 text-xs"
-                onClick={() => setSection("explorer")}
-              >
-                Explore source data <ArrowUpRight className="size-3" />
-              </Button>
             </div>
           )}
           {section === "overview" && (
@@ -942,14 +627,11 @@ export function FleetDashboard() {
           {section === "maintenance" && (
             <Maintenance vehicle={vehicle} period={period} />
           )}
-          {section === "relationships" && <RelationshipsDashboard />}
           {section === "operations" && (
             <Tabs defaultValue="network" className="gap-6">
               <TabsList>
-                <TabsTrigger value="network">Full operating cohort</TabsTrigger>
-                <TabsTrigger value="selected">
-                  Selected handout extracts
-                </TabsTrigger>
+                <TabsTrigger value="network">Network</TabsTrigger>
+                <TabsTrigger value="selected">Usage & service</TabsTrigger>
               </TabsList>
               <TabsContent value="network">
                 <OperationsDashboard />
@@ -962,11 +644,6 @@ export function FleetDashboard() {
           {section === "planning" && <Planning />}
           {section === "passengers" && <Passengers />}
           {section === "costs" && <Costs />}
-          {section === "explorer" && <Explorer />}
-          <footer className="border-t pt-5 text-xs text-muted-foreground">
-            LionLink · Selected exercise records · Singapore time (UTC+08) ·
-            Sources: supplied fleet handouts and operations records
-          </footer>
         </main>
       </SidebarInset>
     </SidebarProvider>

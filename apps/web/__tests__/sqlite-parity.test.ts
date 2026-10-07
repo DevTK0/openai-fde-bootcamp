@@ -89,7 +89,10 @@ function compare(actual: unknown, expected: unknown) {
 describe("SQLite migration parity", () => {
   it("preserves all handout data and passenger evidence", () => {
     const actual = readDashboardData()
-    expect(actual.fleet).toEqual(
+    expect({
+      ...actual.fleet,
+      tables: actual.fleet.tables.map(({ recordIds: _ids, ...table }) => table),
+    }).toEqual(
       fleetSchema.parse(JSON.parse(readFileSync("lib/fleet-data.json", "utf8")))
     )
     expect(actual.operationsPassengers).toEqual(

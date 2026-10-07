@@ -11,6 +11,7 @@ export const datasetSchema = z.object({
   title: z.string(),
   columns: z.array(z.string()),
   rows: z.array(rowSchema),
+  recordIds: z.array(z.number()).optional(),
   sourceRows: z.array(z.number()),
   notes: z.array(z.string()),
 })

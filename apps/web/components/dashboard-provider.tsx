@@ -3,14 +3,12 @@
 import { createContext, useContext, useMemo } from "react"
 import type { DashboardData } from "@/lib/dashboard-data"
 import { createFleet } from "@/lib/fleet"
-import { createRelationships } from "@/lib/relationships"
 
 function createDashboard(data: DashboardData) {
   const fleet = createFleet(data.fleet)
   return {
     ...data,
     ...fleet,
-    ...createRelationships(fleet, data.operationsPassengers),
   }
 }
 const DashboardContext = createContext<ReturnType<
