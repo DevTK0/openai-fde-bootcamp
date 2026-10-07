@@ -1,5 +1,6 @@
 "use client"
 
+import { ServicePlanning } from "./service-planning"
 import { DatasetTabs } from "@/components/dataset-tabs"
 import { useDashboard } from "@/components/dashboard-provider"
 
@@ -507,9 +508,17 @@ function Costs() {
     </div>
   )
 }
-export function FleetDashboard() {
+export function FleetDashboard({
+  initialPlanningQuery = "",
+}: {
+  initialPlanningQuery?: string
+}) {
   const { vehicles } = useDashboard()
-  const [section, setSection] = useState<string>("overview")
+  const [section, setSection] = useState<string>(
+    new URLSearchParams(initialPlanningQuery).get("view") === "service-planning"
+      ? "operations"
+      : "overview"
+  )
   const [vehicle, setVehicle] = useState("all")
   const [period, setPeriod] = useState("latest")
   const current = sections.find((s) => s.id === section)!
@@ -628,13 +637,27 @@ export function FleetDashboard() {
             <Maintenance vehicle={vehicle} period={period} />
           )}
           {section === "operations" && (
-            <Tabs defaultValue="network" className="gap-6">
+            <Tabs
+              defaultValue={
+                new URLSearchParams(initialPlanningQuery).get("view") ===
+                "service-planning"
+                  ? "service-planning"
+                  : "network"
+              }
+              className="gap-6"
+            >
               <TabsList>
                 <TabsTrigger value="network">Network</TabsTrigger>
                 <TabsTrigger value="selected">Usage & service</TabsTrigger>
+                <TabsTrigger value="service-planning">
+                  Service planning
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="network">
                 <OperationsDashboard />
+              </TabsContent>
+              <TabsContent value="service-planning">
+                <ServicePlanning initialQuery={initialPlanningQuery} />
               </TabsContent>
               <TabsContent value="selected">
                 <SelectedOperations />

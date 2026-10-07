@@ -1,18 +1,18 @@
 # Service planning integration brief
 
-Status: proposed product scope. Implementation has not started.
+Status: adapted into the main application in one PR. See [integration behavior and verification](service-planning-integration.md). Operating policy defaults remain proposed.
 
 ## Purpose
 
 Help a planner identify a service problem, inspect its dated evidence, understand when it happened, and review possible interventions.
 
-The `kuma` prototype at commit `f6434e1` is a behavioral reference. Its code, generated data, and animation assets are outside this integration. The implementation branch starts from remote main at `61a465d`.
+The `kuma` prototype at commit `f6434e1` is a behavioral reference. Its code, generated data, and animation assets are outside this integration. The original comparison used remote main at `61a465d`; the implementation follows current main.
 
-The production work belongs in the existing dashboard and domain workspaces. It must use the current application data and shared UI conventions. The first implementation task is to inspect those workspaces and identify existing capabilities before proposing additions.
+The production work belongs in the existing dashboard and domain workspaces. It must use the current application data and shared UI conventions. The workspace comparison and existing capabilities are documented in the integration reference.
 
-## Proposed delivery sequence
+## Integration scope
 
-Each numbered item is a separate proposed PR against main. Later items depend on verification of the earlier workflow. No PR or feature implementation is part of this branch setup.
+The following behaviors are adapted together in one PR against main, per the revised delivery scope. Domain checks and application verification cover each workflow.
 
 1. Add an explainable service watchlist and supporting evidence. Include peak queues, the share of observed boarding-stop positions with queues, and observation coverage.
 2. Add candidate buses for reassignment. Explain the available window, supporting evidence, and remaining feasibility checks.
@@ -50,9 +50,9 @@ Blender videos are deferred. They support demonstrations but are not necessary f
 - The replay does not imply live GPS, street geometry, or continuously measured passenger demand.
 - Moving buses are included only when they explain an operational question better than a timeline alone.
 
-## Decisions before implementation
+## Policy decisions
 
-The immediate gate is a comparison with the latest main application. Confirm which behaviors already exist, which source records support each claim, and where the planner enters the workflow.
+The comparison with main is complete. The planner enters through Operations, then Service planning. The integration reference records the source records, existing capabilities, and remaining limits.
 
 Outstanding product decisions include priority policy, observation windows, stale-data treatment, and the required feasibility horizon for reassignment. Prototype defaults are assumptions rather than approved operating policy.
 
