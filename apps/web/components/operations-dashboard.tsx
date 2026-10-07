@@ -298,17 +298,6 @@ export function OperationsDashboard({
                   detail={`${manifest.tables.find((t) => t.id === "resource_updates")!.count} resource updates`}
                 />
               </div>
-              <OperationsSources
-                initialTable="crew_duties"
-                allowedTables={[
-                  "crew_duties",
-                  "resource_updates",
-                  "terminal_movements",
-                  "planning_constraints",
-                  "origin_arrivals",
-                  "queue_windows",
-                ]}
-              />
             </div>
           )}
         </>

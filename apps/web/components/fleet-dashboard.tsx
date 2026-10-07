@@ -38,29 +38,23 @@ import {
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar"
 import { Separator } from "@workspace/ui/components/separator"
-import { fmt, money, num, sum, groupSum, type Dataset } from "@/lib/fleet"
+import { fmt, money, num, sum, groupSum } from "@/lib/fleet"
 
-function SourcePicker({
-  tables,
-  operations = [],
-}: {
-  tables: Dataset[]
-  operations?: string[]
-}) {
+function DataSources({ kind }: { kind: "operations" | "supplied" }) {
+  const { data, operationsManifest } = useDashboard()
+  if (kind === "operations")
+    return (
+      <OperationsSources
+        allowedTables={operationsManifest.tables.map((table) => table.id)}
+      />
+    )
   return (
     <DatasetPicker
-      items={[
-        ...tables.map((table) => ({
-          id: table.id,
-          label: table.title,
-          content: <Records table={table} />,
-        })),
-        ...operations.map((id) => ({
-          id,
-          label: id.replaceAll("_", " "),
-          content: <OperationsSources initialTable={id} allowedTables={[id]} />,
-        })),
-      ]}
+      items={data.tables.map((table) => ({
+        id: table.id,
+        label: `${table.sheet} · ${table.title}`,
+        content: <Records table={table} />,
+      }))}
     />
   )
 }
@@ -175,7 +169,7 @@ function MaintenanceSummary({
   )
 }
 function Overview({ vehicle, period }: { vehicle: string; period: string }) {
-  const { data, filterHistory } = useDashboard()
+  const { filterHistory } = useDashboard()
   const rows = filterHistory(vehicle, period)
   return (
     <div className="space-y-6">
@@ -192,31 +186,12 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
         />
       </div>
       <ServiceHistory />
-      <SourcePicker
-        tables={data.tables.filter(
-          (t) => t.sheet === "Fleet" || t.sheet === "Monthly usage"
-        )}
-        operations={["vehicles"]}
-      />
     </div>
   )
 }
 function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
-  const { data, filterHistory } = useDashboard()
+  const { filterHistory } = useDashboard()
   const rows = filterHistory(vehicle, period)
-  const tables = data.tables.filter(
-    (t) =>
-      [
-        "Repairs",
-        "Servicing",
-        "Inspections",
-        "Selected observations",
-        "Monthly maintenance",
-      ].includes(t.sheet) ||
-      ["selected_component_observations", "monthly_vehicle_history"].includes(
-        t.id
-      )
-  )
   return (
     <div className="space-y-6">
       <MaintenanceSummary vehicle={vehicle} period={period} />
@@ -255,12 +230,11 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
           { key: "additional_preventive_visits", label: "Preventive visits" },
         ]}
       />
-      <SourcePicker tables={tables} />
     </div>
   )
 }
 function SelectedOperations() {
-  const { data, dataset } = useDashboard()
+  const { dataset } = useDashboard()
   const daily = dataset("Daily usage").rows,
     observations = dataset("Service observations").rows
   return (
@@ -297,22 +271,11 @@ function SelectedOperations() {
           ]}
         />
       </div>
-      <SourcePicker
-        tables={data.tables.filter((t) =>
-          [
-            "Daily usage",
-            "Weekly usage",
-            "Service observations",
-            "Control evidence",
-            "Readiness",
-          ].includes(t.sheet)
-        )}
-      />
     </div>
   )
 }
 function Workshop() {
-  const { data, dataset } = useDashboard()
+  const { dataset } = useDashboard()
   const requests = dataset("Maintenance planning", "Requested maintenance").rows
   return (
     <div className="space-y-6">
@@ -352,20 +315,12 @@ function Workshop() {
           { key: "technicians", label: "Requested technicians" },
         ]}
       />
-      <SourcePicker
-        tables={data.tables.filter((t) => t.sheet === "Maintenance planning")}
-        operations={[
-          "workshop_work_orders",
-          "workshop_vehicles",
-          "planning_constraints",
-        ]}
-      />
     </div>
   )
 }
 
 function Festival() {
-  const { data, dataset } = useDashboard()
+  const { dataset } = useDashboard()
   const allocations = dataset(
     "Festival allocation",
     "Proposed fleet allocations"
@@ -389,14 +344,11 @@ function Festival() {
         )}
         series={[{ key: "capacity", label: "Proposed passenger places" }]}
       />
-      <SourcePicker
-        tables={data.tables.filter((t) => t.sheet === "Festival allocation")}
-      />
     </div>
   )
 }
 function Incident() {
-  const { data, dataset } = useDashboard()
+  const { dataset } = useDashboard()
   const arrivals = dataset(
     "Incident baseline",
     "Relief queue planning arrivals"
@@ -434,9 +386,6 @@ function Incident() {
         }))}
         series={[{ key: "arrivals", label: "Assumed arrivals" }]}
       />
-      <SourcePicker
-        tables={data.tables.filter((t) => t.sheet === "Incident baseline")}
-      />
     </div>
   )
 }
@@ -447,7 +396,7 @@ function Passengers() {
 }
 
 function Costs() {
-  const { data, dataset } = useDashboard()
+  const { dataset } = useDashboard()
   const options = dataset("Cost options")
   const replacement = options.rows.find(
     (r) => r.Option === "Fleet replacement option"
@@ -482,13 +431,6 @@ function Costs() {
           </CardContent>
         </Card>
       </div>
-      <SourcePicker
-        tables={data.tables.filter(
-          (t) =>
-            t.file.includes("06_cost_options") ||
-            t.id === "repair_spend_by_vehicle"
-        )}
-      />
     </div>
   )
 }
@@ -512,32 +454,13 @@ function DashboardReport({
     case "overview":
       return <Overview vehicle={vehicle} period={period} />
     case "vehicles":
-      return (
-        <div className="space-y-6">
-          <VehiclePlanning />
-          <OperationsSources
-            key={view}
-            initialTable="vehicles"
-            allowedTables={["vehicles"]}
-          />
-        </div>
-      )
+      return <VehiclePlanning />
     case "day-schedule":
-      return (
-        <div className="space-y-6">
-          <ServiceHistory mode="scheduled" />
-          <OperationsSources
-            key={view}
-            initialTable="trips"
-            allowedTables={[
-              "trips",
-              "timetable_records",
-              "stop_calls",
-              "service_calendar",
-            ]}
-          />
-        </div>
-      )
+      return <ServiceHistory mode="scheduled" />
+    case "data-operations":
+      return <DataSources kind="operations" />
+    case "data-supplied":
+      return <DataSources kind="supplied" />
     case "control-log":
       return (
         <OperationsSources

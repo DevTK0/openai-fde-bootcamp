@@ -70,8 +70,8 @@ describe("SQLite dashboard interactions", () => {
       screen.getByRole("link", { name: "Fleet overview" })
     ).toHaveAttribute("aria-current", "page")
     expect(
-      screen.getAllByRole("button", { name: "Upload new records" })
-    ).toHaveLength(1)
+      screen.queryByRole("button", { name: "Upload new records" })
+    ).not.toBeInTheDocument()
 
     const groups = [
       { workspace: "Fleet", pages: ["Vehicle register", "Fleet overview"] },
@@ -79,9 +79,7 @@ describe("SQLite dashboard interactions", () => {
         workspace: "Operations",
         pages: [
           "Day schedule",
-          "Control log",
-          "Resource records",
-          "Network records",
+          "Resource overview",
           "Usage & service",
           "Passenger queues",
           "Service reliability",
@@ -89,17 +87,23 @@ describe("SQLite dashboard interactions", () => {
       },
       {
         workspace: "Maintenance",
-        pages: [
-          "Maintenance history",
-          "Workshop planning",
-          "Workshop register",
-        ],
+        pages: ["Maintenance history", "Workshop planning"],
       },
       {
         workspace: "Planning",
         pages: ["Festival allocation", "Incident response"],
       },
-      { workspace: "Passengers", pages: ["Passenger reports"] },
+      {
+        workspace: "Data",
+        pages: [
+          "Operations data",
+          "Supplied datasets",
+          "Control log",
+          "Network records",
+          "Workshop register",
+          "Passenger reports",
+        ],
+      },
       { workspace: "Finance", pages: ["Cost options"] },
     ]
     for (const group of groups) {
@@ -114,13 +118,27 @@ describe("SQLite dashboard interactions", () => {
         expect(screen.getByRole("heading", { name })).toBeInTheDocument()
         expect(link).toHaveAttribute("aria-current", "page")
         expect(screen.getAllByRole("link", { current: "page" })).toHaveLength(1)
-        expect(await screen.findAllByRole("table")).toHaveLength(1)
-        expect(
-          screen.getByRole("textbox", { name: "Search records" })
-        ).toBeInTheDocument()
+        if (
+          group.workspace === "Data" ||
+          ["Passenger queues", "Service reliability"].includes(name)
+        ) {
+          expect(await screen.findAllByRole("table")).toHaveLength(1)
+          expect(
+            screen.getByRole("textbox", { name: "Search records" })
+          ).toBeInTheDocument()
+        } else {
+          expect(
+            screen.queryByRole("textbox", { name: "Search records" })
+          ).not.toBeInTheDocument()
+        }
         expect(
           screen.queryByRole("tab", { name: "Workshop" })
         ).not.toBeInTheDocument()
+        if (group.workspace === "Data") {
+          expect(
+            screen.getByRole("button", { name: "Upload new records" })
+          ).toBeInTheDocument()
+        }
         if (name === "Workshop register") {
           expect(
             screen.queryByRole("combobox", { name: "Historical period" })
@@ -174,11 +192,11 @@ describe("SQLite dashboard interactions", () => {
     expect(
       screen.getByRole("heading", { name: "Workshop register" })
     ).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: "Maintenance" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Data" })).toHaveAttribute(
       "aria-expanded",
       "true"
     )
-    await user.click(screen.getByRole("button", { name: "Maintenance" }))
+    await user.click(screen.getByRole("button", { name: "Data" }))
     await user.click(screen.getByRole("button", { name: "Planning" }))
     await user.click(screen.getByRole("link", { name: "Service planning" }))
     expect(
@@ -193,7 +211,7 @@ describe("SQLite dashboard interactions", () => {
         screen.getByRole("heading", { name: "Workshop register" })
       ).toBeInTheDocument()
     )
-    expect(screen.getByRole("button", { name: "Maintenance" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Data" })).toHaveAttribute(
       "aria-expanded",
       "true"
     )

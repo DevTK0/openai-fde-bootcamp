@@ -3,7 +3,7 @@ import {
   CalendarDays,
   ChartNoAxesCombined,
   LayoutDashboard,
-  MessageSquareText,
+  Database,
   Wrench,
 } from "lucide-react"
 
@@ -22,8 +22,7 @@ export const dashboardWorkspaces = [
       {
         id: "vehicles",
         label: "Vehicle register",
-        description:
-          "Planned vehicle assignments, engineering evidence, and fleet records.",
+        description: "Planned vehicle assignments and engineering evidence.",
       },
     ],
   },
@@ -35,8 +34,7 @@ export const dashboardWorkspaces = [
       {
         id: "day-schedule",
         label: "Day schedule",
-        description:
-          "Scheduled service simulation, timetables, trips, and stop calls.",
+        description: "Scheduled service simulation.",
       },
       {
         id: "reliability",
@@ -49,21 +47,10 @@ export const dashboardWorkspaces = [
         description: "Observed queues and boarding demand by service and stop.",
       },
       {
-        id: "control-log",
-        label: "Control log",
-        description:
-          "Recorded control instructions and their supporting references.",
-      },
-      {
         id: "resources",
-        label: "Resource records",
+        label: "Resource overview",
         description:
           "Crew duties, resource updates, positioning, and operating requirements.",
-      },
-      {
-        id: "network",
-        label: "Network records",
-        description: "Routes, stops, service patterns, and rail connections.",
       },
       {
         id: "usage",
@@ -88,12 +75,6 @@ export const dashboardWorkspaces = [
         label: "Workshop planning",
         description:
           "Requested workshop jobs, bay capacity, and technician requirements.",
-      },
-      {
-        id: "workshop-register",
-        label: "Workshop register",
-        description:
-          "Work orders, engineering readiness, and the separately held workshop vehicle cohort.",
       },
     ],
   },
@@ -128,18 +109,6 @@ export const dashboardWorkspaces = [
     ],
   },
   {
-    id: "passengers",
-    label: "Passengers",
-    icon: MessageSquareText,
-    pages: [
-      {
-        id: "passengers",
-        label: "Passenger reports",
-        description: "Passenger feedback, channels, and recorded concerns.",
-      },
-    ],
-  },
-  {
     id: "finance",
     label: "Finance",
     icon: ChartNoAxesCombined,
@@ -148,6 +117,47 @@ export const dashboardWorkspaces = [
         id: "costs",
         label: "Cost options",
         description: "Compare supplied costs and recorded repair spending.",
+      },
+    ],
+  },
+  {
+    id: "data",
+    label: "Data",
+    icon: Database,
+    pages: [
+      {
+        id: "data-operations",
+        label: "Operations data",
+        description:
+          "Source records for services, vehicles, crews, and workshop activity.",
+      },
+      {
+        id: "data-supplied",
+        label: "Supplied datasets",
+        description:
+          "Imported fleet, maintenance, planning, passenger, and cost records.",
+      },
+      {
+        id: "control-log",
+        label: "Control log",
+        description:
+          "Recorded control instructions and their supporting references.",
+      },
+      {
+        id: "network",
+        label: "Network records",
+        description: "Routes, stops, service patterns, and rail connections.",
+      },
+      {
+        id: "workshop-register",
+        label: "Workshop register",
+        description:
+          "Work orders, engineering readiness, and the separately held workshop vehicle cohort.",
+      },
+      {
+        id: "passengers",
+        label: "Passenger reports",
+        description: "Passenger feedback, channels, and recorded concerns.",
       },
     ],
   },

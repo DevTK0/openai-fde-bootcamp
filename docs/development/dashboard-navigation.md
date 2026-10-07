@@ -4,25 +4,25 @@ The dashboard sidebar groups report pages by workspace. Workspace buttons expand
 
 ## Workspace ownership
 
-| Workspace   | Pages                                                                                                                |
-| ----------- | -------------------------------------------------------------------------------------------------------------------- |
-| Fleet       | Fleet overview, Vehicle register                                                                                     |
-| Operations  | Day schedule, Service reliability, Passenger queues, Control log, Resource records, Network records, Usage & service |
-| Maintenance | Maintenance history, Workshop planning, Workshop register                                                            |
-| Planning    | Crew planning, Service planning, Festival allocation, Incident response                                                             |
-| Passengers  | Passenger reports                                                                                                    |
-| Finance     | Cost options                                                                                                         |
+| Workspace   | Pages                                                                                                  |
+| ----------- | ------------------------------------------------------------------------------------------------------ |
+| Fleet       | Fleet overview, Vehicle register                                                                       |
+| Operations  | Day schedule, Service reliability, Passenger queues, Resource overview, Usage & service                |
+| Maintenance | Maintenance history, Workshop planning                                                                 |
+| Planning    | Crew planning, Service planning, Festival allocation, Incident response                                |
+| Data        | Operations data, Supplied datasets, Control log, Network records, Workshop register, Passenger reports |
+| Finance     | Cost options                                                                                           |
 
 The menu reference is `lionlink-operations-source/ops-console/index.html`, with behavior inspected in `ops-console/app.js`. Its Day schedule, Vehicle register, Workshop register, Control log, and Resource records menus informed the new destinations. The app renders existing SQLite records through the shared dataset table. It does not import the reference console's generated state or implement its as-of-time simulation.
 
-| Reference menu    | App destination                 | Source records                                                                                                                    |
-| ----------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Day schedule      | Operations / Day schedule       | Trips, timetable records, stop calls, service calendar                                                                            |
-| Vehicle register  | Fleet / Vehicle register        | Vehicles                                                                                                       |
-| Workshop register | Maintenance / Workshop register | Workshop work orders, workshop vehicles, vehicle readiness                                                                                           |
-| Control log       | Operations / Control log        | Control actions                                                                                                                   |
-| Resource records  | Operations / Resource records   | Crew duties, resource updates, terminal movements, planning constraints, origin arrivals, queue windows                           |
-| Network map       | Deferred                        | Routes, stops, service patterns, and rail records remain accessible through Operations / Network records. This page is not a map. |
+| Reference menu    | App destination          | Source records                                                                                                              |
+| ----------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Day schedule      | Data / Operations data   | Trips, timetable records, stop calls, service calendar                                                                      |
+| Vehicle register  | Data / Operations data   | Vehicles                                                                                                                    |
+| Workshop register | Data / Workshop register | Workshop work orders, workshop vehicles, vehicle readiness                                                                  |
+| Control log       | Data / Control log       | Control actions                                                                                                             |
+| Resource records  | Data / Operations data   | Crew duties, resource updates, terminal movements, planning constraints, origin arrivals, queue windows                     |
+| Network map       | Deferred                 | Routes, stops, service patterns, and rail records remain accessible through Data / Network records. This page is not a map. |
 
 ## Implementation
 
@@ -36,16 +36,22 @@ Historical vehicle and period controls appear only on Fleet overview and Mainten
 
 Run `pnpm check`. The dashboard tests open every workspace report, switch workshop datasets, check historical-filter scope, exercise browser Back, and preserve planning assumptions. The service-planning investigation still checks thresholds, candidate evidence, and replay observations.
 
-In the running app, open `/dashboard?view=workshop-register`. Confirm Maintenance is expanded and Workshop register is selected. Change the Dataset selector to workshop vehicles. Open Planning / Service planning, change an assumption, visit another workspace, and return. Confirm the assumption remains. Reload the URL and use browser Back to verify page selection. At a mobile viewport, open the sidebar, expand Operations, and select Control log. Confirm the drawer closes and the page has no horizontal overflow outside its table.
+In the running app, open `/dashboard?view=workshop-register`. Confirm Data is expanded and Workshop register is selected. Change the Dataset selector to workshop vehicles. Open Planning / Service planning, change an assumption, visit another workspace, and return. Confirm the assumption remains. Reload the URL and use browser Back to verify page selection. At a mobile viewport, open the sidebar, expand Data, and select Control log. Confirm the drawer closes and the page has no horizontal overflow outside its table.
 
-Fleet overview owns recorded distance, operating hours and the all-service history map. Maintenance history owns maintenance costs, repair counts, repair cost per kilometre, spending comparisons and maintenance hold charts, plus the detailed monthly vehicle history. Engineering readiness records are under Maintenance / Workshop register; Fleet / Vehicle register contains vehicle identity and service assignment records. Historical filters apply to usage metrics in Fleet and maintenance metrics in Maintenance, not to the independently dated service replay.
+Fleet overview owns recorded distance, operating hours and the all-service history map. Maintenance history owns maintenance costs, repair counts, repair cost per kilometre, spending comparisons and maintenance hold charts, with detailed monthly vehicle history in Data / Supplied datasets. Engineering readiness records are under Data / Workshop register; Data / Operations data contains vehicle identity records. Historical filters apply to usage metrics in Fleet and maintenance metrics in Maintenance, not to the independently dated service replay.
 
 Planning / Crew planning shows a read-only timeline of planned trip assignments and supplied crew-duty records. Date and service filters, crew-ID search, and 25-row pagination keep the view navigable. Service filtering retains other assignments for matching crews in muted colors, so cross-service conflicts stay visible. Overlapping trips use separate tracks; red outlines mark trip overlaps and protected-break conflicts. Half-open time intervals allow a trip to end exactly when another starts or a break begins. Missing duty, qualification, location, timing or break evidence remains unverified. Gaps are not availability claims. Click a trip, duty band or break to inspect source IDs and location evidence. Crew names are not present in the source, so rows use crew IDs.
 
 The read-only `/api/crew-planning?date=YYYY-MM-DD` endpoint reads planned assignments and dated crew duties from SQLite. This view does not approve assignments or calculate transfer feasibility and continuous-duty compliance. Test conflict boundaries and incomplete evidence with `crew-planning.test.ts`; in the browser verify service/date filtering, crew search, pagination, assignment details and break details.
 
-Fleet / Vehicle register adds a planned vehicle timeline above the existing source table. It shares the timeline renderer with Crew planning, with service-colored trips labeled by crew, recorded readiness windows, and maintenance holds. Date/service filters, vehicle-ID search, pagination and selection details work independently of the raw source table. The separately held workshop cohort remains labeled. Click a vehicle ID to inspect evidence even without a planned trip.
+Fleet / Vehicle register shows a planned vehicle timeline. It shares the timeline renderer with Crew planning, with service-colored trips labeled by crew, recorded readiness windows, and maintenance holds. Date/service filters, vehicle-ID search, pagination and selection details work on the planning timeline. The separately held workshop cohort remains labeled. Click a vehicle ID to inspect evidence even without a planned trip.
 
 The read-only `/api/vehicle-planning` endpoint reads planned assignments, vehicle rosters, dated readiness and the same maintenance sources used by Service planning. Missing confirmed releases keep holds open; estimated completion is not a release. Exact release/end boundaries do not conflict. Overlapping planned trips or maintenance holds produce red outlines. Missing readiness, location or timing evidence remains unverified. Readiness alone does not establish turnaround, positioning or crew feasibility. Known event times set the visible time axis; longer open holds are clipped to that displayed window, with full timestamps in details.
 
 Vehicle tests cover open holds, confirmed-release boundaries, cross-service overlaps, missing evidence, planned assignments and the separate workshop cohort. Browser checks cover search, filters, hold/trip details, and Crew planning after the shared renderer change.
+
+## Raw data workspace
+
+Data owns raw table browsing, search, filtering, export and record actions. Operations data lists every table in the operations manifest, and Supplied datasets lists every imported dataset. Control log, Network records, Workshop register and Passenger reports retain their existing page URLs under Data. The empty Passengers workspace is removed.
+
+Analysis tables stay in their reports, including service comparisons, queue hotspots, planning watchlists, candidate evidence and departure timelines. Raw dataset pickers no longer appear below fleet, schedule, maintenance, workshop, festival, incident or cost views. The navigation test checks this separation and preserves direct links and browser history.
