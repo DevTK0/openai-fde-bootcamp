@@ -11,6 +11,11 @@ The findings articles use fictional sample records and explain the limits of
 their evidence. Their graphs include the source values behind them. The project
 proposals explain what LionLink could build and what would justify that work.
 
+## Develop a feature from a conversation
+
+[From a transcript to a feature](/docs/software-factory/) explains how your prompt
+and an existing transcript guide the repository's pstack workflow.
+
 ## Learn to read a comparison
 
 [Read a maintenance comparison](/docs/getting-started/) introduces costs,
