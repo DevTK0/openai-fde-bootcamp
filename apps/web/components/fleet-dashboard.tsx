@@ -3,6 +3,7 @@
 import { Plot } from "@workspace/ui/components/report-chart"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Pick, Notice, Metric, Records } from "@/components/report-ui"
 import {
   OperationsDashboard,
@@ -856,6 +857,13 @@ export function FleetDashboard() {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset className="min-w-0 bg-muted/35">
+        <div className="border-b bg-muted px-4 py-2 text-sm lg:px-8">
+          Historical fixture reports. Uploaded revisions are analysed in the{" "}
+          <Link className="underline" href="/workspace">
+            decision workspace
+          </Link>
+          .
+        </div>
         <header className="flex h-16 items-center justify-between gap-3 border-b bg-background px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <SidebarTrigger />

@@ -299,9 +299,44 @@ try {
   await metric("boardings", "200")
   await delay(2000)
   await page.screenshot({ path: `${output}/mobile.png`, fullPage: true })
+  await page.setViewportSize({ width: 1440, height: 1000 })
+  await page.goto(`${base}/dashboard`)
+  await page.locator(".recharts-surface").first().waitFor()
+  const fixtureBanner = page.getByText("Historical fixture reports.", { exact: false })
+  async function readableBanner(state) {
+    assert.equal(
+      await fixtureBanner.evaluate((element) => {
+        const range = document.createRange()
+        range.selectNodeContents(element)
+        return [...range.getClientRects()].every((rect) =>
+          rect.left >= 0 && rect.right <= innerWidth &&
+          element.contains(document.elementFromPoint(rect.left + 1, rect.top + rect.height / 2))
+        )
+      }),
+      true,
+      `Historical fixture banner is readable with ${state}`
+    )
+  }
+  await readableBanner("expanded desktop sidebar")
+  await page.screenshot({ path: `${output}/dashboard-expanded.png` })
+  await page.getByRole("button", { name: "Toggle Sidebar" }).click()
+  await delay(300)
+  await readableBanner("collapsed desktop sidebar")
+  await page.screenshot({ path: `${output}/dashboard-collapsed.png` })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await delay(300)
+  await readableBanner("mobile sidebar closed")
+  await page.getByRole("button", { name: "Toggle Sidebar" }).click()
+  await page.getByRole("dialog").waitFor()
+  await page.keyboard.press("Escape")
+  await page.getByRole("dialog").waitFor({ state: "hidden" })
+  await readableBanner("mobile sidebar dismissed")
+  await page.screenshot({ path: `${output}/dashboard-mobile.png` })
+  await page.getByRole("link", { name: "decision workspace", exact: true }).click()
+  await page.getByRole("heading", { name: "Decision workspace", exact: true }).waitFor()
   assert.deepEqual(errors, [])
   console.log(
-    "PASS: upload, literal metrics, revision restoration, charts, same-query retry recovery, citations, scoped export, missing evidence, filters, invalid/duplicate imports, mobile"
+    "PASS: upload, literal metrics, revision restoration, charts, same-query retry recovery, citations, scoped export, missing evidence, filters, invalid/duplicate imports, mobile, historical banner layout and navigation"
   )
 } catch (error) {
   await page
