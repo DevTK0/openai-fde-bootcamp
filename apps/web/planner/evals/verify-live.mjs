@@ -1,5 +1,13 @@
-const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright")
-const base = process.env.PLANNING_PREVIEW_URL ?? "http://127.0.0.1:3000"
+import { parseArgs } from "node:util"
+const { values } = parseArgs({
+  options: {
+    playwright: { type: "string", default: "playwright" },
+    url: { type: "string", default: "http://127.0.0.1:3000" },
+    output: { type: "string", default: "/tmp/planning-ui-verification.json" },
+  },
+})
+const { chromium } = await import(values.playwright)
+const base = values.url
 import assert from "node:assert/strict"
 import fs from "node:fs/promises"
 const browser = await chromium.launch({
@@ -111,8 +119,7 @@ const dimensions = await page.evaluate(() => ({
 assert(dimensions.scroll <= dimensions.width)
 assert.deepEqual(errors, [])
 await fs.writeFile(
-  process.env.PLANNING_VERIFICATION_OUTPUT ??
-    "/tmp/planning-ui-verification.json",
+  values.output,
   JSON.stringify(
     { reports, cancelled: true, mobile: dimensions, pageErrors: errors },
     null,

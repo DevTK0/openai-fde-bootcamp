@@ -56,6 +56,6 @@ The Astra adapter uses Responses with `gpt-6-astra` and medium reasoning. Decisi
 
 See [evaluation results](evals/RESULTS.md) for measured results and limitations.
 
-`evals/verify-live.mjs` drives the live UI with Playwright and makes paid Decisions calls. Set `PLANNING_PREVIEW_URL` to the preview origin and, if Playwright is outside the workspace, set `PLAYWRIGHT_MODULE` to its installed module entry. Its default report path is `/tmp/planning-ui-verification.json`. Use the native collaborative preview when it is available; this script is the fallback for a headless environment.
+`evals/verify-live.mjs` drives the live UI with Playwright and makes paid Decisions calls. Pass `--url` with the preview origin and, if Playwright is outside the workspace, pass `--playwright` with its installed module entry. Its default report path is `/tmp/planning-ui-verification.json`. Use the native collaborative preview when it is available; this script is the fallback for a headless environment.
 
 API contracts follow the official [Decisions reference](https://developers.openai.com/api/reference/resources/decisions/methods/create) and [Astra model reference](https://developers.openai.com/api/docs/models/gpt-6-astra).

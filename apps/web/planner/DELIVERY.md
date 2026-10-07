@@ -8,10 +8,10 @@ The requested sequence was Decisions tuning, a paired Astra benchmark after the 
 2. Explore the design with architect. Complete. A shared Python engine preserves evaluated behavior behind typed Next routes. A raw database prompt cannot reliably separate future observations from planning facts. A separate TypeScript engine would duplicate the evaluated semantics.
 3. Record the throughput checkpoint. Complete. Evaluation gates precede UI delivery. Work stays sequential under one owner. SQLite remains read-only, and every run has a separate audit directory. There are no delegated workers.
 4. Implement the chosen design. Complete. The engine, streaming API, and shadcn UI share request and report contracts.
-5. Verify on the matching surface. Complete on the feature base. The full frozen replay, live browser flows, and repository checks pass. Repeat the integration checks after incorporating current main.
+5. Verify on the matching surface. Complete on current main. The full frozen replay, live browser flows, sidebar navigation, and repository checks pass. The web suite has 193 passing tests.
 6. Organize small, ordered commits. Engine and evaluation evidence precede UI integration.
 7. Resolve contested design claims. Physical exclusions are candidate construction, not model accuracy. The final corpus is finite and was used during tuning. Zero observed errors is not a universal correctness guarantee.
-8. Run Opening a PR. Publish after current-main integration checks. No merge is authorized.
+8. Run Opening a PR. Current-main integration checks passed. Publish the verified branch. No merge is authorized.
 
 ## Review decisions
 
