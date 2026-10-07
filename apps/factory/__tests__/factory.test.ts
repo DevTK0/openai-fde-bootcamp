@@ -269,7 +269,7 @@ setTimeout(() => process.exit(0), 20000);
     )
     expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
   })
-  it("mounts the owning Node package for its declared executable", async () => {
+  it.each([false, true])("mounts the owning Node package with nested manifest %s", async (nested) => {
     const { config, directory, submit, store } = await setup()
     const tool = join(directory, "node_modules", "fixture-check")
     await mkdir(join(tool, "bin"), { recursive: true })
@@ -287,12 +287,33 @@ setTimeout(() => process.exit(0), 20000);
         JSON.stringify(join(directory, "private")) +
         "), false)"
     )
+    if (nested)
+      await writeFile(join(tool, "bin", "package.json"), '{"type":"commonjs"}')
     const check = join(tool, "bin", "check.cjs")
     await writeFile(check, "#!/usr/bin/env node\nrequire('../check.cjs')\n", {
       mode: 0o755,
     })
     submit(MAGIC_PHRASE)
     await runOnce({ ...config, check: { command: check, args: [] } }, store)
+    expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
+  })
+  it("probes and runs a repository-relative check inside its attempt worktree", async () => {
+    const { config, repo, submit, store } = await setup()
+    await mkdir(join(repo, "scripts"))
+    await writeFile(
+      join(repo, "scripts", "check.sh"),
+      '#!/bin/sh\n[ "$PWD" = /workspace ] && test -f feature.js\n',
+      { mode: 0o755 }
+    )
+    await execute("git", ["add", "scripts/check.sh"], repo)
+    await execute("git", ["commit", "-m", "Add local check"], repo)
+    const configured = {
+      ...config,
+      check: { command: "./scripts/check.sh", args: [] },
+    }
+    await preflight(configured)
+    submit(MAGIC_PHRASE)
+    await runOnce(configured, store)
     expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
   })
   it("runs the installed pnpm check command in the validation sandbox", async () => {
