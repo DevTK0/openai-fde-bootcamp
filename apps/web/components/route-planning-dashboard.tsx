@@ -13,7 +13,7 @@ import {
 } from "@workspace/ui/components/card"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Metric, Notice, Pick } from "@/components/report-ui"
-import { operationsManifest, type OperationsReport } from "@/lib/operations"
+import type { OperationsReport } from "@/lib/operations"
 import { fmt } from "@/lib/fleet"
 
 const initialSource = "261"
@@ -126,11 +126,11 @@ export function RoutePlanningDashboard() {
   )
   const serviceOptions = useMemo(
     () =>
-      operationsManifest.services.map((service) => ({
-        value: service,
-        label: `Service ${service}`,
+      services.map((service) => ({
+        value: service.name,
+        label: `Service ${service.name}`,
       })),
-    []
+    [services]
   )
 
   if (error) {
