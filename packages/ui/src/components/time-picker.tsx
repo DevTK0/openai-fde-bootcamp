@@ -188,6 +188,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 interface StoreState {
+  resetVersion: number
   value: string
   open: boolean
   openedViaFocus: boolean
@@ -350,6 +351,7 @@ function TimePicker(props: TimePickerProps) {
 
   const listenersRef = useLazyRef(() => new Set<() => void>())
   const stateRef = useLazyRef<StoreState>(() => ({
+    resetVersion: 0,
     value: valueProp ?? defaultValue ?? "",
     open: open ?? defaultOpen ?? false,
     openedViaFocus: false,
@@ -411,7 +413,10 @@ function TimePicker(props: TimePickerProps) {
   React.useEffect(() => {
     const form = inputGroup?.closest("form")
     if (!form || valueProp !== undefined) return
-    const reset = () => store.setState("value", defaultValue ?? "")
+    const reset = () => {
+      store.setState("value", defaultValue ?? "")
+      store.setState("resetVersion", store.getState().resetVersion + 1)
+    }
     form.addEventListener("reset", reset)
     return () => form.removeEventListener("reset", reset)
   }, [inputGroup, valueProp, defaultValue, store])
@@ -870,17 +875,20 @@ function TimePickerInput(props: TimePickerInputProps) {
     }
   }, [timeValue, segment, is12Hour, segmentPlaceholder])
 
+  const resetVersion = useStore((state) => state.resetVersion)
+  const lastResetRef = React.useRef(resetVersion)
   const cancelBlurRef = React.useRef(false)
   const [editValue, setEditValue] = React.useState(getSegmentValue())
   const [isEditing, setIsEditing] = React.useState(false)
   const [pendingDigit, setPendingDigit] = React.useState<string | null>(null)
 
   React.useEffect(() => {
-    if (!isEditing) {
+    if (!isEditing || lastResetRef.current !== resetVersion) {
+      lastResetRef.current = resetVersion
       setEditValue(getSegmentValue())
       setPendingDigit(null)
     }
-  }, [getSegmentValue, isEditing])
+  }, [getSegmentValue, isEditing, resetVersion])
 
   const updateTimeValue = React.useCallback(
     (newSegmentValue: string | undefined, shouldCreateIfEmpty = false) => {

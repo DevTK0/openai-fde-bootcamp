@@ -125,9 +125,6 @@ export function ServicePlanning({
   const current = request?.key === requestKey ? request : null
   const report = current?.kind === "ready" ? current.report : null
   const error = current?.kind === "error" ? current.message : ""
-  const selected = report?.watchlist.find(
-    (s) => s.service === selection.service
-  )
   return (
     <div className="space-y-6">
       {!parsed.success && (
@@ -243,30 +240,28 @@ export function ServicePlanning({
               </p>
             </CardContent>
           </Card>
-          {selected && (
-            <div
-              className="space-y-4"
-              aria-label={`Service ${selected.service} investigation`}
-            >
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-xl font-semibold">
-                  Service {selected.service} investigation
-                </h2>
-                <Pick
-                  label="Planning service"
-                  value={selection.service}
-                  options={manifest.services.map((s) => ({
-                    value: s,
-                    label: `Service ${s}`,
-                  }))}
-                  onChange={(service) => updateLocation({ service }, selection)}
-                />
-              </div>
-              <Replay key={query} report={report} />
-            </div>
-          )}
         </>
       )}
+      <div
+        className="space-y-4"
+        aria-label={`Service ${selection.service} investigation`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold">
+            Service {selection.service} investigation
+          </h2>
+          <Pick
+            label="Planning service"
+            value={selection.service}
+            options={manifest.services.map((s) => ({
+              value: s,
+              label: `Service ${s}`,
+            }))}
+            onChange={(service) => updateLocation({ service }, selection)}
+          />
+        </div>
+        {report && <Replay key={query} report={report} />}
+      </div>
     </div>
   )
 }

@@ -169,3 +169,22 @@ it("selects popup options and leaves Tab to the browser", async () => {
   expect(fireEvent.keyDown(option, { key: "Tab" })).toBe(true)
   expect(fireEvent.keyDown(option, { key: "Tab", shiftKey: true })).toBe(true)
 })
+
+it("cancels a focused pending edit when the form resets", () => {
+  render(
+    <form aria-label="Assumptions">
+      <TimePicker name="start" defaultValue="06:00" locale="en-GB">
+        {segments}
+      </TimePicker>
+    </form>
+  )
+  const minutes = screen.getByRole("textbox", { name: "Minutes" })
+  fireEvent.focus(minutes)
+  fireEvent.change(minutes, { target: { value: "15" } })
+  fireEvent.reset(screen.getByRole("form"))
+  fireEvent.blur(minutes)
+  expect(minutes).toHaveValue("00")
+  const form = screen.getByRole("form")
+  if (!(form instanceof HTMLFormElement)) throw new Error("Expected form")
+  expect(new FormData(form).get("start")).toBe("06:00")
+})

@@ -333,3 +333,24 @@ it("starts a fresh continuous duty segment after a completed protected break", (
     dutyLimit: at("13:35"),
   })
 })
+
+it.each([
+  ["11:35", "11:35"],
+  ["11:35", "11:05"],
+])(
+  "does not reset continuous duty for a non-positive break %s to %s",
+  (start, end) => {
+    const data = source()
+    data.releases = data.releases.map((r) => ({ ...r, location: "A" }))
+    data.duties = data.duties.map((d) => ({
+      ...d,
+      location: "A",
+      maximum: 120,
+      breakStart: at(start),
+      breakEnd: at(end),
+    }))
+    expect(buildPlanningReport(data, selection).candidates[0]?.status).not.toBe(
+      "candidate"
+    )
+  }
+)

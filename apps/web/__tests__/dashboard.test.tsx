@@ -387,6 +387,9 @@ it("retries failed planning loads without leaving a loading status", async () =>
     expect(
       screen.queryByText("Loading planning evidence…")
     ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole("combobox", { name: "Planning service" })
+    ).toHaveTextContent("Service 132")
     await user.click(screen.getByRole("button", { name: "Retry" }))
     expect(
       await screen.findByRole("table", { name: "Service watchlist" })

@@ -491,6 +491,7 @@ function candidateReviews(
             (d) =>
               d.breakStart === null ||
               d.breakEnd === null ||
+              d.breakStart > d.breakEnd ||
               overlaps(d.breakStart, d.breakEnd, now, horizon)
           )
         )
@@ -510,6 +511,7 @@ function candidateReviews(
         const completedBreaks = crewDuties.flatMap((d) =>
           d.breakStart !== null &&
           d.breakEnd !== null &&
+          d.breakStart < d.breakEnd &&
           d.breakEnd <= now &&
           !crewTasks.some((t) =>
             overlaps(t.start, t.end, d.breakStart ?? 0, d.breakEnd ?? 0)
