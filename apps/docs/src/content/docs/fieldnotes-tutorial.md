@@ -23,9 +23,9 @@ The screenshots below show the implemented app with the shared web app component
 2. Read the agent's message confirming that it is ready for the presentation.
 3. Click **Play** when the presenter begins.
 
-Chats use numbered names such as **Presentation 1** and **Presentation 2**. To rename one, click its pencil icon, enter a name, and click **Save**.
+Chats use numbered names such as **Presentation 1** and **Presentation 2**. To rename one, right-click its name and choose **Rename**, enter a name, and click **Save**.
 
-Wait for **Listening to your presentation**. The player changes to **Stop**. GPT-Live transcribes the presentation, and the app updates `product-spec.md` in the **Specification** panel in batches. No opening task prompt is needed.
+Choose your microphone below the equalizer. Speak and check that the bars move, then wait for **Transcribing your presentation** and your words in the notes. A connected session alone does not confirm that speech is being captured. The player changes to **Stop**. GPT-Live transcribes the presentation, and the app updates `product-spec.md` in the **Specification** panel in batches. No opening task prompt is needed.
 
 While audio capture is active, finish the conversation before switching chats. If you only want to pause your microphone, use **Mute**. On a narrow screen, use **Toggle Sidebar** to open the chat list.
 
@@ -68,7 +68,7 @@ If an update fails, your previous draft and saved notes remain available. Click 
 
 Finish your clarifications and download the specification before ending the conversation.
 
-1. Click **Stop** on the player card.
+1. Click **Stop** below the equalizer.
 2. Read the **End this conversation?** confirmation. Stopping ends the entire conversation, and you cannot resume it or send more messages.
 3. Click **End conversation** to confirm. To keep the conversation open, click **Cancel** instead.
 
@@ -76,7 +76,13 @@ Finish your clarifications and download the specification before ending the conv
 
 Fieldnotes stops sending microphone audio, waits for final transcript events, and saves the notes before ending the conversation. After confirmation, the message box and voice controls are disabled. Your specification remains available to preview and download. If generation failed, **Update specification** can still retry from the saved notes. Start a new chat for another presentation.
 
+## Delete a session
+
+Right-click a session name and choose **Delete session**. The confirmation names the session and explains that its transcript and specification will be permanently deleted. Choose **Cancel** to keep it. Finish live capture before deleting a session.
+
 ## Recover from a connection problem
+
+If the equalizer stays flat and **No microphone signal detected** appears, check the microphone mute switch and select a different input. If audio is detected but no words appear, review your connection before continuing.
 
 If microphone permission is denied, allow it in your browser settings and click **Play** again. Written clarifications remain available.
 

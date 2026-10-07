@@ -1,8 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { AudioLines, Check, Clock3, Pencil, Plus } from "lucide-react"
+import { AudioLines, Plus } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+} from "@workspace/ui/components/context-menu"
 import { Input } from "@workspace/ui/components/input"
 import {
   Sidebar,
@@ -22,12 +28,14 @@ export function PresentationSidebar({
   onCreate,
   onSelect,
   onRename,
+  onDelete,
 }: {
   chats: Chat[]
   selectedId?: string
   disabled: boolean
   onCreate: () => Promise<void>
   onSelect: (id: string) => Promise<void>
+  onDelete: (chat: Chat) => void
   onRename: (id: string, name: string) => Promise<void>
 }) {
   const [rename, setRename] = useState<{ id: string; name: string } | null>(
@@ -105,27 +113,37 @@ export function PresentationSidebar({
                   </Button>
                 </form>
               ) : (
-                <>
-                  <SidebarMenuButton
-                    isActive={selectedId === chat.id}
-                    className="h-10 gap-3 px-3 data-active:bg-primary/10 data-active:text-primary"
-                    disabled={disabled}
-                    onClick={() => void navigate(() => onSelect(chat.id))}
+                <ContextMenu>
+                  <ContextMenuTrigger
+                    render={
+                      <SidebarMenuButton
+                        isActive={selectedId === chat.id}
+                        className="h-10 px-3 data-active:bg-primary/10 data-active:text-primary"
+                        disabled={disabled}
+                        onClick={() => void navigate(() => onSelect(chat.id))}
+                      />
+                    }
                   >
-                    <Clock3 />
                     <span>{chat.name}</span>
-                    {chat.endedAt && <Check className="ml-auto" />}
-                  </SidebarMenuButton>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Rename ${chat.name}`}
-                    disabled={disabled}
-                    onClick={() => setRename({ id: chat.id, name: chat.name })}
-                  >
-                    <Pencil className="size-3" />
-                  </Button>
-                </>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
+                      disabled={disabled}
+                      onClick={() =>
+                        setRename({ id: chat.id, name: chat.name })
+                      }
+                    >
+                      Rename
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      disabled={disabled}
+                      variant="destructive"
+                      onClick={() => onDelete(chat)}
+                    >
+                      Delete session
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               )}
             </SidebarMenuItem>
           ))}

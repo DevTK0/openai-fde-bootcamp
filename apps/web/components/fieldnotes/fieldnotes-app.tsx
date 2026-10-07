@@ -36,7 +36,9 @@ import {
   type Command,
   type NoteEvent,
 } from "@/lib/fieldnotes/schema"
-import { LiveCapture } from "./live"
+import { MicrophoneInput, inputLabels } from "./microphone-input"
+import { MicrophoneEqualizer } from "./microphone-equalizer"
+import { LiveCapture, type InputHealth } from "./live"
 import { PresentationSidebar } from "./presentation-sidebar"
 import { SpecificationPanel } from "./specification-panel"
 import {
@@ -45,7 +47,6 @@ import {
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar"
 import { Separator } from "@workspace/ui/components/separator"
-import { Card } from "@workspace/ui/components/card"
 
 type CaptureState = "idle" | "connecting" | "live" | "closing"
 async function request(command?: Command, id?: string): Promise<unknown> {
@@ -115,6 +116,9 @@ export function FieldnotesApp() {
   const [busy, setBusy] = useState(false)
   const [generating, setGenerating] = useState(false)
   const [state, setState] = useState<CaptureState>("idle")
+  const [deviceId, setDeviceId] = useState("default")
+  const [inputHealth, setInputHealth] = useState<InputHealth | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Chat | null>(null)
   const [muted, setMuted] = useState(false)
   const [error, setError] = useState("")
   const [draft, setDraft] = useState("")
@@ -273,6 +277,7 @@ export function FieldnotesApp() {
   }
   async function start() {
     if (!chat || !audio.current) return
+    setInputHealth(null)
     setState("connecting")
     setError("")
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -285,6 +290,12 @@ export function FieldnotesApp() {
     const live = new LiveCapture({
       audio: audio.current,
       event: enqueue,
+      input: setInputHealth,
+      diagnostics: (diagnostics) => {
+        void request({ kind: "diagnostics", id: chat.id, diagnostics }).catch(
+          () => {}
+        )
+      },
       error: (text) => {
         setError(text)
         if (!capture.current?.connected) setState("idle")
@@ -292,7 +303,7 @@ export function FieldnotesApp() {
     })
     capture.current = live
     try {
-      await live.start(chat.id)
+      await live.start(chat.id, deviceId)
       if (capture.current === live) {
         setState("live")
         setMuted(false)
@@ -377,11 +388,17 @@ export function FieldnotesApp() {
           })
         }
         onSelect={select}
+        onDelete={setDeleteTarget}
         onRename={(id, name) =>
           run(async () => {
-            accept(
-              chatSchema.parse(await request({ kind: "rename", id, name }))
+            const updated = chatSchema.parse(
+              await request({ kind: "rename", id, name })
             )
+            if (current.current?.id === id) accept(updated)
+            else
+              setChats((items) =>
+                items.map((item) => (item.id === id ? updated : item))
+              )
           })
         }
       />
@@ -458,74 +475,90 @@ export function FieldnotesApp() {
               className="flex min-h-130 min-w-0 flex-1 flex-col lg:min-h-0"
             >
               <div className="px-5 pt-6 md:px-8">
-                <Card className="flex-row items-center gap-4 p-5 shadow-none">
-                  <Button
-                    className="size-12 shrink-0 rounded-full"
-                    size="icon"
-                    aria-label={state === "live" ? "Stop" : "Play"}
-                    disabled={
-                      ended ||
-                      busy ||
-                      state === "connecting" ||
-                      state === "closing"
+                <div className="flex flex-col items-center gap-4 py-6">
+                  <MicrophoneEqualizer
+                    level={
+                      state === "live" && !muted ? (inputHealth?.level ?? 0) : 0
                     }
-                    onClick={() =>
-                      state === "live" ? setConfirmEnd(true) : void start()
-                    }
-                  >
-                    {state === "connecting" || state === "closing" ? (
-                      <LoaderCircle className="animate-spin" />
-                    ) : state === "live" ? (
-                      <Square className="size-4 fill-current" />
-                    ) : (
-                      <Play className="size-5 fill-current" />
-                    )}
-                  </Button>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <AudioLines
-                        className={cn(
-                          "size-5 text-primary",
-                          state === "live" &&
-                            !muted &&
-                            "motion-safe:animate-pulse"
-                        )}
-                      />
-                      {ended
-                        ? "Presentation complete"
-                        : state === "live"
-                          ? muted
-                            ? "Microphone muted"
-                            : "Listening to your presentation"
-                          : state === "connecting"
-                            ? "Connecting microphone…"
-                            : state === "closing"
-                              ? "Finishing and saving…"
-                              : "Ready when you are"}
+                  />
+                  <div className="flex w-full items-center gap-4">
+                    <Button
+                      className="size-12 shrink-0 rounded-full"
+                      size="icon"
+                      aria-label={state === "live" ? "Stop" : "Play"}
+                      disabled={
+                        ended ||
+                        busy ||
+                        state === "connecting" ||
+                        state === "closing"
+                      }
+                      onClick={() =>
+                        state === "live" ? setConfirmEnd(true) : void start()
+                      }
+                    >
+                      {state === "connecting" || state === "closing" ? (
+                        <LoaderCircle className="animate-spin" />
+                      ) : state === "live" ? (
+                        <Square className="size-4 fill-current" />
+                      ) : (
+                        <Play className="size-5 fill-current" />
+                      )}
+                    </Button>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        {ended
+                          ? "Presentation complete"
+                          : state === "live"
+                            ? muted
+                              ? "Microphone muted"
+                              : inputLabels[inputHealth?.status ?? "waiting"]
+                            : state === "connecting"
+                              ? "Connecting microphone…"
+                              : state === "closing"
+                                ? "Finishing and saving…"
+                                : "Ready when you are"}
+                      </div>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                        {ended
+                          ? "Your specification is ready to review."
+                          : state === "live"
+                            ? "GPT-Live · microphone input"
+                            : "Press Play to start capturing audio."}
+                      </p>
                     </div>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                      {ended
-                        ? "Your specification is ready to review."
-                        : state === "live"
-                          ? "GPT-Live · audio capture active"
-                          : "Press Play to start capturing audio."}
-                    </p>
+                    <Button
+                      variant="secondary"
+                      className="size-10 shrink-0 rounded-full"
+                      size="icon"
+                      aria-label={muted ? "Unmute" : "Mute"}
+                      aria-pressed={muted}
+                      disabled={state !== "live"}
+                      onClick={() => {
+                        capture.current?.mute(!muted)
+                        setMuted(!muted)
+                      }}
+                    >
+                      {muted ? <MicOff /> : <Mic />}
+                    </Button>
                   </div>
-                  <Button
-                    variant="secondary"
-                    className="size-10 shrink-0 rounded-full"
-                    size="icon"
-                    aria-label={muted ? "Unmute" : "Mute"}
-                    aria-pressed={muted}
-                    disabled={state !== "live"}
-                    onClick={() => {
-                      capture.current?.mute(!muted)
-                      setMuted(!muted)
-                    }}
-                  >
-                    {muted ? <MicOff /> : <Mic />}
-                  </Button>
-                </Card>
+                  {!ended && (
+                    <MicrophoneInput
+                      value={deviceId}
+                      health={inputHealth}
+                      connected={state === "live"}
+                      disabled={
+                        busy || state === "connecting" || state === "closing"
+                      }
+                      onChange={(id) =>
+                        void run(async () => {
+                          if (capture.current?.connected)
+                            await capture.current.changeMicrophone(id)
+                          setDeviceId(id)
+                        })
+                      }
+                    />
+                  )}
+                </div>
                 {state === "connecting" && (
                   <Button
                     variant="ghost"
@@ -667,6 +700,45 @@ export function FieldnotesApp() {
           </div>
         )}
       </SidebarInset>
+      <AlertDialog
+        open={Boolean(deleteTarget)}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently deletes the session, transcript, and
+              specification.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                const target = deleteTarget
+                if (!target) return
+                void run(async () => {
+                  await request({ kind: "delete", id: target.id })
+                  setChats((items) =>
+                    items.filter((item) => item.id !== target.id)
+                  )
+                  if (current.current?.id === target.id) {
+                    current.current = null
+                    setChat(null)
+                    setDraft("")
+                  }
+                  setDeleteTarget(null)
+                })
+              }}
+            >
+              Delete session
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <AlertDialog open={confirmEnd} onOpenChange={setConfirmEnd}>
         <AlertDialogContent>
           <AlertDialogHeader>

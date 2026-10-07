@@ -7,6 +7,7 @@ import {
   chatSchema,
   initialSpecification,
   type Chat,
+  type CaptureDiagnostics,
   type NoteEvent,
 } from "./schema"
 
@@ -38,7 +39,9 @@ export class FieldnotesStore {
     this.db = new DatabaseSync(path)
     this.db.exec(`PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;
       CREATE TABLE IF NOT EXISTS chats (id TEXT PRIMARY KEY, owner TEXT NOT NULL, data TEXT NOT NULL);
-      CREATE INDEX IF NOT EXISTS chats_owner ON chats(owner);`)
+      CREATE INDEX IF NOT EXISTS chats_owner ON chats(owner);
+      CREATE TABLE IF NOT EXISTS counters (owner TEXT PRIMARY KEY, n INTEGER NOT NULL);
+      INSERT OR IGNORE INTO counters SELECT owner, count(*) FROM chats GROUP BY owner;`)
   }
   close() {
     this.db.close()
@@ -61,11 +64,13 @@ export class FieldnotesStore {
     this.db.exec("BEGIN IMMEDIATE")
     try {
       const count = this.db
-        .prepare("SELECT count(*) AS n FROM chats WHERE owner = ?")
+        .prepare(
+          "INSERT INTO counters VALUES (?, 1) ON CONFLICT(owner) DO UPDATE SET n = n + 1 RETURNING n"
+        )
         .get(owner)
       const chat: Chat = {
         id: randomUUID(),
-        name: `Presentation ${z.number().parse(count?.n) + 1}`,
+        name: `Presentation ${z.number().parse(count?.n)}`,
         createdAt: new Date().toISOString(),
         endedAt: null,
         revision: 0,
@@ -101,6 +106,20 @@ export class FieldnotesStore {
       this.db.exec("ROLLBACK")
       throw error
     }
+  }
+  diagnostics(owner: string, id: string, diagnostics: CaptureDiagnostics) {
+    this.change(owner, id, (chat) => {
+      chat.captureDiagnostics = diagnostics
+    })
+    return { id }
+  }
+  delete(owner: string, id: string) {
+    const result = this.db
+      .prepare("DELETE FROM chats WHERE owner = ? AND id = ?")
+      .run(owner, id)
+    if (!result.changes)
+      throw new FieldnotesError("Presentation not found.", 404)
+    return { id }
   }
   rename(owner: string, id: string, name: string) {
     return this.change(owner, id, (chat) => {

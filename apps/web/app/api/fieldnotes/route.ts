@@ -38,6 +38,10 @@ export async function POST(request: Request) {
           return store.rename(who, command.id, command.name)
         case "append":
           return store.append(who, command.id, command.events)
+        case "diagnostics":
+          return store.diagnostics(who, command.id, command.diagnostics)
+        case "delete":
+          return store.delete(who, command.id)
         case "end":
           return store.end(who, command.id)
       }

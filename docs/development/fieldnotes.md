@@ -48,3 +48,7 @@ A browser-only IndexedDB design with hosted delegation would move persistence an
 The Live session handles speech. A separate Responses request writes the Markdown from saved evidence, so a draft update does not depend on a spoken model turn. There is no raw-audio storage or screen capture. Transcription and generated acceptance criteria require human review.
 
 The implementation follows the official [GPT-Live WebRTC](https://developers.openai.com/api/docs/guides/voice-webrtc) and [session lifecycle](https://developers.openai.com/api/docs/guides/live-conversations) documentation. Keep event names and shutdown behavior aligned with those contracts.
+
+Microphone capture exposes measured WebRTC input levels and device selection. The equalizer displays recent input levels; it does not synthesize activity from connection state. Confirm speech in the transcript before presenting. Session rows use the shared shadcn context menu for rename and permanent deletion. Deletion is owner-scoped and requires a confirmation in the UI. Per-owner counters preserve session numbering after deletion.
+
+For capture troubleshooting, each session keeps its latest WebRTC diagnostic sample in SQLite. Samples contain microphone level and peak, device label, audio format, sent packet/byte counts, packet loss, received event counts, and service errors. They contain no raw audio. Compare these counters with saved user transcript events to distinguish quiet input, transport problems, and missing transcription. Deleting a session removes its diagnostics with its notes.

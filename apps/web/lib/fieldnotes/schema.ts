@@ -17,6 +17,27 @@ export const eventSchema = z.discriminatedUnion("kind", [
   }),
 ])
 export type NoteEvent = z.infer<typeof eventSchema>
+export const captureDiagnosticsSchema = z.object({
+  sessionId: z.string().max(200),
+  capturedAt: z.string().max(100),
+  connection: z.string().max(40),
+  channel: z.string().max(40),
+  level: z.number().nullable(),
+  peak: z.number(),
+  device: z.string().max(300),
+  bytesSent: z.number().nullable(),
+  packetsSent: z.number().nullable(),
+  packetsLost: z.number().nullable(),
+  codec: z.string().max(200).nullable(),
+  sampleRate: z.number().nullable(),
+  channelCount: z.number().nullable(),
+  events: z
+    .array(z.object({ type: z.string().max(100), count: z.number() }))
+    .max(30),
+  parseErrors: z.number(),
+  lastError: z.string().max(2000).nullable(),
+})
+export type CaptureDiagnostics = z.infer<typeof captureDiagnosticsSchema>
 export const chatSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
@@ -26,10 +47,16 @@ export const chatSchema = z.object({
   specRevision: z.number().int(),
   specification: z.string(),
   events: z.array(eventSchema),
+  captureDiagnostics: captureDiagnosticsSchema.optional(),
 })
 export type Chat = z.infer<typeof chatSchema>
 export const commandSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("create") }),
+  z.object({
+    kind: z.literal("diagnostics"),
+    id: z.string().uuid(),
+    diagnostics: captureDiagnosticsSchema,
+  }),
   z.object({
     kind: z.literal("rename"),
     id: z.string().uuid(),
@@ -41,6 +68,7 @@ export const commandSchema = z.discriminatedUnion("kind", [
     events: z.array(eventSchema).min(1).max(500),
   }),
   z.object({ kind: z.literal("generate"), id: z.string().uuid() }),
+  z.object({ kind: z.literal("delete"), id: z.string().uuid() }),
   z.object({ kind: z.literal("end"), id: z.string().uuid() }),
 ])
 export type Command = z.infer<typeof commandSchema>

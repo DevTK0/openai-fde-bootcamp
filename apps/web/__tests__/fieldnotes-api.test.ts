@@ -185,3 +185,54 @@ it("creates GPT-Live WebRTC sessions with a server-owned configuration and never
     409
   )
 })
+
+it("stores bounded capture diagnostics with the session and deletes them only for the owner", async () => {
+  const chat = await create()
+  const diagnostics = {
+    sessionId: "live_test",
+    capturedAt: new Date().toISOString(),
+    connection: "connected",
+    channel: "open",
+    level: 0.2,
+    peak: 0.3,
+    device: "Test microphone",
+    bytesSent: 1024,
+    packetsSent: 40,
+    packetsLost: 0,
+    codec: "audio/opus",
+    sampleRate: 48000,
+    channelCount: 1,
+    events: [{ type: "session.started", count: 1 }],
+    parseErrors: 0,
+    lastError: null,
+  }
+  expect(
+    (await POST(command({ kind: "diagnostics", id: chat.id, diagnostics })))
+      .status
+  ).toBe(200)
+  const saved = chatSchema.parse(
+    await (
+      await GET(
+        new Request(`https://fieldnotes.test/api/fieldnotes?id=${chat.id}`)
+      )
+    ).json()
+  )
+  expect(saved.captureDiagnostics).toEqual(diagnostics)
+  expect(saved.revision).toBe(0)
+  const original = identity.value
+  identity.value = randomUUID()
+  expect((await POST(command({ kind: "delete", id: chat.id }))).status).toBe(
+    404
+  )
+  identity.value = original
+  expect((await POST(command({ kind: "delete", id: chat.id }))).status).toBe(
+    200
+  )
+  expect(
+    (
+      await GET(
+        new Request(`https://fieldnotes.test/api/fieldnotes?id=${chat.id}`)
+      )
+    ).status
+  ).toBe(404)
+})

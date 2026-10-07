@@ -30,7 +30,19 @@ class Peer extends EventTarget {
   createDataChannel() {
     return this.channel
   }
-  addTrack() {}
+  level = 0
+  replacement = vi.fn(async () => {})
+  addTrack() {
+    return { replaceTrack: this.replacement }
+  }
+  async getStats() {
+    return new Map([
+      [
+        "source",
+        { type: "media-source", kind: "audio", audioLevel: this.level },
+      ],
+    ])
+  }
   async createOffer() {
     return this.localDescription
   }
@@ -42,7 +54,14 @@ class Peer extends EventTarget {
     this.connectionState = "closed"
   }
 }
-const track = { enabled: true, stop: vi.fn() }
+const track = {
+  enabled: true,
+  muted: false,
+  label: "Test microphone",
+  getSettings: () => ({ sampleRate: 48000, channelCount: 1 }),
+  addEventListener: vi.fn(),
+  stop: vi.fn(),
+}
 const microphone = { getTracks: () => [track], getAudioTracks: () => [track] }
 beforeEach(() => {
   track.enabled = true
@@ -143,4 +162,123 @@ it("reports unconfirmed finalization on timeout but still stops capture", async 
   expect(await closing).toBe(false)
   expect(track.stop).toHaveBeenCalledOnce()
   expect(Peer.latest.connectionState).toBe("closed")
+})
+
+it("reports silent input separately from audio and confirmed transcription", async () => {
+  vi.useFakeTimers()
+  const input = vi.fn()
+  const live = new LiveCapture({
+    audio: document.createElement("audio"),
+    event: vi.fn(),
+    error: vi.fn(),
+    input,
+  })
+  await live.start("chat", "chosen-device")
+  expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith({
+    audio: { deviceId: { exact: "chosen-device" } },
+  })
+  await vi.advanceTimersByTimeAsync(8500)
+  expect(input).toHaveBeenLastCalledWith({
+    device: "Test microphone",
+    level: 0,
+    status: "silent",
+  })
+  Peer.latest.level = 0.2
+  await vi.advanceTimersByTimeAsync(500)
+  expect(input).toHaveBeenLastCalledWith({
+    device: "Test microphone",
+    level: 0.2,
+    status: "sending",
+  })
+  Peer.latest.channel.receive({
+    type: "session.input_transcript.delta",
+    event_id: "speech",
+    delta: "Hello",
+    start_ms: 0,
+    end_ms: 100,
+  })
+  await vi.advanceTimersByTimeAsync(500)
+  expect(input).toHaveBeenLastCalledWith({
+    device: "Test microphone",
+    level: 0.2,
+    status: "transcribing",
+  })
+  live.mute(true)
+  await vi.advanceTimersByTimeAsync(500)
+  expect(input.mock.lastCall?.[0].status).toBe("muted")
+  live.dispose()
+})
+
+it("switches the transmitted microphone and releases the previous one", async () => {
+  const live = capture()
+  await live.start("chat")
+  live.mute(true)
+  const replacement = { ...track, enabled: true, stop: vi.fn() }
+  vi.stubGlobal("navigator", {
+    mediaDevices: {
+      getUserMedia: vi.fn(async () => ({
+        getTracks: () => [replacement],
+        getAudioTracks: () => [replacement],
+      })),
+    },
+  })
+  await live.changeMicrophone("second")
+  expect(Peer.latest.replacement).toHaveBeenCalledWith(replacement)
+  expect(replacement.enabled).toBe(false)
+  expect(track.stop).toHaveBeenCalledOnce()
+  live.dispose()
+  expect(replacement.stop).toHaveBeenCalledOnce()
+})
+
+it("records transport diagnostics without recording raw audio", async () => {
+  vi.useFakeTimers()
+  const diagnostics = vi.fn()
+  const live = new LiveCapture({
+    audio: document.createElement("audio"),
+    event: vi.fn(),
+    error: vi.fn(),
+    input: vi.fn(),
+    diagnostics,
+  })
+  await live.start("chat")
+  Peer.latest.level = 0.15
+  await vi.advanceTimersByTimeAsync(5500)
+  expect(diagnostics).toHaveBeenLastCalledWith({
+    sessionId: "live_test",
+    capturedAt: expect.any(String),
+    connection: "connected",
+    channel: "open",
+    level: 0.15,
+    peak: 0.15,
+    device: "Test microphone",
+    bytesSent: null,
+    packetsSent: null,
+    packetsLost: null,
+    codec: null,
+    sampleRate: 48000,
+    channelCount: 1,
+    events: [{ type: "session.started", count: 1 }],
+    parseErrors: 0,
+    lastError: null,
+  })
+  live.dispose()
+})
+
+it("reports a persistent disconnection and releases the microphone", async () => {
+  vi.useFakeTimers()
+  const error = vi.fn()
+  const live = new LiveCapture({
+    audio: document.createElement("audio"),
+    event: vi.fn(),
+    error,
+  })
+  await live.start("chat")
+  Peer.latest.connectionState = "disconnected"
+  Peer.latest.dispatchEvent(new Event("connectionstatechange"))
+  await vi.advanceTimersByTimeAsync(10000)
+  expect(error).toHaveBeenCalledWith(
+    "Audio disconnected. Press Play to reconnect before continuing your presentation."
+  )
+  expect(track.stop).toHaveBeenCalledOnce()
+  expect(live.connected).toBe(false)
 })
