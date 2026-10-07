@@ -1,6 +1,6 @@
 # LionLink stakeholder slides
 
-Three decks grouped by business function, with one full slide per caveat, using [Open Slide](https://github.com/open-slide/open-slide),
+Three evidence decks grouped by business function and an eight-page AI scheduling story, using [Open Slide](https://github.com/open-slide/open-slide),
 pinned to `@open-slide/core` 2.0.1. The runtime provides the deck browser, slide
 navigation, presentation mode, speaker notes and its built-in download menu.
 Authored slides use editable text, shapes, vector icons and the shared
@@ -32,13 +32,14 @@ build/test inputs include all three source snapshots so changes invalidate the c
 
 All paths start with `/slides/s/`:
 
-| Deck | Route | Pages | Covers |
-| --- | --- | --- | --- |
-| Scheduling | `scheduling` | 25 | Late journeys, workshop booking clashes, festival connections and disruption response |
-| Maintenance | `maintenance` | 24 | Maintenance costs, repairs, safety approvals and cooling faults |
-| Ridership | `ridership` | 14 | Crowding, spare capacity, boardings and customer growth |
+| Deck                   | Route           | Pages | Covers                                                                                                         |
+| ---------------------- | --------------- | ----- | -------------------------------------------------------------------------------------------------------------- |
+| Scheduling             | `scheduling`    | 25    | Late journeys, workshop booking clashes, festival connections and disruption response                          |
+| Maintenance            | `maintenance`   | 24    | Maintenance costs, repairs, safety approvals and cooling faults                                                |
+| Ridership              | `ridership`     | 14    | Crowding, spare capacity, boardings and customer growth                                                        |
+| LionLink AI scheduling | `ai-scheduling` | 8     | Passenger delays, demand, repairs, the proposed AI assistant, a schedule test, assumed value and pilot targets |
 
-The decks contain 63 pages. Scheduling brings together the evidence about when
+The three original evidence decks contain 63 pages; the new AI scheduling deck brings the total to 71. Scheduling brings together the evidence about when
 buses run and whether the proposed plans have enough capacity. Maintenance covers
 bus condition, repair work and its costs. Ridership covers passenger demand and
 what the boarding records can tell us about growth. Each deck has one Caveats
@@ -83,7 +84,7 @@ colours, size and position; the canvas supports moving and resizing elements.
 Use Open Slide's **Save** button to persist pending changes. Notes use its built-in
 notes editor. **Preview** and **Present** hide editing controls.
 
-All 63 pages contain literal JSX in their own `slides/<id>/index.tsx`. Chart labels
+All 71 pages contain literal JSX in their own `slides/<id>/index.tsx`. Chart labels
 are HTML text and bars are individual shapes, so the native inspector can select
 them. Icons remain vector graphics inside selectable groups. Chart bars and their
 numeric labels are separate objects; update both when changing figures. Page
@@ -141,6 +142,16 @@ eight selected buses, not the entire operating fleet. Future-dated October
 observations and planning assumptions are labelled as fixture periods, not live
 results. Quotes are separate from incurred spend. Proposed benefits are not
 claimed as causal effects or guaranteed savings. The conflicting workshop requests, festival timetable and incident queue arithmetic
-are explicitly conditional planning evidence, not observed outcomes. No solutions,
-pilots, purchasing decisions or approval requests are presented. Customer acquisition,
+are explicitly conditional planning evidence, not observed outcomes. The three original evidence decks contain no solutions,
+pilots, purchasing decisions or approval requests. Customer acquisition,
 retention and revenue effects are explicitly unknown where the supplied data is silent.
+
+The separate `ai-scheduling` deck presents a proposed copilot and pilot. Its notes
+distinguish recorded fictional evidence, checked retrospective feasibility replays,
+conditional workshop proposals and assumed labour capacity value. The value case
+uses two planners, three hours reduced to one hour per day, 250 working days and
+S$45 per loaded hour. Released hours are capacity value; cash savings require an
+avoided expense. Costs and payback are assumptions, with the negative first-year
+value disclosed. `content/ai-scheduling-evidence.json` preserves the supporting
+analysis extract, replay methods and source fingerprints. It does not overwrite
+the authored slides or change the original deck provenance groups.

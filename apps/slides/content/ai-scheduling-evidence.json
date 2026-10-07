@@ -1,0 +1,627 @@
+{
+  "schema_version": 1,
+  "scope": "Fictional exercise fixtures. Ten weekdays, 5\u201316 October 2026, morning departures with complete downstream trips. Historical maintenance is eight selected buses only. Future fixture dates are not live observations.",
+  "analysis_report_sha256": "76dc0e573596ca0f436c2034c8f48b5b9778a7e3453afb11fdb0af6982b811a7",
+  "source_verification": {
+    "original_workbook_tables": 37,
+    "monthly_csv_records": 192
+  },
+  "source_fingerprints": [
+    {
+      "source": "Data/01_maintenance_and_repairs.xlsx",
+      "sha256": "1f815cef3a6ec71637e44255bd317fce64251372e66c4c08456730a42061d320"
+    },
+    {
+      "source": "Data/02_usage_and_service_impacts.xlsx",
+      "sha256": "a338ee4fad6da1c5c3904ec8c8c7296e161e821ff21ca2a286bba8a19e239ad0"
+    },
+    {
+      "source": "Data/03_workshop_and_fleet.xlsx",
+      "sha256": "e69c95762eb817e6c09130f92778b794b800daa32e47d224015db8f92445ca31"
+    },
+    {
+      "source": "Data/04_passenger_reports.xlsx",
+      "sha256": "66b634c9623f4cd0fcb4aecc2ad5ec307afaec15f2c6050b08d09929d282297f"
+    },
+    {
+      "source": "Data/06_cost_options.xlsx",
+      "sha256": "c70298ea08c33cca3c77ecbec696abe1f4e2d9f1005288fc3bd05a4ab16c7431"
+    },
+    {
+      "source": "Data/lionlink-monthly-history/monthly_vehicle_history.csv",
+      "sha256": "7dc1de974fb99391dc33bd91a9253bba62d6c52de97122af40a2fd511484ff95"
+    },
+    {
+      "source": "apps/slides/slides/scheduling/index.tsx",
+      "sha256": "42933da4d4ddf4588c695b372a3b7f541756ed48ddb14fb408d057b6c98786e9"
+    },
+    {
+      "source": "apps/slides/slides/maintenance/index.tsx",
+      "sha256": "e9a953eb662b04feb831f87505c043503b8b299dccf197e6b31b2aedec2bde6a"
+    },
+    {
+      "source": "apps/slides/slides/ridership/index.tsx",
+      "sha256": "bbf809be37cb6c10201efda06177725c32ea162c2740b7ed1fb153402d947587"
+    },
+    {
+      "source": "lionlink-operations-source/data/trips.csv",
+      "sha256": "79c2ce540adf0389f6158218e1a52e76a4574f15b5953b89ced62cce50c98e97"
+    },
+    {
+      "source": "lionlink-operations-source/data/stop_calls.csv",
+      "sha256": "c5555a8223cc6104856467286d19bd636ed25ea6613de338089cc6c191bf1811"
+    },
+    {
+      "source": "lionlink-operations-source/data/routes.csv",
+      "sha256": "4e6d999f3d6a237720601712e54fd595024af26252b323ecc8503ee0ab3d9e5a"
+    },
+    {
+      "source": "lionlink-operations-source/data/route_stops.csv",
+      "sha256": "2d00f7621f35b1144ee2fc30fd1eb824a76e5310d2ad8190746b10a0d4ff6173"
+    },
+    {
+      "source": "lionlink-operations-source/data/crew_duties.csv",
+      "sha256": "fd016e367b0078e62169695a4342bc958c7eaabd3b3368fa211c160703eaa46d"
+    },
+    {
+      "source": "lionlink-operations-source/data/vehicle_readiness.csv",
+      "sha256": "10fb3ade6c5737597353204aee9a7bdad7fd5f8bcc3e13cb3dd36286539c2843"
+    },
+    {
+      "source": "lionlink-operations-source/data/resource_updates.csv",
+      "sha256": "e87471ed8582268c93a773b4636aabd0296003b44a8f5b067a1be980bfc24d41"
+    },
+    {
+      "source": "lionlink-operations-source/data/control_actions.csv",
+      "sha256": "5fc7dd799f54d372ea68f438f254032530fc78f9c0c4eef04ad3744a1067d652"
+    },
+    {
+      "source": "lionlink-operations-source/data/queue_windows.csv",
+      "sha256": "2db209f4491ce7c3d47fcee96fb10a610d3461e2e1ff93947bc75e4491970610"
+    },
+    {
+      "source": "lionlink-operations-source/data/origin_arrivals.csv",
+      "sha256": "8105f0efbb3b54f7f5501b8e4402b6748f0ed9be487c285249ea4f545a7699db"
+    },
+    {
+      "source": "lionlink-operations-source/data/planning_constraints.csv",
+      "sha256": "b99e19e1c1b95d74daf49651606b16e5fa2191abd452e4e9387d2c28a3f6fb92"
+    }
+  ],
+  "recorded_operating_summary": {
+    "scope": "Fictional October 5\u201316 2026 morning operating cohort; complete downstream calls; historical maintenance is eight selected vehicles only.",
+    "trips": 6900,
+    "calls": 252380,
+    "services": 24,
+    "routes": 36,
+    "completed": 6900,
+    "late_departures_gt_5min": 48,
+    "late_arrivals_gt_5min": 100,
+    "late_arrivals_departure_within_5min": 52,
+    "departure_delay_total_positive_minutes": 5180.9,
+    "arrival_delay_total_positive_minutes": 8046.483333333334,
+    "distance_weighted_occupancy_pct": 36.961989978592946,
+    "unweighted_call_occupancy_pct": 36.42381582481832,
+    "boardings": 2048591,
+    "queued_calls": 22210,
+    "final_queue_people": 2050,
+    "deferral_person_minutes_between_recorded_cutoffs": 3331993.1500000004,
+    "origin_departure_delay_weighted_by_boarded_people_minutes": 80550.73333333334,
+    "trips_maxload_le_30pct_no_queues": 443,
+    "trips_peak_at_least_90pct": 125,
+    "238_0715": {
+      "days": 10,
+      "days_with_queue": 8,
+      "waiting": 967,
+      "boarded": 724,
+      "remaining_queue_instances": 243,
+      "max_waiting": 124
+    },
+    "historical": [
+      {
+        "year": "Oct 2024\u2013Sep 2025",
+        "recorded_km": 131600,
+        "recorded_operating_hours": 8087.6,
+        "repair_count": 31,
+        "repair_cost_sgd": 13625,
+        "scheduled_service_count": 254,
+        "scheduled_service_cost_sgd": 47310,
+        "additional_preventive_visits": 34,
+        "additional_preventive_cost_sgd": 4110,
+        "repair_unavailable_hours": 151.03,
+        "scheduled_maintenance_unavailable_hours": 537.25,
+        "repair_cost_per_1000km": 103.5334346505,
+        "repair_hold_hours_per_1000km": 1.1476443769,
+        "total_maintenance_cost_sgd": 65045,
+        "total_maintenance_unavailable_hours": 688.28
+      },
+      {
+        "year": "Oct 2025\u2013Sep 2026",
+        "recorded_km": 146570,
+        "recorded_operating_hours": 9009.1,
+        "repair_count": 55,
+        "repair_cost_sgd": 24880,
+        "scheduled_service_count": 281,
+        "scheduled_service_cost_sgd": 52980,
+        "additional_preventive_visits": 33,
+        "additional_preventive_cost_sgd": 3975,
+        "repair_unavailable_hours": 265.26,
+        "scheduled_maintenance_unavailable_hours": 593.75,
+        "repair_cost_per_1000km": 169.7482431603,
+        "repair_hold_hours_per_1000km": 1.8097837211,
+        "total_maintenance_cost_sgd": 81835,
+        "total_maintenance_unavailable_hours": 859.01
+      }
+    ]
+  },
+  "selected_services": [
+    {
+      "service_no": "132",
+      "trips": 280,
+      "late_departures": 17,
+      "late_arrivals": 42,
+      "dep_delay_total_minutes": 413.9333333333,
+      "arr_delay_total_minutes": 1060.7833333333,
+      "departure_p95_minutes": 12.6166666667,
+      "arrival_p95_minutes": 23.6216666667,
+      "mean_runtime_overrun_minutes": 1.9567857143,
+      "passenger_km": 340459.2,
+      "capacity_km": 860160.0,
+      "queued_calls": 3206,
+      "boardings": 159434,
+      "low_peak_no_queue_trips": 0,
+      "near_full_peak_trips": 0,
+      "max_trip_peak_pct": 87.5,
+      "occupancy_pct": 39.5809151786,
+      "departure_late_pct": 6.0714285714,
+      "arrival_late_pct": 15.0,
+      "deferral_person_minutes": 679054.4333333333,
+      "final_queue_people": 453
+    },
+    {
+      "service_no": "159",
+      "trips": 280,
+      "late_departures": 24,
+      "late_arrivals": 48,
+      "dep_delay_total_minutes": 383.4166666667,
+      "arr_delay_total_minutes": 1053.6166666667,
+      "departure_p95_minutes": 8.7516666667,
+      "arrival_p95_minutes": 26.7516666667,
+      "mean_runtime_overrun_minutes": 2.2145238095,
+      "passenger_km": 231939.0,
+      "capacity_km": 569856.0,
+      "queued_calls": 2750,
+      "boardings": 123298,
+      "low_peak_no_queue_trips": 0,
+      "near_full_peak_trips": 0,
+      "max_trip_peak_pct": 87.5,
+      "occupancy_pct": 40.7013350741,
+      "departure_late_pct": 8.5714285714,
+      "arrival_late_pct": 17.1428571429,
+      "deferral_person_minutes": 543619.2833333333,
+      "final_queue_people": 374
+    },
+    {
+      "service_no": "235",
+      "trips": 220,
+      "late_departures": 7,
+      "late_arrivals": 8,
+      "dep_delay_total_minutes": 253.7166666667,
+      "arr_delay_total_minutes": 296.55,
+      "departure_p95_minutes": 2.0866666667,
+      "arrival_p95_minutes": 2.805,
+      "mean_runtime_overrun_minutes": 0.0960606061,
+      "passenger_km": 57533.9,
+      "capacity_km": 168300.0,
+      "queued_calls": 129,
+      "boardings": 35701,
+      "low_peak_no_queue_trips": 10,
+      "near_full_peak_trips": 1,
+      "max_trip_peak_pct": 100.0,
+      "occupancy_pct": 34.1853238265,
+      "departure_late_pct": 3.1818181818,
+      "arrival_late_pct": 3.6363636364,
+      "deferral_person_minutes": 4752.5666666667,
+      "final_queue_people": 2
+    },
+    {
+      "service_no": "261",
+      "trips": 280,
+      "late_departures": 0,
+      "late_arrivals": 0,
+      "dep_delay_total_minutes": 187.2833333333,
+      "arr_delay_total_minutes": 217.3,
+      "departure_p95_minutes": 1.7008333333,
+      "arrival_p95_minutes": 2.0833333333,
+      "mean_runtime_overrun_minutes": 0.0735119048,
+      "passenger_km": 26126.2,
+      "capacity_km": 114240.0,
+      "queued_calls": 5,
+      "boardings": 18978,
+      "low_peak_no_queue_trips": 131,
+      "near_full_peak_trips": 0,
+      "max_trip_peak_pct": 57.6470588235,
+      "occupancy_pct": 22.8695728291,
+      "departure_late_pct": 0.0,
+      "arrival_late_pct": 0.0,
+      "deferral_person_minutes": 108.45,
+      "final_queue_people": 0
+    }
+  ],
+  "passenger_reports": [
+    {
+      "case_id": "PC01",
+      "report": "I boarded the 132 at Hougang Interchange around 7:45 this morning. The bus felt very hot and the air from the vents was weak. The ride was uncomfortable.",
+      "time_basis": "Observed departure",
+      "matched_trips": [
+        {
+          "trip_id": "NW-20261005-0207",
+          "service": "132",
+          "vehicle": "NW-V020",
+          "scheduled_departure": "2026-10-05 07:42:00+08:00",
+          "actual_departure": "2026-10-05 07:42:19+08:00",
+          "departure_delay_minutes": 0.31666666666666665,
+          "arrival_delay_minutes": 23.716666666666665,
+          "origin_waiting": 35,
+          "origin_left_behind": 0
+        }
+      ]
+    },
+    {
+      "case_id": "PC02",
+      "report": "I noted fleet number NW-V020 when I boarded at Hougang Interchange around 7:45. I cannot remember the service number. It felt hot inside and there was hardly any cool air.",
+      "time_basis": "Observed departure",
+      "matched_trips": [
+        {
+          "trip_id": "NW-20261012-0207",
+          "service": "132",
+          "vehicle": "NW-V020",
+          "scheduled_departure": "2026-10-12 07:42:00+08:00",
+          "actual_departure": "2026-10-12 07:42:00+08:00",
+          "departure_delay_minutes": 0.0,
+          "arrival_delay_minutes": 23.616666666666667,
+          "origin_waiting": 30,
+          "origin_left_behind": 0
+        }
+      ]
+    },
+    {
+      "case_id": "PC03",
+      "report": "I was expecting the 06:20 service 235 from Toa Payoh Interchange. It did not leave then. I gave up and made other arrangements before it came. I needed clearer information about the wait.",
+      "time_basis": "Expected departure",
+      "matched_trips": [
+        {
+          "trip_id": "NW-20261007-0039",
+          "service": "235",
+          "vehicle": "NW-V039",
+          "scheduled_departure": "2026-10-07 06:20:00+08:00",
+          "actual_departure": "2026-10-07 06:40:32+08:00",
+          "departure_delay_minutes": 20.533333333333335,
+          "arrival_delay_minutes": 20.233333333333334,
+          "origin_waiting": 0,
+          "origin_left_behind": 0
+        }
+      ]
+    },
+    {
+      "case_id": "PC04",
+      "report": "I waited for the 06:20 service 235 at Toa Payoh Interchange. The bus I boarded, fleet number NW-V039, left closer to 06:40. The wait made me late for work.",
+      "time_basis": "Expected departure",
+      "matched_trips": [
+        {
+          "trip_id": "NW-20261014-0039",
+          "service": "235",
+          "vehicle": "NW-V039",
+          "scheduled_departure": "2026-10-14 06:20:00+08:00",
+          "actual_departure": "2026-10-14 06:39:53+08:00",
+          "departure_delay_minutes": 19.883333333333333,
+          "arrival_delay_minutes": 19.166666666666668,
+          "origin_waiting": 16,
+          "origin_left_behind": 0
+        }
+      ]
+    },
+    {
+      "case_id": "PC05",
+      "report": "The bus at Toa Payoh Interchange was fleet number NW-V039, different from the one I usually see. It left at 06:00 and my journey went as expected. I wanted to check whether the different bus was planned.",
+      "time_basis": "Observed departure",
+      "matched_trips": [
+        {
+          "trip_id": "NW-20261014-0001",
+          "service": "235",
+          "vehicle": "NW-V039",
+          "scheduled_departure": "2026-10-14 06:00:00+08:00",
+          "actual_departure": "2026-10-14 06:00:00+08:00",
+          "departure_delay_minutes": 0.0,
+          "arrival_delay_minutes": -0.11666666666666667,
+          "origin_waiting": 7,
+          "origin_left_behind": 0
+        }
+      ]
+    },
+    {
+      "case_id": "PC07",
+      "report": "I could not get on the 07:15 service 238 at Toa Payoh Interchange. There were still people waiting when it left. I got on the next bus around 07:30. The extra wait disrupted my morning.",
+      "time_basis": "Expected departure",
+      "matched_trips": [
+        {
+          "trip_id": "NW-20261006-0136",
+          "service": "238",
+          "vehicle": "NW-V050",
+          "scheduled_departure": "2026-10-06 07:15:00+08:00",
+          "actual_departure": "2026-10-06 07:16:48+08:00",
+          "departure_delay_minutes": 1.8,
+          "arrival_delay_minutes": 1.6666666666666667,
+          "origin_waiting": 115,
+          "origin_left_behind": 30
+        }
+      ]
+    }
+  ],
+  "service_235_replay": {
+    "classification": "Bounded retrospective feasibility replay, not measured AI performance",
+    "published_trips_retained": 44,
+    "late_departures_before": 7,
+    "late_departures_after": 0,
+    "avoided_bus_departure_minutes": 117.76666666666668,
+    "by_date": [
+      {
+        "date": "2026-10-07",
+        "assumptions": "Retain every published departure and route. Use the listed relief driver on NW-V001 through its 09:00 duty. Preserve each trip's observed running duration. For NW-V039 remove departure delay attributed to the prior cover commitment; other actual departure delays are retained. This is a bounded retrospective feasibility replay, not a measured AI result.",
+        "baseline_late_departures_gt_5min": 4,
+        "replay_late_departures_gt_5min": 0,
+        "baseline_positive_delay_minutes": 71.45,
+        "replay_positive_delay_minutes": 9.4
+      },
+      {
+        "date": "2026-10-14",
+        "assumptions": "Retain every published departure and route. Use the listed relief driver on NW-V001 through its 09:00 duty. Preserve each trip's observed running duration. For NW-V039 remove departure delay attributed to the prior cover commitment; other actual departure delays are retained. This is a bounded retrospective feasibility replay, not a measured AI result.",
+        "baseline_late_departures_gt_5min": 3,
+        "replay_late_departures_gt_5min": 0,
+        "baseline_positive_delay_minutes": 66.5,
+        "replay_positive_delay_minutes": 10.783333333333333
+      }
+    ]
+  },
+  "service_238_origin_retiming": {
+    "scenario": "Move scheduled 07:30 service 238 departure to 07:25, retaining its observed departure deviation and 120-second boarding dwell. Other origin calls unchanged. Same listed vehicle and crew, full trip count. Origin arrivals replayed FIFO at 1.2 seconds per boarding; baseline reproduces every supplied origin boarding and residual queue. Downstream passenger redistribution and changed dwell are outside this origin-only comparison.",
+    "days": [
+      {
+        "date": "2026-10-05",
+        "baseline_origin_wait_person_minutes": 3679.3533375104266,
+        "retimed_origin_wait_person_minutes": 3502.6600041866304,
+        "reduction_person_minutes": 176.6933333237962,
+        "boardings": 303,
+        "turnaround_margin_seconds": 156.0,
+        "original_0715_queue": 39
+      },
+      {
+        "date": "2026-10-06",
+        "baseline_origin_wait_person_minutes": 3455.9100037058192,
+        "retimed_origin_wait_person_minutes": 3379.1633370518684,
+        "reduction_person_minutes": 76.7466666539508,
+        "boardings": 278,
+        "turnaround_margin_seconds": 125.0,
+        "original_0715_queue": 30
+      },
+      {
+        "date": "2026-10-07",
+        "baseline_origin_wait_person_minutes": 3318.2166705091795,
+        "retimed_origin_wait_person_minutes": 3190.076670392354,
+        "reduction_person_minutes": 128.14000011682538,
+        "boardings": 282,
+        "turnaround_margin_seconds": 146.0,
+        "original_0715_queue": 28
+      },
+      {
+        "date": "2026-10-08",
+        "baseline_origin_wait_person_minutes": 3590.636670656999,
+        "retimed_origin_wait_person_minutes": 3518.986670601368,
+        "reduction_person_minutes": 71.6500000556307,
+        "boardings": 312,
+        "turnaround_margin_seconds": 93.0,
+        "original_0715_queue": 24
+      },
+      {
+        "date": "2026-10-09",
+        "baseline_origin_wait_person_minutes": 1794.883334294955,
+        "retimed_origin_wait_person_minutes": 1839.123334312439,
+        "reduction_person_minutes": -44.240000017484135,
+        "boardings": 241,
+        "turnaround_margin_seconds": 187.0,
+        "original_0715_queue": 0
+      },
+      {
+        "date": "2026-10-12",
+        "baseline_origin_wait_person_minutes": 3262.42000383536,
+        "retimed_origin_wait_person_minutes": 3171.466670473417,
+        "reduction_person_minutes": 90.95333336194335,
+        "boardings": 300,
+        "turnaround_margin_seconds": 134.0,
+        "original_0715_queue": 29
+      },
+      {
+        "date": "2026-10-13",
+        "baseline_origin_wait_person_minutes": 3836.720004447301,
+        "retimed_origin_wait_person_minutes": 3714.0400043090185,
+        "reduction_person_minutes": 122.6800001382826,
+        "boardings": 324,
+        "turnaround_margin_seconds": 177.0,
+        "original_0715_queue": 33
+      },
+      {
+        "date": "2026-10-14",
+        "baseline_origin_wait_person_minutes": 3968.846671116352,
+        "retimed_origin_wait_person_minutes": 3894.406670995553,
+        "reduction_person_minutes": 74.44000012079869,
+        "boardings": 355,
+        "turnaround_margin_seconds": 54.0,
+        "original_0715_queue": 31
+      },
+      {
+        "date": "2026-10-15",
+        "baseline_origin_wait_person_minutes": 3708.8800041596096,
+        "retimed_origin_wait_person_minutes": 3653.0833374182384,
+        "reduction_person_minutes": 55.796666741371155,
+        "boardings": 331,
+        "turnaround_margin_seconds": 173.0,
+        "original_0715_queue": 29
+      },
+      {
+        "date": "2026-10-16",
+        "baseline_origin_wait_person_minutes": 1746.0666675408681,
+        "retimed_origin_wait_person_minutes": 1777.8800009012223,
+        "reduction_person_minutes": -31.813333360354136,
+        "boardings": 242,
+        "turnaround_margin_seconds": 196.0,
+        "original_0715_queue": 0
+      }
+    ],
+    "total_wait_reduction_person_minutes": 721.0466671347606,
+    "baseline_total_wait_person_minutes": 32361.93336777687,
+    "replayed_boardings": 2968,
+    "minimum_turnaround_margin_seconds": 54.0
+  },
+  "maintenance_proposal": {
+    "scenario_date": "2026-10-19",
+    "workshop_slots": [
+      {
+        "vehicle": "NW-V020",
+        "start": "2026-10-19 09:00:00",
+        "end": "2026-10-19 13:00:00",
+        "technicians": 2
+      },
+      {
+        "vehicle": "NW-V009",
+        "start": "2026-10-19 13:00:00",
+        "end": "2026-10-19 15:00:00",
+        "technicians": 1
+      }
+    ],
+    "service_assignments": [
+      {
+        "trip": "EXT-MT01-1",
+        "duty": "EXT-MD01",
+        "vehicle": "NW-V005",
+        "crew": "EXT-MC01",
+        "departure": "2026-10-19 09:00:00",
+        "arrival": "2026-10-19 10:23:55",
+        "passengers": 96,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT01-2",
+        "duty": "EXT-MD01",
+        "vehicle": "NW-V005",
+        "crew": "EXT-MC01",
+        "departure": "2026-10-19 10:32:00",
+        "arrival": "2026-10-19 11:53:00",
+        "passengers": 96,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT02-1",
+        "duty": "EXT-MD02",
+        "vehicle": "NW-V009",
+        "crew": "EXT-MC02",
+        "departure": "2026-10-19 09:15:00",
+        "arrival": "2026-10-19 10:38:55",
+        "passengers": 101,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT02-2",
+        "duty": "EXT-MD02",
+        "vehicle": "NW-V009",
+        "crew": "EXT-MC02",
+        "departure": "2026-10-19 10:47:00",
+        "arrival": "2026-10-19 12:08:00",
+        "passengers": 101,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT03-1",
+        "duty": "EXT-MD03",
+        "vehicle": "NW-V020",
+        "crew": "EXT-MC03",
+        "departure": "2026-10-19 13:15:00",
+        "arrival": "2026-10-19 14:38:55",
+        "passengers": 96,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT03-2",
+        "duty": "EXT-MD03",
+        "vehicle": "NW-V020",
+        "crew": "EXT-MC03",
+        "departure": "2026-10-19 14:47:00",
+        "arrival": "2026-10-19 16:08:00",
+        "passengers": 96,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT04-1",
+        "duty": "EXT-MD04",
+        "vehicle": "NW-V005",
+        "crew": "EXT-MC04",
+        "departure": "2026-10-19 13:30:00",
+        "arrival": "2026-10-19 14:53:55",
+        "passengers": 101,
+        "wheelchair_users": 2
+      },
+      {
+        "trip": "EXT-MT04-2",
+        "duty": "EXT-MD04",
+        "vehicle": "NW-V005",
+        "crew": "EXT-MC04",
+        "departure": "2026-10-19 15:02:00",
+        "arrival": "2026-10-19 16:23:00",
+        "passengers": 101,
+        "wheelchair_users": 2
+      }
+    ],
+    "protected_trips_retained": 8,
+    "cover_vehicle": "NW-V005",
+    "daily_engineering_release_required": true,
+    "assumptions": [
+      "Use supplied future resource positions, availability, capacities, qualified crews and running times.",
+      "Workshop slots include signed Engineering release at their stated end; estimated completion alone cannot authorise service.",
+      "NW-V020 must be released by 13:08 to allow takeover and boarding for 13:15.",
+      "The provided outbound-to-return trip gap has only 20 seconds beyond minimum alighting and turnaround; robust running-time allowances still need validation."
+    ],
+    "workshop_capacity_conflicts_after_replan": 0
+  },
+  "assumed_business_case": {
+    "assumptions": {
+      "planners": 2,
+      "manual_hours_per_planner_day": 3,
+      "ai_hours_per_planner_day": 1,
+      "working_days": 250,
+      "loaded_hourly_cost_sgd": 45,
+      "setup_cost_sgd": 50000,
+      "annual_running_cost_sgd": 12000
+    },
+    "annual_hours_released": 1000,
+    "annual_staff_capacity_value_sgd": 45000,
+    "steady_year_net_capacity_value_sgd": 33000,
+    "first_year_net_capacity_value_sgd": -17000,
+    "economic_payback_months": 18.18181818181818,
+    "cash_payback": "Not established: labour capacity only becomes cash savings if overtime, hiring or another cash expense is actually avoided.",
+    "maintenance_illustration": {
+      "assumed_corrective_hold_reduction_pct": 10,
+      "historical_eight_bus_latest_year_corrective_hold_hours": 265.26,
+      "potential_hold_hours_recovered": 26.526,
+      "scope": "Illustration for the same eight vehicles only; no full-fleet extrapolation or measured AI effect."
+    }
+  },
+  "proposed_pilot": {
+    "shadow_weeks": 2,
+    "supervised_weeks": 4,
+    "initial_services": ["235", "238"],
+    "planner_time_reduction_target_pct": 50,
+    "selected_duty_waiting_reduction_target_pct": 20,
+    "protected_trip_retention_target_pct": 100,
+    "hard_constraint_violations_allowed": 0,
+    "classification": "Proposed targets, not forecasts or measured effects"
+  }
+}
