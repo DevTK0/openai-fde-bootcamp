@@ -1,14 +1,11 @@
+// @vitest-environment node
 import { describe, expect, it } from "vitest"
-import {
-  csvExport,
-  data,
-  dataset,
-  filterHistory,
-  groupSum,
-  monthly,
-  num,
-  sum,
-} from "@/lib/fleet"
+import { createFleet, csvExport, groupSum, num, sum } from "@/lib/fleet"
+
+import { readDashboardData } from "@/lib/dashboard-server"
+const { data, dataset, filterHistory, monthly } = createFleet(
+  readDashboardData().fleet
+)
 
 describe("Fleet data and dashboard calculations", () => {
   it("imports all workbook tables and CSVs, preserving missing values", () => {

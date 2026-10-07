@@ -1,14 +1,5 @@
-import operationsPassengers from "./operations-passengers.json"
-import {
-  data,
-  dataset,
-  filterHistory,
-  monthly,
-  num,
-  sum,
-  vehicles,
-  type Row,
-} from "./fleet"
+import { createFleet, num, sum, type Row } from "./fleet"
+import type { PassengerMatches } from "./dashboard-data"
 
 export function pearson(points: { x: number; y: number }[]): number | null {
   if (points.length < 2) return null
@@ -37,56 +28,70 @@ export function totals(rows: Row[]) {
     visits: sum(rows, "additional_preventive_visits"),
   }
 }
-export const annualVehicles = vehicles.map((vehicle) => ({
-  vehicle,
-  earlier: totals(filterHistory(vehicle, "earlier")),
-  latest: totals(filterHistory(vehicle, "latest")),
-  year: num(
-    dataset("Fleet").rows.find((r) => r["Vehicle ID"] === vehicle)!,
-    "Fictional in service year"
-  ),
-}))
-export const annualTotals = {
-  earlier: totals(filterHistory("all", "earlier")),
-  latest: totals(filterHistory("all", "latest")),
-}
-export const componentObservations = data.tables.find(
-  (t) => t.id === "selected_component_observations"
-)!.rows
-export function matchPassengerReports() {
-  return dataset("Passenger reports").rows.map((report) => ({
-    report,
-    matches: (
-      operationsPassengers.find((c) => c.caseId === report["Case ID"])
-        ?.matches ?? []
-    ).map((trip): Row => ({
-      "Service observation ID":
-        dataset("Service observations").rows.find(
-          (r) => r["Trip ID"] === trip.trip_id
-        )?.["Service observation ID"] ?? null,
-      "Trip ID": trip.trip_id,
-      "Actual vehicle ID": trip.actual_vehicle_id,
-      "Service no": trip.service_no,
-      "Departure delay seconds":
-        (Date.parse(trip.actual_departure_at) -
-          Date.parse(trip.scheduled_departure_at)) /
-        1000,
-      "Arrival delay seconds":
-        (Date.parse(trip.actual_arrival_at) -
-          Date.parse(trip.scheduled_arrival_at)) /
-        1000,
-      "Origin queue before people": trip.origin.queue_before_people,
-      "Origin boarded people": trip.origin.boarded_people,
-      "Origin queue after people": trip.origin.queue_after_people,
-    })),
+export function createRelationships(
+  fleet: ReturnType<typeof createFleet>,
+  operationsPassengers: PassengerMatches
+) {
+  const { data, dataset, filterHistory, monthly, vehicles } = fleet
+  const annualVehicles = vehicles.map((vehicle) => ({
+    vehicle,
+    earlier: totals(filterHistory(vehicle, "earlier")),
+    latest: totals(filterHistory(vehicle, "latest")),
+    year: num(
+      dataset("Fleet").rows.find((r) => r["Vehicle ID"] === vehicle)!,
+      "Fictional in service year"
+    ),
   }))
-}
-export function monthlyPoints(vehicle: string, measure: string) {
-  return monthly
-    .filter((r) => vehicle === "all" || r.vehicle_id === vehicle)
-    .map((r) => ({
-      x: num(r, "recorded_km"),
-      y: num(r, measure),
-      label: `${r.vehicle_id} · ${r.month}`,
+  const annualTotals = {
+    earlier: totals(filterHistory("all", "earlier")),
+    latest: totals(filterHistory("all", "latest")),
+  }
+  const componentObservations = data.tables.find(
+    (t) => t.id === "selected_component_observations"
+  )!.rows
+  function matchPassengerReports() {
+    return dataset("Passenger reports").rows.map((report) => ({
+      report,
+      matches: (
+        operationsPassengers.find((c) => c.caseId === report["Case ID"])
+          ?.matches ?? []
+      ).map((trip): Row => ({
+        "Service observation ID":
+          dataset("Service observations").rows.find(
+            (r) => r["Trip ID"] === trip.trip_id
+          )?.["Service observation ID"] ?? null,
+        "Trip ID": trip.trip_id,
+        "Actual vehicle ID": trip.actual_vehicle_id,
+        "Service no": trip.service_no,
+        "Departure delay seconds":
+          (Date.parse(trip.actual_departure_at) -
+            Date.parse(trip.scheduled_departure_at)) /
+          1000,
+        "Arrival delay seconds":
+          (Date.parse(trip.actual_arrival_at) -
+            Date.parse(trip.scheduled_arrival_at)) /
+          1000,
+        "Origin queue before people": trip.origin.queue_before_people,
+        "Origin boarded people": trip.origin.boarded_people,
+        "Origin queue after people": trip.origin.queue_after_people,
+      })),
     }))
+  }
+  function monthlyPoints(vehicle: string, measure: string) {
+    return monthly
+      .filter((r) => vehicle === "all" || r.vehicle_id === vehicle)
+      .map((r) => ({
+        x: num(r, "recorded_km"),
+        y: num(r, measure),
+        label: `${r.vehicle_id} · ${r.month}`,
+      }))
+  }
+
+  return {
+    annualVehicles,
+    annualTotals,
+    componentObservations,
+    matchPassengerReports,
+    monthlyPoints,
+  }
 }

@@ -1,13 +1,17 @@
+// @vitest-environment node
 import { describe, expect, it } from "vitest"
-import {
+import { createRelationships, pearson } from "@/lib/relationships"
+import { createFleet, num } from "@/lib/fleet"
+
+import { readDashboardData } from "@/lib/dashboard-server"
+const source = readDashboardData()
+const {
   annualTotals,
   annualVehicles,
   matchPassengerReports,
   monthlyPoints,
-  pearson,
   componentObservations,
-} from "@/lib/relationships"
-import { num } from "@/lib/fleet"
+} = createRelationships(createFleet(source.fleet), source.operationsPassengers)
 
 describe("Relationship analysis", () => {
   it("handles perfect, inverse, and undefined correlations", () => {

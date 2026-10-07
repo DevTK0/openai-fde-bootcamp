@@ -1,5 +1,7 @@
 "use client"
 
+import { useDashboard } from "@/components/dashboard-provider"
+
 import { Plot } from "@workspace/ui/components/report-chart"
 
 import { useState } from "react"
@@ -8,8 +10,6 @@ import {
   OperationsDashboard,
   OperationsSources,
 } from "@/components/operations-dashboard"
-import { operationsManifest } from "@/lib/operations"
-import operationsPassengers from "@/lib/operations-passengers.json"
 import { RelationshipsDashboard } from "@/components/relationships-dashboard"
 import {
   Activity,
@@ -55,14 +55,10 @@ import {
 } from "@workspace/ui/components/sidebar"
 import { Separator } from "@workspace/ui/components/separator"
 import {
-  data,
-  dataset,
-  filterHistory,
   fmt,
   money,
   num,
   sum,
-  vehicles,
   groupSum,
   type Dataset,
 } from "@/lib/fleet"
@@ -257,6 +253,7 @@ function SourcePicker({
   )
 }
 function Overview({ vehicle, period }: { vehicle: string; period: string }) {
+  const { dataset, filterHistory, vehicles } = useDashboard()
   const rows = filterHistory(vehicle, period)
   const repair = sum(rows, "repair_cost_sgd"),
     routine = sum(rows, "scheduled_service_cost_sgd"),
@@ -363,6 +360,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
   )
 }
 function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
+  const { data, filterHistory, vehicles } = useDashboard()
   const rows = filterHistory(vehicle, period)
   const tables = data.tables.filter((t) =>
     ["Repairs", "Servicing", "Inspections", "Selected observations"].includes(
@@ -418,6 +416,7 @@ function Maintenance({ vehicle, period }: { vehicle: string; period: string }) {
   )
 }
 function SelectedOperations() {
+  const { data, dataset } = useDashboard()
   const daily = dataset("Daily usage").rows,
     observations = dataset("Service observations").rows
   return (
@@ -480,6 +479,7 @@ function SelectedOperations() {
   )
 }
 function Planning() {
+  const { data, dataset, vehicles } = useDashboard()
   const requests = dataset("Maintenance planning", "Requested maintenance").rows
   const allocations = dataset(
     "Festival allocation",
@@ -616,6 +616,7 @@ function Planning() {
   )
 }
 function Passengers() {
+  const { dataset, operationsPassengers, operationsManifest } = useDashboard()
   const reports = dataset("Passenger reports")
   return (
     <div className="space-y-6">
@@ -691,6 +692,7 @@ function Passengers() {
   )
 }
 function Costs() {
+  const { dataset } = useDashboard()
   const options = dataset("Cost options")
   const maintenance = options.rows.filter(
     (r) => r.Option !== "Fleet replacement option"
@@ -746,6 +748,7 @@ function Costs() {
   )
 }
 function Explorer() {
+  const { data, operationsManifest } = useDashboard()
   return (
     <div className="space-y-6">
       <Notice>
@@ -796,6 +799,7 @@ function Explorer() {
   )
 }
 export function FleetDashboard() {
+  const { data, vehicles } = useDashboard()
   const [section, setSection] = useState<string>("overview")
   const [vehicle, setVehicle] = useState("all")
   const [period, setPeriod] = useState("latest")

@@ -1,34 +1,10 @@
-import snapshot from "./fleet-data.json"
+import type { FleetData } from "./dashboard-data"
 
-export type Cell = string | number | null
-export type Row = Record<string, Cell>
-export type Dataset = {
-  id: string
-  file: string
-  sheet: string
-  title: string
-  columns: string[]
-  rows: Row[]
-  sourceRows: number[]
-  notes: string[]
-}
-export const data = snapshot as unknown as {
-  tables: Dataset[]
-  documents: { file: string; text: string }[]
-}
-export const monthly = data.tables.find(
-  (t) => t.id === "monthly_vehicle_history"
-)!.rows
-export const vehicles = [
-  ...new Set(monthly.map((r) => String(r.vehicle_id))),
-].sort()
-export function dataset(sheet: string, title?: string): Dataset {
-  const table = data.tables.find(
-    (t) => t.sheet === sheet && (!title || t.title === title)
-  )
-  if (!table) throw new Error(`Missing source table: ${sheet} / ${title}`)
-  return table
-}
+import type { z } from "zod"
+import type { rowSchema, datasetSchema } from "./dashboard-data"
+export type Row = z.infer<typeof rowSchema>
+export type Cell = Row[string]
+export type Dataset = z.infer<typeof datasetSchema>
 export const num = (row: Row, key: string) =>
   typeof row[key] === "number" ? (row[key] as number) : 0
 export const sum = (rows: Row[], key: string) =>
@@ -36,16 +12,6 @@ export const sum = (rows: Row[], key: string) =>
 export const fmt = (value: number, digits = 0) =>
   value.toLocaleString("en-SG", { maximumFractionDigits: digits })
 export const money = (value: number) => `S$${fmt(value)}`
-export function filterHistory(vehicle: string, period: string) {
-  return monthly.filter(
-    (r) =>
-      (vehicle === "all" || r.vehicle_id === vehicle) &&
-      (period === "all" ||
-        (period === "latest"
-          ? String(r.month) >= "2025-10"
-          : String(r.month) < "2025-10"))
-  )
-}
 export function groupSum(rows: Row[], group: string, keys: string[]): Row[] {
   const groups = new Map<string, Row>()
   for (const row of rows) {
@@ -70,4 +36,30 @@ export function csvExport(columns: string[], rows: Row[]) {
     columns.map(escape).join(","),
     ...rows.map((r) => columns.map((c) => escape(r[c])).join(",")),
   ].join("\r\n")
+}
+
+export function createFleet(data: FleetData) {
+  const monthly = data.tables.find(
+    (t) => t.id === "monthly_vehicle_history"
+  )!.rows
+  const vehicles = [...new Set(monthly.map((r) => String(r.vehicle_id)))].sort()
+  function dataset(sheet: string, title?: string): Dataset {
+    const table = data.tables.find(
+      (t) => t.sheet === sheet && (!title || t.title === title)
+    )
+    if (!table) throw new Error(`Missing source table: ${sheet} / ${title}`)
+    return table
+  }
+  function filterHistory(vehicle: string, period: string) {
+    return monthly.filter(
+      (r) =>
+        (vehicle === "all" || r.vehicle_id === vehicle) &&
+        (period === "all" ||
+          (period === "latest"
+            ? String(r.month) >= "2025-10"
+            : String(r.month) < "2025-10"))
+    )
+  }
+
+  return { data, monthly, vehicles, dataset, filterHistory }
 }

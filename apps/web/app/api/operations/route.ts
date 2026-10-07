@@ -1,16 +1,34 @@
-import { operationsManifest } from "@/lib/operations"
 import {
   getOperationsReport,
-  OperationsQueryBusyError,
+  getOperationsManifest,
   queryOperationsTable,
   readOperationsDownload,
   sourceTable,
 } from "@/lib/operations-server"
+import { DatabaseBusyError } from "@/lib/database"
+
 export const runtime = "nodejs"
 export async function GET(request: Request) {
+  try {
+    request.signal.throwIfAborted()
+    return await operationsResponse(request)
+  } catch (error) {
+    if (request.signal.aborted) return new Response(null, { status: 499 })
+    if (error instanceof DatabaseBusyError) {
+      return Response.json(
+        { error: error.message },
+        { status: 503, headers: { "Retry-After": "1" } }
+      )
+    }
+    throw error
+  }
+}
+
+async function operationsResponse(request: Request) {
   const params = new URL(request.url).searchParams
   const view = params.get("view") ?? "summary"
   if (view === "summary") {
+    const operationsManifest = getOperationsManifest()
     const service = params.get("service") ?? "all",
       date = params.get("date") ?? "all"
     if (
@@ -21,7 +39,9 @@ export async function GET(request: Request) {
         { error: "Unknown service or date" },
         { status: 400 }
       )
-    return Response.json(await getOperationsReport(service, date))
+    return Response.json(
+      await getOperationsReport(service, date, request.signal)
+    )
   }
   const table = params.get("table") ?? "trips"
   if (!sourceTable(table))
@@ -50,15 +70,7 @@ export async function GET(request: Request) {
       { error: "Invalid page or search (maximum 120 characters)" },
       { status: 400 }
     )
-  try {
-    return Response.json(await queryOperationsTable(table, query, page))
-  } catch (error) {
-    if (error instanceof OperationsQueryBusyError) {
-      return Response.json(
-        { error: error.message },
-        { status: 503, headers: { "Retry-After": "1" } }
-      )
-    }
-    throw error
-  }
+  return Response.json(
+    await queryOperationsTable(table, query, page, request.signal)
+  )
 }
