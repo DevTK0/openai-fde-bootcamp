@@ -38,7 +38,8 @@ Before interaction, confirm the retained session is alive and run
 Use `preview_status`, then `preview_open` if no automation-capable tab exists.
 Retain the returned tab id for every browser call.
 Navigate to the recorded preview URL and take `preview_snapshot`.
-Require the Open Slide gallery with Scheduling, Maintenance, and Ridership,
+Require the Open Slide gallery with Scheduling, Maintenance, Ridership, and
+LionLink AI scheduling,
 not a login screen or a different worktree's app.
 
 If the browser cannot reach the tailnet, try the same running server with

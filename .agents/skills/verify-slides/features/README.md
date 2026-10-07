@@ -6,8 +6,8 @@ then cover their listed entry points. Source inspection alone is not a live pass
 
 ## Baseline
 
-The gallery has Scheduling, Maintenance, and Ridership. Their current page counts
-are 25, 24, and 14. Reconcile those counts with the deck exports after intentional
+The gallery has Scheduling, Maintenance, Ridership, and LionLink AI scheduling.
+Their current page counts are 25, 24, 14, and 8. Reconcile those counts with the deck exports after intentional
 page changes. Use an owned authoring preview and a dedicated browser tab. Back up
 files before editing, including uncommitted content. Mutation recipes restore
 original content after collecting evidence.

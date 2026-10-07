@@ -12,7 +12,7 @@ Users browse decks, move between pages, present, and save page-specific notes.
 
 ## How to get to it (user POV)
 
-- Open Scheduling, Maintenance, or Ridership at `/slides/`.
+- Open Scheduling, Maintenance, Ridership, or LionLink AI scheduling at `/slides/`.
 - Open `/slides/s/ridership?p=2` directly.
 - Click a page thumbnail or press ArrowRight and ArrowLeft outside text fields.
 - Choose Present or an option under Present options.
