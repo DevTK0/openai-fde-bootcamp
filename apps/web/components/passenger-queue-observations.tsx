@@ -14,13 +14,7 @@ type Result =
   | { key: string; kind: "ready"; detail: PlanningDetail }
   | { key: string; kind: "error" }
 
-export function PassengerQueueObservations({
-  date,
-  service,
-}: {
-  date: string
-  service: string
-}) {
+export function PassengerQueueObservations({ date }: { date: string }) {
   const dashboard = useDashboard()
   const [result, setResult] = useState<Result | null>(null)
   const [attempt, setAttempt] = useState(0)
@@ -57,11 +51,7 @@ export function PassengerQueueObservations({
       </div>
     )
   if (!current) return <p role="status">Loading queue observations…</p>
-  const routes = current.detail.routes.filter(
-    (r) => service === "all" || r.service === service
-  )
-  const routeIds = new Set(routes.map((r) => r.id))
-  const calls = current.detail.calls.filter((c) => routeIds.has(c.route))
+  const calls = current.detail.calls
   const day = planningTime(date, "00:00")
   const observed = calls.flatMap((c) =>
     c.observed !== null && c.observed >= day && c.observed < day + 86400
@@ -94,8 +84,8 @@ export function PassengerQueueObservations({
   const hour = (n: number) => `${String(n).padStart(2, "0")}:00`
   return (
     <QueueObservations
-      key={`${date}/${service}`}
-      detail={{ ...current.detail, routes, calls }}
+      key={date}
+      detail={current.detail}
       selection={{
         date,
         start: hour(firstHour),

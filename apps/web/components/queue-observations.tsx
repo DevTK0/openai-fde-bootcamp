@@ -40,9 +40,13 @@ export function QueueObservations({
   detail: PlanningDetail
   selection: Pick<PlanningSelection, "date" | "start" | "end" | "queue">
 }) {
+  const [serviceId, setServiceId] = useState(detail.routes[0]?.service ?? "")
+  const services = [...new Set(detail.routes.map((r) => r.service))]
+  const service = services.includes(serviceId) ? serviceId : services[0]
+  const routes = detail.routes.filter((r) => r.service === service)
   const [routeId, setRouteId] = useState(detail.routes[0]?.id ?? "")
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const route = detail.routes.find((r) => r.id === routeId) ?? detail.routes[0]
+  const route = routes.find((r) => r.id === routeId) ?? routes[0]
   const start = planningTime(selection.date, selection.start)
   const end = planningTime(selection.date, selection.end)
   const positions = detail.positions
@@ -77,18 +81,33 @@ export function QueueObservations({
       </CardHeader>
       <CardContent className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Pick
-            label="Queue route"
-            value={route?.id ?? ""}
-            onChange={(value) => {
-              setRouteId(value)
-              setSelectedId(null)
-            }}
-            options={detail.routes.map((r) => ({
-              value: r.id,
-              label: `${r.id} · Direction ${r.direction}`,
-            }))}
-          />
+          <div className="flex flex-wrap gap-2">
+            <Pick
+              label="Queue service"
+              value={service ?? ""}
+              onChange={(value) => {
+                setServiceId(value)
+                setRouteId("")
+                setSelectedId(null)
+              }}
+              options={services.map((s) => ({
+                value: s,
+                label: `Service ${s}`,
+              }))}
+            />
+            <Pick
+              label="Queue direction"
+              value={route?.id ?? ""}
+              onChange={(value) => {
+                setRouteId(value)
+                setSelectedId(null)
+              }}
+              options={routes.map((r) => ({
+                value: r.id,
+                label: `Direction ${r.direction}`,
+              }))}
+            />
+          </div>
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
             <span className="text-red-700 dark:text-red-300">
               ● ≥{selection.queue} left behind

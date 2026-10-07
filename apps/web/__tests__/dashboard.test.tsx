@@ -165,7 +165,7 @@ describe("SQLite dashboard interactions", () => {
             screen.getByRole("combobox", { name: "Operating date" })
           ).toHaveTextContent("2026-10-16")
           expect(
-            screen.getByRole("combobox", { name: "Queue route" })
+            screen.getByRole("combobox", { name: "Queue direction" })
           ).toBeInTheDocument()
           expect(
             screen.queryByText("Where queues remain at observation end")

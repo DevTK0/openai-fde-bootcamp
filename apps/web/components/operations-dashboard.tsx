@@ -242,11 +242,11 @@ export function OperationsDashboard({
                   series={[{ key: "boardings", label: "Boarding events" }]}
                 />
               </div>
-              <PassengerQueueObservations date={date} service={service} />
             </div>
           )}
         </>
       )}
+      {view === "crowding" && <PassengerQueueObservations date={date} />}
     </div>
   )
 }

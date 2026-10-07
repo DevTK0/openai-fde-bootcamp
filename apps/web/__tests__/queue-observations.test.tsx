@@ -121,8 +121,8 @@ it("opens dated passenger evidence by keyboard and switches route directions wit
     within(sheet).getByText(/2026-10-07 · SGT · stop_calls/)
   ).toBeInTheDocument()
   await user.keyboard("{Escape}")
-  await user.click(screen.getByRole("combobox", { name: "Queue route" }))
-  await user.click(screen.getByRole("option", { name: "R2 · Direction 2" }))
+  await user.click(screen.getByRole("combobox", { name: "Queue direction" }))
+  await user.click(screen.getByRole("option", { name: "Direction 2" }))
   expect(
     screen.queryByRole("button", { name: /06:00:00, 0 left behind/ })
   ).not.toBeInTheDocument()
@@ -172,9 +172,63 @@ it("closes removed evidence on refresh and falls back to the new service's route
     />
   )
   expect(
-    screen.getByRole("combobox", { name: "Queue route" })
-  ).toHaveTextContent("NEW")
+    screen.getByRole("combobox", { name: "Queue direction" })
+  ).toHaveTextContent("Direction 1")
   expect(
     screen.getByText("No boarding positions supplied for this route.")
   ).toBeInTheDocument()
+})
+
+it("selects a service independently and limits directions and evidence to it", async () => {
+  const user = userEvent.setup()
+  render(
+    <QueueObservations
+      selection={selection}
+      detail={{
+        ...detail,
+        routes: [
+          ...detail.routes,
+          {
+            id: "R3",
+            service: "261",
+            direction: 1,
+            name: "Loop",
+            origin: "S3",
+          },
+        ],
+        positions: [
+          ...detail.positions,
+          { route: "R3", order: 1, stop: "S3", name: "Loop stop", boarding: 1 },
+        ],
+        calls: [
+          ...detail.calls,
+          { ...call("loop-call", 1, 19, at("06:30")), route: "R3" },
+        ],
+      }}
+    />
+  )
+  expect(
+    screen.getByRole("combobox", { name: "Queue service" })
+  ).toHaveTextContent("Service 132")
+  await user.click(screen.getByRole("combobox", { name: "Queue direction" }))
+  await user.click(await screen.findByRole("option", { name: "Direction 2" }))
+  await user.click(screen.getByRole("combobox", { name: "Queue service" }))
+  expect(screen.queryByRole("option", { name: /All/ })).not.toBeInTheDocument()
+  await user.click(await screen.findByRole("option", { name: "Service 261" }))
+  expect(
+    screen.getByRole("combobox", { name: "Queue direction" })
+  ).toHaveTextContent("Direction 1")
+  expect(
+    screen.getByRole("button", { name: /Loop stop.*19 left behind/ })
+  ).toBeInTheDocument()
+  expect(
+    screen.queryByRole("button", { name: /Market inbound/ })
+  ).not.toBeInTheDocument()
+  await user.click(screen.getByRole("combobox", { name: "Queue direction" }))
+  expect(
+    await screen.findByRole("option", { name: "Direction 1" })
+  ).toBeInTheDocument()
+  expect(
+    screen.queryByRole("option", { name: "Direction 2" })
+  ).not.toBeInTheDocument()
 })
