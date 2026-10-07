@@ -6,7 +6,6 @@ import {
   useSyncExternalStore,
   type FormEvent,
 } from "react"
-import { RefreshCw } from "lucide-react"
 import { PlanningTimePicker } from "./planning-time-picker"
 import { ReplayPlayer } from "./service-replay/player"
 import { Badge } from "@workspace/ui/components/badge"
@@ -14,7 +13,6 @@ import { Button } from "@workspace/ui/components/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
@@ -88,7 +86,6 @@ export function ServicePlanning({
     report: PlanningReport
   } | null>(null)
   const [error, setError] = useState("")
-  const [attempt, setAttempt] = useState(0)
   useEffect(() => {
     const controller = new AbortController()
     fetch(`/api/service-planning?${query}`, { signal: controller.signal })
@@ -114,25 +111,13 @@ export function ServicePlanning({
           )
       })
     return () => controller.abort()
-  }, [query, attempt, dashboard])
+  }, [query, dashboard])
   const report = request?.query === query ? request.report : null
   const selected = report?.watchlist.find(
     (s) => s.service === selection.service
   )
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-semibold">Service optimisation</h2>
-          <p className="text-sm text-muted-foreground">
-            Review service priorities and replay recorded journeys.
-          </p>
-        </div>
-        <Button variant="outline" onClick={() => setAttempt((a) => a + 1)}>
-          <RefreshCw />
-          Refresh evidence
-        </Button>
-      </div>
       {!parsed.success && (
         <p role="alert">
           Invalid planning link. Showing the default assumptions.
@@ -168,10 +153,6 @@ export function ServicePlanning({
           <Card>
             <CardHeader>
               <CardTitle>Service watchlist</CardTitle>
-              <CardDescription>
-                {selection.date} · {selection.start} to {selection.end} SGT ·
-                Two or more triggers = Critical; one = High. Proposed policy.
-              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="max-h-112 overflow-y-auto">
@@ -291,10 +272,6 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
     <Card>
       <CardHeader>
         <CardTitle>Planning assumptions</CardTitle>
-        <CardDescription>
-          Proposed defaults: delay ≥5 min, peak queue ≥30 people, 06:00–12:00
-          window. Validate against operating policy.
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={submit} className="flex flex-wrap items-end gap-4">
