@@ -1,5 +1,6 @@
 "use client"
 
+import { CrewPlanning } from "./crew-planning"
 import { ServiceHistory } from "./service-history"
 import { ServicePlanning } from "./service-planning"
 import { DatasetPicker } from "@/components/dataset-picker"
@@ -578,6 +579,8 @@ function DashboardReport({
           ]}
         />
       )
+    case "crew-planning":
+      return <CrewPlanning />
     case "service-planning":
       return <ServicePlanning initialQuery={initialQuery} />
     case "festival":

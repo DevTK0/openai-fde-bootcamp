@@ -35,7 +35,8 @@ export const dashboardWorkspaces = [
       {
         id: "day-schedule",
         label: "Day schedule",
-        description: "Scheduled service simulation, timetables, trips, and stop calls.",
+        description:
+          "Scheduled service simulation, timetables, trips, and stop calls.",
       },
       {
         id: "reliability",
@@ -101,6 +102,11 @@ export const dashboardWorkspaces = [
     label: "Planning",
     icon: CalendarDays,
     pages: [
+      {
+        id: "crew-planning",
+        label: "Crew planning",
+        description: "Planned assignments, duty windows, and protected breaks.",
+      },
       {
         id: "service-planning",
         label: "Service planning",
