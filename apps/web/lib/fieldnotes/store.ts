@@ -158,7 +158,7 @@ export class FieldnotesStore {
     specification: string
   ) {
     return this.change(owner, id, (chat) => {
-      if (revision > chat.specRevision && revision <= chat.revision) {
+      if (revision >= chat.specRevision && revision <= chat.revision) {
         chat.specification = specification
         chat.specRevision = revision
       }

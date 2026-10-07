@@ -236,3 +236,59 @@ it("stores bounded capture diagnostics with the session and deletes them only fo
     ).status
   ).toBe(404)
 })
+
+it("regenerates an existing specification on request without changing its saved notes", async () => {
+  const chat = await create()
+  await POST(
+    command({
+      kind: "append",
+      id: chat.id,
+      events: [
+        {
+          kind: "clarification",
+          id: "feature",
+          text: "Users can export CSV files.",
+        },
+      ],
+    })
+  )
+  const output = (text: string) =>
+    Response.json({
+      status: "completed",
+      output: [{ type: "message", content: [{ type: "output_text", text }] }],
+    })
+  const service = vi
+    .fn()
+    .mockResolvedValueOnce(
+      output(
+        "# Feature specification\n\n## Features\nCSV export.\n\n## Open questions\nNone."
+      )
+    )
+    .mockResolvedValueOnce(
+      output(
+        "# Feature specification\n\n## CSV export\nUsers can export CSV files."
+      )
+    )
+  vi.stubGlobal("fetch", service)
+  await POST(command({ kind: "generate", id: chat.id }))
+  await POST(command({ kind: "generate", id: chat.id }))
+  expect(service).toHaveBeenCalledTimes(1)
+  const regenerated = chatSchema.parse(
+    await (
+      await POST(command({ kind: "generate", id: chat.id, force: true }))
+    ).json()
+  )
+  expect(service).toHaveBeenCalledTimes(2)
+  expect(regenerated.specification).toBe(
+    "# Feature specification\n\n## CSV export\nUsers can export CSV files."
+  )
+  expect(regenerated.events).toEqual([
+    {
+      kind: "clarification",
+      id: "feature",
+      text: "Users can export CSV files.",
+    },
+  ])
+  expect(regenerated.revision).toBe(1)
+  expect(regenerated.specRevision).toBe(1)
+})

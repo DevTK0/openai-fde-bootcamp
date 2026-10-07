@@ -40,10 +40,7 @@ export function SpecificationPanel({
             size="icon"
             aria-label="Update specification"
             disabled={
-              generating ||
-              busy ||
-              closing ||
-              (!pending && chat.revision === chat.specRevision)
+              generating || busy || closing || (!pending && chat.revision === 0)
             }
             onClick={onUpdate}
           >

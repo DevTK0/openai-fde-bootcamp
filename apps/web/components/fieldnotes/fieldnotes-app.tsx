@@ -197,32 +197,38 @@ export function FieldnotesApp() {
     }
   }, [accept])
 
-  const generate = useCallback(async () => {
-    if (generation.current) return generation.current
-    const selected = current.current
-    if (!selected || selected.revision === selected.specRevision) return
-    setGenerating(true)
-    const work = async () => {
-      try {
-        accept(
-          chatSchema.parse(await request({ kind: "generate", id: selected.id }))
-        )
-        failedRevision.current = -1
-      } catch (error) {
-        failedRevision.current = selected.revision
-        throw error
-      } finally {
-        lastGenerated.current = Date.now()
-        setGenerating(false)
+  const generate = useCallback(
+    async (force = false) => {
+      if (generation.current) return generation.current
+      const selected = current.current
+      if (!selected || (!force && selected.revision === selected.specRevision))
+        return
+      setGenerating(true)
+      const work = async () => {
+        try {
+          accept(
+            chatSchema.parse(
+              await request({ kind: "generate", id: selected.id, force })
+            )
+          )
+          failedRevision.current = -1
+        } catch (error) {
+          failedRevision.current = selected.revision
+          throw error
+        } finally {
+          lastGenerated.current = Date.now()
+          setGenerating(false)
+        }
       }
-    }
-    generation.current = work()
-    try {
-      await generation.current
-    } finally {
-      generation.current = null
-    }
-  }, [accept])
+      generation.current = work()
+      try {
+        await generation.current
+      } finally {
+        generation.current = null
+      }
+    },
+    [accept]
+  )
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -596,7 +602,7 @@ export function FieldnotesApp() {
                   </div>
                   <p className="max-w-xl text-sm leading-7">
                     Ready for the presentation. Press Play when it begins. I’ll
-                    capture features and open questions in the specification.
+                    document the features you present in the specification.
                   </p>
                 </div>
                 {groups.map((group) => (
@@ -696,7 +702,7 @@ export function FieldnotesApp() {
                 onUpdate={() =>
                   void run(async () => {
                     await flush()
-                    await generate()
+                    await generate(true)
                   })
                 }
               />

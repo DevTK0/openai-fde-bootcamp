@@ -22,7 +22,8 @@ export async function POST(request: Request) {
     const who = await owner()
     if (command.kind === "generate") {
       const chat = withStore((store) => store.get(who, command.id))
-      if (chat.revision === chat.specRevision) return Response.json(chat)
+      if (chat.revision === chat.specRevision && !command.force)
+        return Response.json(chat)
       const specification = await generateSpecification(chat)
       return Response.json(
         withStore((store) =>

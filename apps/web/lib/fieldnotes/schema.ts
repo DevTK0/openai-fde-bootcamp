@@ -67,13 +67,17 @@ export const commandSchema = z.discriminatedUnion("kind", [
     id: z.string().uuid(),
     events: z.array(eventSchema).min(1).max(500),
   }),
-  z.object({ kind: z.literal("generate"), id: z.string().uuid() }),
+  z.object({
+    kind: z.literal("generate"),
+    id: z.string().uuid(),
+    force: z.boolean().optional(),
+  }),
   z.object({ kind: z.literal("delete"), id: z.string().uuid() }),
   z.object({ kind: z.literal("end"), id: z.string().uuid() }),
 ])
 export type Command = z.infer<typeof commandSchema>
 export const initialSpecification =
-  "# Feature specification\n\nWaiting for the presentation.\n\n## Features\n\nNo features captured yet.\n\n## Clarifications\n\nNo clarifications yet.\n\n## Open questions\n\nNo questions captured yet.\n"
+  "# Feature specification\n\nNo features captured yet. Start the presentation to document them.\n"
 
 export function mergeChat(previous: Chat | null, incoming: Chat): Chat {
   if (!previous || previous.id !== incoming.id) return incoming

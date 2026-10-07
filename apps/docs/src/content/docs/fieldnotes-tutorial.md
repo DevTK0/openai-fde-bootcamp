@@ -5,6 +5,8 @@ description: Start a presentation session, clarify details, and download a featu
 
 Fieldnotes listens to the current presentation and creates a real-time feature specification of the product being shown. Its system instructions already define that task. You do not need to tell the agent what to do before each presentation.
 
+The specification documents each presented feature, its purpose, and demonstrated behavior. Written corrections update the relevant feature directly. It does not add separate clarification or open-question sections.
+
 Have the presentation ready before starting a Fieldnotes session.
 
 ## Before you start
@@ -47,22 +49,22 @@ Let the presentation supply the main description. Use chat to correct a detail, 
 
 > That feature is planned for a later release, not the first version.
 
-Type the clarification in the message box and send it. If a detail is unknown, tell the agent to leave it as an open question rather than assume an answer.
+Type the clarification in the message box and send it. Unresolved details are omitted rather than invented.
 
-The app saves your clarification and refines the specification. Wait for **Draft saved**, then review the **Clarifications** section in the document preview. You can also send written details before starting audio.
+The app saves your clarification and refines the specification. Wait for **Draft saved**, then review the updated feature description in the document preview. You can also send written details before starting audio.
 
 ![The conversation records a scope instruction, with the clarification visible in the document preview.](/docs/fieldnotes/tutorial-assets/03-clarifications.png)
 
 ## 4. Review and download the specification
 
 1. Read the formatted Markdown preview in the **Specification** panel on the right.
-2. Compare the captured features and clarifications with the presentation.
+2. Compare the documented features with the presentation.
 3. Send any corrections in the message box.
 4. Click **Download** at the top of the panel to save the Markdown source as `product-spec.md`.
 
-If the panel is hidden, click **Specification** in the top bar. On narrow screens, scroll below the conversation to see it. Review unresolved decisions before requesting implementation.
+If the panel is hidden, click **Specification** in the top bar. On narrow screens, scroll below the conversation to see it. Check that each description matches what was presented.
 
-If an update fails, your previous draft and saved notes remain available. Click **Update specification** to retry. **Updates pending** means the downloadable draft does not yet include every saved note.
+If an update fails, your previous draft and saved notes remain available. Click **Update specification** to regenerate from saved notes, including existing sessions that used the previous document format. **Updates pending** means the downloadable draft does not yet include every saved note.
 
 ## 5. Stop and end the conversation
 
