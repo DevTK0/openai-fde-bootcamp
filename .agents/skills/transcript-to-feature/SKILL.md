@@ -91,7 +91,7 @@ routed here, continue from the brief rather than re-entering transcript intake.
 - For a plan-only request, ground the affected system and produce ordered units with dependencies, success criteria, and verification evidence. Stop before implementation. Read supporting skills only for their planning work; do not enter `architect` implementation or figure-it-out execution merely because their later phases exist.
 - For an investigation request within feature intake, use [how](../how/SKILL.md) to answer the scoped question with evidence. Do not turn the answer into an implementation or a PR.
 - For documentation, use [technical-writing](../technical-writing/SKILL.md) and stop at the requested documentation deliverable.
-- For implementation, inspect the system with [how](../how/SKILL.md), use [architect](../architect/SKILL.md) when needed, and use [figure-it-out](../figure-it-out/SKILL.md) when no narrower workflow fits.
+- For feature implementation, pass the brief into [Feature](../pstack/playbooks/feature.md). Use [figure-it-out](../figure-it-out/SKILL.md) when no narrower workflow fits.
 - Use autopilot or swarm only when the user explicitly requests those workflows. A transcript with several ideas does not start a parallel queue.
 - Preserve the user's commit, PR, merge, and deployment boundaries. This skill grants no additional publishing or landing authority.
 

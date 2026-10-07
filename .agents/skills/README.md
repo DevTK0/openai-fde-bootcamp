@@ -81,16 +81,19 @@ All **24 principles** are included. Their index and triggers are in
 | [technical-writing](technical-writing/SKILL.md) | Structure clear documentation and technical explanations. |
 | [show-me-your-work](show-me-your-work/SKILL.md) | Preserve decision evidence, as referenced by Prove It Works. |
 
-The **7 playbooks** cover:
+The **9 playbooks** cover:
 
 | Area | Playbooks |
 | --- | --- |
 | Autopilot | [autopilot-full](pstack/playbooks/autopilot-full.md), [autopilot-stack](pstack/playbooks/autopilot-stack.md) |
+| Feature delivery | [feature](pstack/playbooks/feature.md) |
+| Design exploration | [prototype](pstack/playbooks/prototype.md) |
 | Autonomous execution | [autonomous run](pstack/playbooks/autonomous-run.md) |
 | Skill maintenance | [adapting skills](pstack/playbooks/adapting-skills.md) |
 | PR lifecycle | [opening a PR](pstack/playbooks/opening-a-pr.md), [babysit](pstack/playbooks/babysit.md), [shipping](pstack/playbooks/shipping.md) |
 
 There are **12 supporting skills**, plus the entrypoint and all 24 principles.
+Count the playbooks with `rg --files .agents/skills/pstack/playbooks -g "*.md" | wc -l`.
 [verify-slides](verify-slides/SKILL.md) verifies the slides app through its native
 UI and a [feature map](verify-slides/features/README.md). Its local Playwright
 helper proves editable text, independent chart objects, native persistence,
@@ -98,7 +101,7 @@ discard, and restoration. Use `/maintain-verification-skill` to audit the map.
 No app-specific verification skill exists for web yet; invoke `/pstack create a
 verification skill for apps/web` to generate one separately.
 
-General feature, bug-fix, investigation, prototype, refactoring, eval,
+General bug-fix, investigation, refactoring, eval,
 performance/forensics workflows, arena/interrogate, general orchestration,
 model setup, session handoff, and the remaining
 situational skills and playbooks are not included. Motivation and regression
@@ -113,6 +116,8 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
 
 - Added `autonomous-run` from the same revision, replacing Cursor loops and watcher defaults with bounded session waits, scoped fixes, and explicit handoff instructions.
 - Added `figure-it-out` from the same revision, with local skill resolution, sequential delivery, scoped rollback, and session-bound supervision. Removed Cursor-only invocation frontmatter, consistent with the other imported skills.
+- Added [prototype](pstack/playbooks/prototype.md) from [`9f451cf875ad1239912762f67741e8e5ba6ac0f1`](https://github.com/cursor/plugins/blob/9f451cf875ad1239912762f67741e8e5ba6ac0f1/pstack/skills/poteto-mode/playbooks/prototype.md). Standalone UI experiments use plain HTML, CSS, and JavaScript in scratch directories. Experiments that depend on the app use isolated worktrees, shadcn components, and the shared preview launcher. Local browser tools replace the upstream control skill. The chosen prototype now hands off to the local Feature playbook.
+- Added [feature](pstack/playbooks/feature.md) from the prototype revision. Existing skills provide grounding, design exploration, verification, and PR delivery. Sequential implementation and explicit self-review replace upstream mandatory delegation, Arena, and Interrogate. Shipping and autopilot keep their independent verification gates.
 - Renamed `poteto-mode` to `pstack` and trimmed its routing to the bundled subset.
 - Preserved the principles with focused corrections to nonnegative-duration
   modeling and test-assertion guidance. TypeScript examples also preserve tuple
