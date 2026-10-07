@@ -1,4 +1,4 @@
-import { spawn, spawnSync } from "node:child_process"
+import { spawn } from "node:child_process"
 import { createHash } from "node:crypto"
 import { once } from "node:events"
 import {
@@ -33,6 +33,7 @@ const env = {
 }
 
 function forwardSignals(child) {
+  process.on("SIGHUP", () => child.kill("SIGTERM"))
   for (const signal of ["SIGINT", "SIGTERM"]) {
     process.on(signal, () => child.kill(signal))
   }
@@ -104,20 +105,32 @@ async function run() {
   const temporary = mkdtempSync(join(tmpdir(), "portless-launch-"))
   const marker = join(temporary, "registered")
   let child
+  let lockProcess
   let pendingSignal
   let registered = false
   const stop = (signal) => {
     pendingSignal = signal
+    lockProcess?.kill(signal)
     if (registered) child?.kill(signal)
   }
+  // Portless handles SIGTERM cleanup but not SIGHUP.
+  process.on("SIGHUP", () => stop("SIGTERM"))
   process.on("SIGINT", () => stop("SIGINT"))
   process.on("SIGTERM", () => stop("SIGTERM"))
   try {
-    const acquired = spawnSync("flock", ["--exclusive", "--wait", "60", "3"], {
+    lockProcess = spawn("flock", ["--exclusive", "--wait", "60", "3"], {
       stdio: ["ignore", "inherit", "inherit", lock],
     })
-    if (acquired.error) throw acquired.error
-    if (acquired.status !== 0)
+    const [lockCode] = await once(lockProcess, "exit")
+    lockProcess = undefined
+    if (pendingSignal) {
+      closeSync(lock)
+      lock = undefined
+      rmSync(temporary, { recursive: true, force: true })
+      process.exitCode = pendingSignal === "SIGINT" ? 130 : 143
+      return
+    }
+    if (lockCode !== 0)
       throw new Error(
         "Timed out waiting for another preview to finish registering."
       )

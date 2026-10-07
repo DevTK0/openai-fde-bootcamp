@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import { spawn, execFileSync } from "node:child_process"
 import { once } from "node:events"
-import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises"
+import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises"
 import { createServer } from "node:net"
 import { get } from "node:http"
 import { tmpdir } from "node:os"
@@ -25,7 +25,7 @@ async function eventually(check) {
 }
 
 test(
-  "concurrent previews, duplicate refusal, isolated stop, failed command, early stop",
+  "preview isolation, duplicate refusal, failures, lock cancellation, and terminal hangup",
   { timeout: 120_000 },
   async () => {
     const directory = await mkdtemp(join(tmpdir(), "preview-test-"))
@@ -67,8 +67,8 @@ test(
       children.push(result)
       return result
     }
-    const stop = async (result) => {
-      result.child.kill("SIGTERM")
+    const stop = async (result, signal = "SIGTERM") => {
+      result.child.kill(signal)
       await result.exit
     }
     const url = (result) => result.output.match(/Preview: (http:\/\/\S+)/)?.[1]
@@ -100,22 +100,24 @@ test(
     }
     try {
       const dirs = await Promise.all(
-        ["one", "two", "failed", "early"].map(async (name) => {
-          const cwd = join(directory, name)
-          await mkdir(cwd)
-          await writeFile(
-            join(cwd, "package.json"),
-            JSON.stringify({
-              name: "same-package",
-              devPreview: { path: "/docs/" },
-            })
-          )
-          await writeFile(
-            join(cwd, "server.mjs"),
-            `import { createServer } from 'node:http'; createServer((req, res) => res.end(${JSON.stringify(name)} + req.url)).listen(Number(process.env.PORT), '127.0.0.1')`
-          )
-          return cwd
-        })
+        ["one", "two", "failed", "early", "hungup", "stalled", "waiting"].map(
+          async (name) => {
+            const cwd = join(directory, name)
+            await mkdir(cwd)
+            await writeFile(
+              join(cwd, "package.json"),
+              JSON.stringify({
+                name: "same-package",
+                devPreview: { path: "/docs/" },
+              })
+            )
+            await writeFile(
+              join(cwd, "server.mjs"),
+              `import { createServer } from 'node:http'; createServer((req, res) => res.end(${JSON.stringify(name)} + req.url)).listen(Number(process.env.PORT), '127.0.0.1')`
+            )
+            return cwd
+          }
+        )
       )
       const first = start(dirs[0])
       const second = start(dirs[1])
@@ -150,6 +152,33 @@ test(
       await stop(first)
       assert.equal(await read(first), "")
       assert.equal(await read(second), "two/docs/")
+      const stalled = start(dirs[5], [
+        process.execPath,
+        "-e",
+        "setInterval(() => {}, 1000)",
+      ])
+      await eventually(() => Boolean(url(stalled)))
+      const waiting = start(dirs[6])
+      await delay(200)
+      waiting.child.kill("SIGTERM")
+      const cancelled = await Promise.race([
+        waiting.exit.then(() => true),
+        delay(1500).then(() => false),
+      ])
+      await stop(stalled)
+      assert.equal(
+        cancelled,
+        true,
+        "Cancellation must interrupt a pending startup lock"
+      )
+      const hungup = start(dirs[4])
+      await eventually(async () => (await read(hungup)) === "hungup/docs/")
+      await stop(hungup, "SIGHUP")
+      assert.equal(
+        await read(hungup),
+        "",
+        "Terminal hangup must remove the preview"
+      )
       const failed = start(dirs[2], ["nonexistent-preview-command"])
       assert.notEqual((await failed.exit)[0], 0)
       assert.equal(await read(failed), "")
@@ -159,7 +188,29 @@ test(
       assert.equal(await read(early), "")
       assert.equal(await read(second), "two/docs/")
     } finally {
-      await Promise.all(children.map(stop))
+      await Promise.all(children.map((child) => stop(child)))
+      // A failing hangup regression can orphan Portless. Only this test owns this state directory.
+      const routes = JSON.parse(
+        await readFile(join(directory, "state", "routes.json"), "utf8").catch(
+          () => "[]"
+        )
+      )
+      for (const route of routes) {
+        try {
+          process.kill(route.pid, "SIGTERM")
+        } catch (error) {
+          if (error.code !== "ESRCH") throw error
+        }
+      }
+      await eventually(
+        async () =>
+          JSON.parse(
+            await readFile(
+              join(directory, "state", "routes.json"),
+              "utf8"
+            ).catch(() => "[]")
+          ).length === 0
+      )
       const proxy = spawn(process.execPath, [portless, "proxy", "stop"], {
         env,
         stdio: "ignore",

@@ -11,7 +11,7 @@ presentations. Both use fictional sample data.
 
 ## Run it locally
 
-You'll need **Node.js 22.12+** and **pnpm 12.9.1**. From the repository root:
+You'll need **Node.js 24+** and **pnpm 12.9.1**. From the repository root:
 
 ```bash
 pnpm install
