@@ -28,7 +28,7 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { useDashboard } from "./dashboard-provider"
-import { Notice, Pick } from "./report-ui"
+import { Pick } from "./report-ui"
 import {
   planningReportSchema,
   planningSelectionSchema,
@@ -130,15 +130,6 @@ export function ServicePlanning({
           options={manifest.dates.map((d) => ({ value: d, label: d }))}
           onChange={(date) => updateLocation({ date })}
         />
-        <Pick
-          label="Planning service"
-          value={selection.service}
-          options={manifest.services.map((s) => ({
-            value: s,
-            label: `Service ${s}`,
-          }))}
-          onChange={(service) => updateLocation({ service })}
-        />
       </div>
       <Assumptions key={query} selection={selection} />
       {error && (
@@ -235,9 +226,20 @@ export function ServicePlanning({
               className="space-y-4"
               aria-label={`Service ${selected.service} investigation`}
             >
-              <h2 className="text-xl font-semibold">
-                Service {selected.service} investigation
-              </h2>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl font-semibold">
+                  Service {selected.service} investigation
+                </h2>
+                <Pick
+                  label="Planning service"
+                  value={selection.service}
+                  options={manifest.services.map((s) => ({
+                    value: s,
+                    label: `Service ${s}`,
+                  }))}
+                  onChange={(service) => updateLocation({ service })}
+                />
+              </div>
               <Replay key={query} report={report} />
             </div>
           )}
@@ -330,10 +332,6 @@ function Replay({ report }: { report: PlanningReport }) {
     end = planningTime(selection.date, selection.end)
   return (
     <div className="space-y-5">
-      <Notice>
-        Historical replay. Passenger counts show recorded departures; movement
-        between stops is estimated.
-      </Notice>
       <ReplayPlayer
         detail={detail}
         date={selection.date}
