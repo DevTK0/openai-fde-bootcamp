@@ -41,7 +41,7 @@ export async function getPlanningReport(
       {
         sql: `SELECT call_id AS id, trip_id AS trip, route_id AS route, stop_order AS "order", actual_vehicle_id AS vehicle,
       unixepoch(actual_arrival_at) AS arrival, unixepoch(actual_departure_at) AS departure,
-      unixepoch(boarding_cutoff_at) AS observed, queue_after_people AS queue FROM stop_calls WHERE service_date = ?`,
+      unixepoch(boarding_cutoff_at) AS observed, queue_after_people AS queue, boarded_people AS boarded, alighted_people AS alighted FROM stop_calls WHERE service_date = ?`,
         parameters: [selection.date],
       },
       {

@@ -2,7 +2,7 @@ import { expect, it } from "vitest"
 import {
   headingBetween,
   routeHeading,
-} from "../app/prototypes/singapore-replay/geometry"
+} from "../components/service-replay/geometry"
 
 it("points along the road before and after a right-angle bend", () => {
   const route = {

@@ -15,7 +15,7 @@ const citySchema = z.object({
 type City = z.infer<typeof citySchema>
 let request: Promise<City> | undefined
 export function loadCity() {
-  request ??= fetch("/prototype-map/streets.json")
+  request ??= fetch("/service-replay/streets.json")
     .then((r) => {
       if (!r.ok) throw new Error("Street data unavailable")
       return r.json()

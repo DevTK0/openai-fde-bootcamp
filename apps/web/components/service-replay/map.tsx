@@ -1,18 +1,11 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { Badge } from "@workspace/ui/components/badge"
+import { useMemo, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
-import { Card, CardContent } from "@workspace/ui/components/card"
-import { Slider } from "@workspace/ui/components/slider"
-import { Pause, Play, RotateCcw, LogIn, LogOut, UserRoundX } from "lucide-react"
-import {
-  planningTime,
-  replayAt,
-  type PlanningReport,
-} from "@/lib/service-planning"
+import { LogIn, LogOut, UserRoundX } from "lucide-react"
+import { replayAt, type PlanningReport } from "@/lib/service-planning"
 import { busPositions, mapData, point } from "./geometry"
-import { exchangesAt, type PassengerRecord } from "./passenger-exchange"
+import { exchangesAt } from "./passenger-exchange"
 import {
   Tooltip,
   TooltipContent,
@@ -20,50 +13,34 @@ import {
 } from "@workspace/ui/components/tooltip"
 import { Scene, type Marker } from "./scene"
 
-const start = planningTime("2026-10-07", "06:00")
-const end = planningTime("2026-10-07", "12:00")
-const clock = (at: number) =>
-  new Date(at * 1000).toLocaleTimeString("en-SG", {
-    timeZone: "Asia/Singapore",
-    hour12: false,
-  })
-
-export function SingaporeReplay({
-  reports,
-  passengers,
+export function ServiceReplayMap({
+  report,
+  at,
 }: {
-  reports: PlanningReport[]
-  passengers: PassengerRecord[]
+  report: PlanningReport
+  at: number
 }) {
+  const service = report.selection.service
   const [cameraVersion, setCameraVersion] = useState(0)
-  const [service, setService] = useState("132")
-  const [at, setAt] = useState(start + 216)
-  const [playing, setPlaying] = useState(false)
-  const [speed, setSpeed] = useState(5)
   const [roads, setRoads] = useState(true)
   const [view, setView] = useState<"tilted" | "top">("tilted")
   const [extent, setExtent] = useState<"service" | "island" | "neighborhood">(
     "service"
   )
-  const [selected, setSelected] = useState("bus:NW-20261007-0009")
-  const report = reports.find((r) => r.selection.service === service)
-  const ended = at >= end
-  useEffect(() => {
-    if (!playing || ended) return
-    let previous = performance.now()
-    const timer = setInterval(() => {
-      const now = performance.now()
-      const elapsed = Math.min(1, (now - previous) / 1000)
-      previous = now
-      setAt((t) => Math.min(end, t + elapsed * speed))
-    }, 250)
-    return () => clearInterval(timer)
-  }, [playing, ended, speed])
+  const [selected, setSelected] = useState("")
   const state = useMemo(() => {
-    if (!report) return { buses: [], queues: [], markers: [] }
     const buses = busPositions(report.detail, at, roads)
     const queues = replayAt(report.detail, at).queues
-    const exchanges = exchangesAt(report.detail.calls, passengers, at)
+    const exchanges = exchangesAt(
+      report.detail.calls,
+      report.detail.calls.map((call) => ({
+        id: call.id,
+        boarded: call.boarded ?? null,
+        alighted: call.alighted ?? null,
+        left: call.queue,
+      })),
+      at
+    )
     const markers: Marker[] = buses.map((b) => ({
       ...b,
       key: `bus:${b.trip}`,
@@ -84,41 +61,17 @@ export function SingaporeReplay({
         })
     }
     return { buses, queues, markers }
-  }, [report, at, roads, passengers])
+  }, [report, at, roads])
   const routes = mapData.routes.filter((r) => r.service === service)
+  if (!routes.length)
+    return (
+      <p className="text-sm text-muted-foreground">
+        Road geometry is available for services 132 and 159. Use the recorded
+        evidence below for this service.
+      </p>
+    )
   return (
-    <main className="mx-auto max-w-[1700px] space-y-5 p-5 md:p-8">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <div className="mb-2 flex items-center gap-2">
-            <Badge variant="outline">Experimental replay</Badge>
-            <span className="text-xs text-muted-foreground">
-              PLANNING / SERVICE REPLAY
-            </span>
-          </div>
-          <h1 className="text-3xl font-semibold tracking-tight">
-            A service in motion
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Singapore · 7 October 2026 · 06:00–12:00 SGT · Synthetic operating
-            records
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {["132", "159"].map((s) => (
-            <Button
-              key={s}
-              variant={service === s ? "default" : "outline"}
-              onClick={() => {
-                setService(s)
-                setSelected("")
-              }}
-            >
-              Service {s}
-            </Button>
-          ))}
-        </div>
-      </header>
+    <section aria-label="Service replay map" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <Button
@@ -237,122 +190,6 @@ export function SingaporeReplay({
           </div>
         </div>
       </div>
-      <Card>
-        <CardContent className="space-y-4 pt-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                onClick={() => {
-                  if (at >= end) setAt(start)
-                  setPlaying((p) => at >= end || !p)
-                }}
-              >
-                {playing && at < end ? <Pause /> : <Play />}
-                {playing && at < end ? "Pause" : "Play"}
-              </Button>
-              <Button
-                size="icon-sm"
-                variant="outline"
-                aria-label="Reset time"
-                onClick={() => {
-                  setAt(start)
-                  setPlaying(false)
-                }}
-              >
-                <RotateCcw />
-              </Button>
-              <span className="ml-2 font-mono text-xl">{clock(at)}</span>
-              <span className="text-xs text-muted-foreground">SGT</span>
-              <div
-                className="flex gap-1"
-                role="group"
-                aria-label="Playback speed"
-              >
-                {[1, 5, 15, 60].map((value) => (
-                  <Button
-                    key={value}
-                    size="sm"
-                    variant={speed === value ? "secondary" : "ghost"}
-                    aria-pressed={speed === value}
-                    aria-label={`${value}× playback speed`}
-                    onClick={() => setSpeed(value)}
-                  >
-                    {value}×
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setAt(start + 216)
-                  setPlaying(false)
-                }}
-              >
-                06:03:36 · Dwell
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setAt(start + 240)
-                  setPlaying(false)
-                }}
-              >
-                06:04 · Travel
-              </Button>
-              <Button
-                size="icon-sm"
-                variant="outline"
-                aria-label="Replay a passenger exchange"
-                title="Passenger exchange: 07:06:45"
-                onClick={() => {
-                  setService("132")
-                  setAt(start + 4005)
-                  setExtent("neighborhood")
-                  setCameraVersion((v) => v + 1)
-                  setPlaying(false)
-                }}
-              >
-                <LogIn />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setAt(start + 7200)
-                  setPlaying(false)
-                }}
-              >
-                08:00 · Peak
-              </Button>
-            </div>
-          </div>
-          <Slider
-            aria-label="Replay time"
-            min={start}
-            max={end}
-            step={1}
-            value={[at]}
-            onValueChange={(value) => {
-              setAt(Array.isArray(value) ? (value[0] ?? start) : value)
-              setPlaying(false)
-            }}
-          />
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>06:00</span>
-            <span>07:00</span>
-            <span>08:00</span>
-            <span>09:00</span>
-            <span>10:00</span>
-            <span>11:00</span>
-            <span>12:00</span>
-          </div>
-        </CardContent>
-      </Card>
       <div className="grid gap-3 md:grid-cols-2">
         {routes.map((r) => (
           <div key={r.id} className="text-sm">
@@ -364,9 +201,7 @@ export function SingaporeReplay({
         ))}
       </div>
       <details className="text-xs text-muted-foreground">
-        <summary className="cursor-pointer">
-          Map sources and prototype limits
-        </summary>
+        <summary className="cursor-pointer">Map sources and limits</summary>
         <p className="mt-2 max-w-4xl leading-relaxed">
           Official LTA service KML paths from the supplied 2 October 2026 source
           snapshot. Stops use the supplied geographic network. Land shapes use
@@ -383,9 +218,9 @@ export function SingaporeReplay({
           order. Numbers give exact recorded counts; a question mark means
           missing evidence. They fade completely after three replay minutes.
           These are departure events, not current waiting counts. Only services
-          132 and 159 have been validated for this prototype.
+          132 and 159 have been validated for this visualization.
         </p>
       </details>
-    </main>
+    </section>
   )
 }

@@ -27,12 +27,15 @@ it("investigates current SQLite evidence and refreshes after a record change", a
   const watch = before.watchlist.find((r) => r.service === "132")!
   expect(watch.priority).toBe("Critical")
   expect(watch.holds).toEqual([])
+  expect(
+    before.detail.calls.find((call) => call.id === "NW-20261007-0108-03")
+  ).toMatchObject({ boarded: 10, alighted: 9, queue: 10 })
   const id = watch.peak!.id
   const database = new DatabaseSync(path)
   try {
     database
       .prepare(
-        "UPDATE stop_calls SET queue_after_people = 999 WHERE call_id = ?"
+        "UPDATE stop_calls SET queue_after_people = 999, boarded_people = 0, alighted_people = NULL WHERE call_id = ?"
       )
       .run(id)
   } finally {
@@ -43,7 +46,11 @@ it("investigates current SQLite evidence and refreshes after a record change", a
     id,
     queue: 999,
   })
-  expect(after.detail.calls.find((c) => c.id === id)?.queue).toBe(999)
+  expect(after.detail.calls.find((c) => c.id === id)).toMatchObject({
+    queue: 999,
+    boarded: 0,
+    alighted: null,
+  })
   expect(
     (
       await GET(

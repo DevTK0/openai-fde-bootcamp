@@ -62,6 +62,8 @@ export const planningSourcesSchema = z.object({
       departure: time,
       observed: time,
       queue: count,
+      boarded: count.optional(),
+      alighted: count.optional(),
     })
   ),
   releases: z.array(

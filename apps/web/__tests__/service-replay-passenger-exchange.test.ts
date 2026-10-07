@@ -1,5 +1,5 @@
 import { expect, it } from "vitest"
-import { exchangesAt } from "../app/prototypes/singapore-replay/passenger-exchange"
+import { exchangesAt } from "../components/service-replay/passenger-exchange"
 
 const call = {
   id: "a",

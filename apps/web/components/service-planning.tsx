@@ -7,7 +7,14 @@ import {
   useSyncExternalStore,
   type FormEvent,
 } from "react"
-import { BlenderReplayPreview } from "./blender-replay-preview"
+import dynamic from "next/dynamic"
+import { Slider } from "@workspace/ui/components/slider"
+
+const ServiceReplayMap = dynamic(
+  () =>
+    import("./service-replay/map").then((module) => module.ServiceReplayMap),
+  { ssr: false, loading: () => <p role="status">Loading service map…</p> }
+)
 import { Play, Pause, RefreshCw } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -670,14 +677,19 @@ function Replay({ report }: { report: PlanningReport }) {
     end = planningTime(selection.date, selection.end)
   const [cursor, setCursor] = useState(start)
   const [playing, setPlaying] = useState(false)
+  const [speed, setSpeed] = useState(5)
+  const ended = cursor >= end
   useEffect(() => {
-    if (!playing) return
-    const timer = window.setInterval(
-      () => setCursor((value) => Math.min(end, value + 30)),
-      500
-    )
+    if (!playing || ended) return
+    let previous = performance.now()
+    const timer = window.setInterval(() => {
+      const now = performance.now()
+      const elapsed = Math.min(1, (now - previous) / 1000)
+      previous = now
+      setCursor((value) => Math.min(end, value + elapsed * speed))
+    }, 250)
     return () => window.clearInterval(timer)
-  }, [playing, end])
+  }, [playing, ended, end, speed])
   const replay = useMemo(() => replayAt(detail, cursor), [detail, cursor])
   return (
     <div className="space-y-5">
@@ -685,7 +697,7 @@ function Replay({ report }: { report: PlanningReport }) {
         Replay of recorded events. Queues are last observed values, not
         continuously measured demand. Observations older than 10 minutes are
         labeled stale under a proposed display rule. Between-stop positions are
-        estimates, not live GPS or street geometry.
+        estimates along recorded route geometry, not live GPS.
       </Notice>
       <Card>
         <CardHeader>
@@ -728,36 +740,34 @@ function Replay({ report }: { report: PlanningReport }) {
               setCursor(Math.max(start, Math.min(end, next)))
             }}
           />
-          <span className="text-xs text-muted-foreground">
-            Playback advances 30 recorded seconds every half second.
-          </span>
+          <div role="group" aria-label="Playback speed" className="flex gap-1">
+            {[1, 5, 15, 60].map((value) => (
+              <Button
+                key={value}
+                size="sm"
+                variant={speed === value ? "secondary" : "ghost"}
+                aria-pressed={speed === value}
+                onClick={() => setSpeed(value)}
+              >
+                {value}×
+              </Button>
+            ))}
+          </div>
+          <Slider
+            aria-label="Replay time"
+            className="w-full"
+            min={start}
+            max={end}
+            step={1}
+            value={[cursor]}
+            onValueChange={(value) => {
+              setPlaying(false)
+              setCursor(Array.isArray(value) ? (value[0] ?? start) : value)
+            }}
+          />
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Singapore 3D replay</CardTitle>
-          <CardDescription>
-            Explore roads, buildings, and passenger exchanges in the interactive
-            experimental map. Services 132 and 159 · 7 October 2026 ·
-            06:00–12:00 SGT. This example has its own time and service controls.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Button
-            nativeButton={false}
-            render={
-              <a
-                href="/prototypes/singapore-replay"
-                target="_blank"
-                rel="noreferrer"
-              />
-            }
-          >
-            Open interactive 3D replay
-          </Button>
-        </CardContent>
-      </Card>
-      <BlenderReplayPreview service={selection.service} date={selection.date} />
+      <ServiceReplayMap report={report} at={cursor} />
       <EvidenceTable
         title="Bus states at replay time"
         columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}

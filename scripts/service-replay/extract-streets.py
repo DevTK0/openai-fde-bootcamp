@@ -2,7 +2,7 @@ import requests,math,json,pathlib,concurrent.futures
 import mapbox_vector_tile
 from shapely.geometry import shape,box,mapping
 from shapely import make_valid
-out=pathlib.Path('apps/web/public/prototype-map'); cache=pathlib.Path('.audit/vector-tiles');cache.mkdir(parents=True,exist_ok=True);out.mkdir(parents=True,exist_ok=True)
+out=pathlib.Path('apps/web/public/service-replay'); cache=pathlib.Path('.audit/vector-tiles');cache.mkdir(parents=True,exist_ok=True);out.mkdir(parents=True,exist_ok=True)
 meta=requests.get('https://tiles.openfreemap.org/planet',timeout=30).json(); template=meta['tiles'][0]
 (out/'source.json').write_text(json.dumps({'provider':'OpenFreeMap','source':'OpenStreetMap contributors','licence':'ODbL','url':'https://www.openstreetmap.org/copyright','tilejson':meta,'detailBounds':[103.78,1.26,103.94,1.415]},indent=2))
 def tile(lon,lat,z):return (int((lon+180)/360*2**z),int((1-math.asinh(math.tan(math.radians(lat)))/math.pi)/2*2**z))

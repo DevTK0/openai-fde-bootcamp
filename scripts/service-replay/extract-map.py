@@ -39,5 +39,5 @@ for service in ['132','159']:
   assert all(a['distance']<=b['distance'] for a,b in zip(stops,stops[1:])),route['id']
   routes.append({'id':route['id'],'service':service,'direction':direction,'origin':route['origin'],'destination':route['destination'],'points':points,'distances':distances,'stops':stops})
 out={'land':land,'labels':labels,'routes':routes}
-pathlib.Path('apps/web/app/prototypes/singapore-replay/map-data.json').write_text(json.dumps(out,separators=(',',':')))
+pathlib.Path('apps/web/components/service-replay/map-data.json').write_text(json.dumps(out,separators=(',',':')))
 print(len(land),'land polygons;',len(routes),'validated ordered paths')
