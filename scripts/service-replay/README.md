@@ -54,3 +54,11 @@ Fleet overview includes a Service history map for all services on a selected ope
 Verify Fleet overview at 07:30 on 16 October 2026, change the operating date, and exercise play/pause, event seeking and the time scrubber. Check that all 24 services remain included and that changing vehicle and usage-period filters does not filter the service map. These are historical exercise records, and movement between observations remains estimated.
 
 Passenger info and Bus stops toggles independently control departure overlays and stop circles. Both start hidden in Fleet history and visible in the single-service Planning replay. Bus labels remain on the map; the service legend and expandable source notes are omitted. Source provenance and interpretation limits remain documented here, with geographic attribution on the map.
+
+## Scheduled service
+
+Operations / Day schedule uses the same map and player with a separate scheduled-trip model. `/api/scheduled-service?date=YYYY-MM-DD` reads planned vehicle and crew assignments and scheduled departure/arrival times from SQLite. It does not read actual journey times or stop calls. Dates are limited to the operating calendar; the supplied records cover synthetic weekday morning departures on 5–16 October 2026.
+
+Scheduled positions interpolate by distance along the route between scheduled departure and arrival. Buses appear at departure and disappear at arrival. There are no invented intermediate arrival times, dwell periods, passenger counts, delays, or readiness claims. Incomplete or reversed journey times and routes with missing stops are not animated. The Bus stops toggle remains available; passenger overlays are absent. Source tables beneath the map retain their existing search and import controls across all dates.
+
+Verify a busy time such as 07:30, play/pause, next event and date switching. Confirm Fleet history still offers passenger overlays. Tests change actual vehicle/timing records and delete stop calls without changing the schedule response, and check movement boundaries and incomplete evidence.

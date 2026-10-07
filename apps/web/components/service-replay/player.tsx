@@ -7,7 +7,10 @@ import { ButtonGroup } from "@workspace/ui/components/button-group"
 import { Slider } from "@workspace/ui/components/slider"
 import { Card, CardContent } from "@workspace/ui/components/card"
 import { PlanningTimePicker } from "../planning-time-picker"
-import { replayEventTimes, type PlanningDetail } from "@/lib/service-planning"
+import {
+  serviceEventTimes,
+  type ServiceMapDetail,
+} from "@/lib/scheduled-service"
 const ServiceReplayMap = dynamic(
   () => import("./map").then((module) => module.ServiceReplayMap),
   { ssr: false, loading: () => <p role="status">Loading service map…</p> }
@@ -22,7 +25,7 @@ export function ReplayPlayer({
   initialAt,
   children,
 }: {
-  detail: PlanningDetail
+  detail: ServiceMapDetail
   date: string
   start: number
   end: number
@@ -45,7 +48,7 @@ export function ReplayPlayer({
     return () => window.clearInterval(timer)
   }, [playing, ended, end, speed])
   const events = useMemo(
-    () => replayEventTimes(detail, start, end),
+    () => serviceEventTimes(detail, start, end),
     [detail, start, end]
   )
   const previous = events.filter((at) => at < cursor).at(-1) ?? start

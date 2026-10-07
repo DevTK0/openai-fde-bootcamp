@@ -1,3 +1,4 @@
+import { scheduledServiceSchema } from "./scheduled-service"
 import { queryDatabase } from "./database"
 import {
   buildPlanningReport,
@@ -76,7 +77,7 @@ export async function getPlanningReport(
   )
 }
 
-function replayQueries(date: string) {
+function networkQueries() {
   return [
     {
       sql: `SELECT route_id AS id, service_no AS service, direction, service_name AS name, origin_stop_id AS origin FROM routes ORDER BY route_id`,
@@ -86,6 +87,12 @@ function replayQueries(date: string) {
       p.stop_order < (SELECT max(last.stop_order) FROM route_stops last WHERE last.route_id = p.route_id) AS boarding, s.latitude, s.longitude
       FROM route_stops p LEFT JOIN stops s USING(stop_id) ORDER BY p.route_id, p.stop_order`,
     },
+  ]
+}
+
+function replayQueries(date: string) {
+  return [
+    ...networkQueries(),
     {
       sql: `SELECT trip_id AS id, service_no AS service, route_id AS route, actual_vehicle_id AS vehicle, actual_crew_id AS crew,
       origin_stop_id AS origin, destination_stop_id AS destination, unixepoch(scheduled_departure_at) AS scheduled,
@@ -107,4 +114,21 @@ export async function getServiceHistory(date: string, signal?: AbortSignal) {
     signal
   )
   return planningDetailSchema.parse({ routes, positions, trips, calls })
+}
+
+export async function getScheduledService(date: string, signal?: AbortSignal) {
+  const [routes, positions, plannedTrips] = await queryDatabase(
+    [
+      ...networkQueries(),
+      {
+        sql: `SELECT trip_id AS id, service_no AS service, route_id AS route,
+      planned_vehicle_id AS vehicle, planned_crew_id AS crew,
+      unixepoch(scheduled_departure_at) AS departure, unixepoch(scheduled_arrival_at) AS arrival
+      FROM trips WHERE service_date = ? ORDER BY scheduled_departure_at, trip_id`,
+        parameters: [date],
+      },
+    ],
+    signal
+  )
+  return scheduledServiceSchema.parse({ routes, positions, plannedTrips })
 }

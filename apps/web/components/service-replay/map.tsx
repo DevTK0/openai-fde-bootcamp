@@ -2,8 +2,13 @@
 
 import { useMemo, useState } from "react"
 import { LogIn, LogOut, UserRoundX, Users, MapPin } from "lucide-react"
-import type { PlanningDetail } from "@/lib/service-planning"
-import { busPositions, prepareBusTrips, point } from "./geometry"
+import type { ServiceMapDetail } from "@/lib/scheduled-service"
+import {
+  busPositions,
+  prepareBusTrips,
+  scheduledBusPositions,
+  point,
+} from "./geometry"
 import { exchangesAt } from "./passenger-exchange"
 import {
   Tooltip,
@@ -18,23 +23,31 @@ export function ServiceReplayMap({
   detail,
   at,
 }: {
-  detail: PlanningDetail
+  detail: ServiceMapDetail
   at: number
 }) {
+  const scheduled = "plannedTrips" in detail
   const [selected, setSelected] = useState("")
   const routes = useMemo(() => buildRoutes(detail), [detail])
   const services = [
     ...new Set(detail.routes.map((route) => route.service)),
   ].sort((a, b) => a.localeCompare(b, "en", { numeric: true }))
   const network = services.length > 1
-  const [showPassengers, setShowPassengers] = useState(!network)
+  const [showPassengers, setShowPassengers] = useState(!network && !scheduled)
   const [showStops, setShowStops] = useState(!network)
-  const trips = useMemo(() => prepareBusTrips(detail, routes), [detail, routes])
+  const trips = useMemo(
+    () => ("plannedTrips" in detail ? [] : prepareBusTrips(detail, routes)),
+    [detail, routes]
+  )
   const state = useMemo(() => {
-    const buses = busPositions(trips, at)
+    const buses =
+      "plannedTrips" in detail
+        ? scheduledBusPositions(detail, routes, at)
+        : busPositions(trips, at)
+    const calls = "plannedTrips" in detail ? [] : detail.calls
     const exchanges = exchangesAt(
-      detail.calls,
-      detail.calls.map((call) => ({
+      calls,
+      calls.map((call) => ({
         id: call.id,
         boarded: call.boarded ?? null,
         alighted: call.alighted ?? null,
@@ -75,14 +88,16 @@ export function ServiceReplayMap({
   return (
     <section aria-label="Service replay map" className="space-y-4">
       <div aria-label="Map layers" className="flex flex-wrap gap-2">
-        <Toggle
-          variant="outline"
-          pressed={showPassengers}
-          onPressedChange={setShowPassengers}
-          aria-label="Passenger info"
-        >
-          <Users /> Passenger info
-        </Toggle>
+        {!scheduled && (
+          <Toggle
+            variant="outline"
+            pressed={showPassengers}
+            onPressedChange={setShowPassengers}
+            aria-label="Passenger info"
+          >
+            <Users /> Passenger info
+          </Toggle>
+        )}
         <Toggle
           variant="outline"
           pressed={showStops}

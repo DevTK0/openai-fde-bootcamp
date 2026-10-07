@@ -35,7 +35,7 @@ export const dashboardWorkspaces = [
       {
         id: "day-schedule",
         label: "Day schedule",
-        description: "Published timetables, recorded trips, and stop calls.",
+        description: "Scheduled service simulation, timetables, trips, and stop calls.",
       },
       {
         id: "reliability",

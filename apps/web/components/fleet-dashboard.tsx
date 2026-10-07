@@ -1,6 +1,6 @@
 "use client"
 
-import { FleetServiceHistory } from "./fleet-service-history"
+import { ServiceHistory } from "./service-history"
 import { ServicePlanning } from "./service-planning"
 import { DatasetPicker } from "@/components/dataset-picker"
 import { useDashboard } from "@/components/dashboard-provider"
@@ -189,7 +189,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           detail="Recorded use in the selected period"
         />
       </div>
-      <FleetServiceHistory />
+      <ServiceHistory />
       <SourcePicker
         tables={data.tables.filter(
           (t) => t.sheet === "Fleet" || t.sheet === "Monthly usage"
@@ -519,16 +519,19 @@ function DashboardReport({
       )
     case "day-schedule":
       return (
-        <OperationsSources
-          key={view}
-          initialTable="trips"
-          allowedTables={[
-            "trips",
-            "timetable_records",
-            "stop_calls",
-            "service_calendar",
-          ]}
-        />
+        <div className="space-y-6">
+          <ServiceHistory mode="scheduled" />
+          <OperationsSources
+            key={view}
+            initialTable="trips"
+            allowedTables={[
+              "trips",
+              "timetable_records",
+              "stop_calls",
+              "service_calendar",
+            ]}
+          />
+        </div>
       )
     case "control-log":
       return (

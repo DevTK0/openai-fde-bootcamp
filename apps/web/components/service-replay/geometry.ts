@@ -116,3 +116,42 @@ export function busPositions(
     return []
   })
 }
+
+export function scheduledBusPositions(
+  detail: import("@/lib/scheduled-service").ScheduledService,
+  routes: Route[],
+  at: number
+) {
+  const byRoute = new Map(routes.map((route) => [route.id, route]))
+  return detail.plannedTrips.flatMap((trip) => {
+    const route = byRoute.get(trip.route)
+    if (
+      !route ||
+      trip.departure === null ||
+      trip.arrival === null ||
+      trip.arrival <= trip.departure ||
+      at < trip.departure ||
+      at >= trip.arrival
+    )
+      return []
+    const first = route.stops[0]
+    const last = route.stops.at(-1)
+    if (!first || !last || route.missingStops > 0) return []
+    const distance =
+      first.distance +
+      ((last.distance - first.distance) * (at - trip.departure)) /
+        (trip.arrival - trip.departure)
+    return [
+      {
+        ...along(route, distance),
+        heading: routeHeading(route, distance),
+        service: trip.service,
+        trip: trip.id,
+        vehicle: trip.vehicle,
+        state: "Estimated scheduled position",
+        evidence: trip.id,
+        estimated: true,
+      },
+    ]
+  })
+}
