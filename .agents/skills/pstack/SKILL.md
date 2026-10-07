@@ -15,6 +15,8 @@ The Principles section below grounds every trigger. In your reply, name each pri
 
 Remaining triggers:
 
+- A transcript or meeting notes plus a prompt to plan, document, or implement a feature → **transcript-to-feature**. It extracts a source-grounded brief and returns to the requested delivery workflow without expanding authorization. General meeting summaries do not need this route.
+
 - Asked to import, port, adapt, or update upstream pstack skills or playbooks → **Adapting skills**. Its instructions are self-contained; `.agents/skills/README.md` is not required.
 - Asked to run autonomously until a stated outcome, "do not stop until X", or "/loop until X" → **Autonomous run**. Explicit autopilot queues retain their own playbooks. Importing this playbook does not start a run.
 - Explicit "figure it out", a large migration, or work with no narrower matching playbook → the **figure-it-out** skill. It designs a scoped workflow under this entrypoint's existing authority. Prefer Adapting skills for skill imports and the lifecycle playbooks for PR work.

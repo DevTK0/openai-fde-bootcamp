@@ -19,7 +19,7 @@ our repository prompt alias, not a new built-in Codex command. If a client
 intercepts unknown slash commands, use `$pstack` or explicitly ask the agent to
 read `.agents/skills/pstack/SKILL.md`. See the [official skill discovery documentation](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
 
-All 36 skills (the entrypoint, 11 supporting skills, and 24 principles) are
+All 37 skills (the entrypoint, 12 supporting skills, and 24 principles) are
 stored directly in `.agents/skills/`. Playbooks are loaded
 by `/pstack`. Edit the skill sources in place. The skills are available to Codex on the next turn.
 No global installation, model configuration, or companion plugin is required.
@@ -40,6 +40,7 @@ All **24 principles** are included. Their index and triggers are in
 | [typescript-best-practices](typescript-best-practices/SKILL.md) | Apply the type-system principles to TypeScript. |
 | [swarm](swarm/SKILL.md) | Coordinate independent workers and aggregate evidence-backed coverage. |
 | [figure-it-out](figure-it-out/SKILL.md) | Design an auditable workflow when no narrower playbook fits. |
+| [transcript-to-feature](transcript-to-feature/SKILL.md) | Turn a transcript and steering prompt into a brief, then carry out the requested pstack workflow. |
 | [how](how/SKILL.md) | Trace the system before changing it. |
 | [architect](architect/SKILL.md) | Sketch usage, types, and boundaries before implementation. |
 | [tdd](tdd/SKILL.md) | Failing-before, passing-after evidence for cheap regression tests. |
@@ -56,7 +57,8 @@ The **7 playbooks** cover:
 | Skill maintenance | [adapting skills](pstack/playbooks/adapting-skills.md) |
 | PR lifecycle | [opening a PR](pstack/playbooks/opening-a-pr.md), [babysit](pstack/playbooks/babysit.md), [shipping](pstack/playbooks/shipping.md) |
 
-There are **11 supporting skills**, plus the entrypoint and all 24 principles.
+There are **12 supporting skills**, plus the entrypoint and all 24 principles.
+Count the skill files with `rg --files --hidden .agents/skills -g SKILL.md | wc -l`.
 The verification skills are generators and maintenance workflows; no app-specific
 `verify-*` skill has been generated yet. Invoke `/pstack create a verification
 skill for apps/web` to run that workflow separately.
