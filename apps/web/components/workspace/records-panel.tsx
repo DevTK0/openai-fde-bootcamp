@@ -1,4 +1,5 @@
 "use client"
+import { Plot } from "@workspace/ui/components/report-chart"
 import { useState } from "react"
 import {
   Card,
@@ -35,15 +36,29 @@ export function RecordsPanel({
   initialTable: string
 }) {
   const [tableId, setTableId] = useState(
-    initialTable || analysis.tables[0]?.id || ""
+    analysis.tables.some((item) => item.id === initialTable)
+      ? initialTable
+      : analysis.tables[0]?.id || ""
   )
   const [search, setSearch] = useState("")
   const [page, setPage] = useState(0)
+  const [numericColumn, setNumericColumn] = useState("")
   const resource = useResource<EvidenceTablePage>(
     `/api/workspace/${analysis.revision}?${scope}&view=table&table=${encodeURIComponent(tableId)}&q=${encodeURIComponent(search)}&page=${page}`
   )
   const table = analysis.tables.find((item) => item.id === tableId)
   const source = analysis.sources.find((item) => item.id === table?.sourceId)
+  const numericColumns =
+    resource.status === "ready"
+      ? resource.data.columns.filter((column) =>
+          resource.data.rows.some(
+            (row) => typeof row.values[column] === "number"
+          )
+        )
+      : []
+  const chartColumn = numericColumns.includes(numericColumn)
+    ? numericColumn
+    : (numericColumns[0] ?? "")
   return (
     <Card id="records" className="min-w-0 shadow-none">
       <CardHeader>
@@ -95,6 +110,31 @@ export function RecordsPanel({
         {resource.status === "error" && <p role="alert">{resource.error}</p>}
         {resource.status === "ready" && (
           <>
+            {chartColumn && (
+              <div className="space-y-3">
+                <Pick
+                  label="Chart numeric column"
+                  value={chartColumn}
+                  options={numericColumns.map((column) => ({
+                    value: column,
+                    label: column,
+                  }))}
+                  onChange={setNumericColumn}
+                />
+                <Plot
+                  title="Record comparison"
+                  description={`${chartColumn} as supplied, current page only. One bar per row; no aggregation. Check units and evidence class before comparing.`}
+                  rows={resource.data.rows.map((row) => ({
+                    name: row.id,
+                    value:
+                      typeof row.values[chartColumn] === "number"
+                        ? row.values[chartColumn]
+                        : null,
+                  }))}
+                  series={[{ key: "value", label: chartColumn }]}
+                />
+              </div>
+            )}
             <div className="max-h-96 overflow-auto rounded-md border">
               <Table>
                 <TableHeader>

@@ -35,6 +35,11 @@ export function AnalysisView({
   const metrics = analysis.metrics.filter((metric) => ids.includes(metric.id))
   return (
     <div className="space-y-5">
+      <p className="text-xs text-muted-foreground">
+        Descriptive indicators for the selected scope. These do not answer the
+        causal question above. Workshop, festival and relief capacity require
+        the planning records in the record inspector.
+      </p>
       <div className="grid gap-3 md:grid-cols-3">
         {metrics.map((metric) => (
           <Card

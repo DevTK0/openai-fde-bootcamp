@@ -223,7 +223,10 @@ export function Workspace({
                         variant={problem.id === item.id ? "secondary" : "ghost"}
                         className="h-auto w-full justify-start px-3 py-2.5 text-left text-xs leading-relaxed whitespace-normal"
                         aria-pressed={problem.id === item.id}
-                        onClick={() => setProblemId(item.id)}
+                        onClick={() => {
+                          setProblemId(item.id)
+                          setTable({ id: "", serial: 0 })
+                        }}
                       >
                         {item.title}
                       </Button>
@@ -395,10 +398,22 @@ export function Workspace({
                   problem={problem}
                 />
                 <RecordsPanel
-                  key={table.serial}
+                  key={`${problem.id}-${table.serial}`}
                   analysis={analysis.data}
                   scope={scope}
-                  initialTable={table.id}
+                  initialTable={
+                    table.id ||
+                    [...analysis.data.tables].sort((a, b) => {
+                      const score = (title: string) =>
+                        problem.query
+                          .split(" ")
+                          .filter((term) =>
+                            title.toLowerCase().includes(term.toLowerCase())
+                          ).length
+                      return score(b.title) - score(a.title)
+                    })[0]?.id ||
+                    ""
+                  }
                 />
               </div>
             )}
