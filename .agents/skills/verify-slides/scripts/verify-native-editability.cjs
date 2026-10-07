@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
+const { restoreSource } = require('./restore-source.cjs');
 const { chromium } = require(process.env.VERIFY_SLIDES_PLAYWRIGHT || 'playwright');
 
 const [baseUrl, evidencePath] = process.argv.slice(2);
@@ -118,15 +119,14 @@ async function run() {
     if (page) await page.screenshot({ path: path.join(evidence, 'failure.png') }).catch(() => {});
   } finally {
     if (browser) await browser.close();
-    const current = await fs.readFile(sourcePath, 'utf8');
-    if (current === original) {
-      await record('Cleanup', 'Source already matches baseline');
-    } else if (current === savedSource || isOwnedSave(current)) {
-      await fs.writeFile(sourcePath, original);
+    try {
+      const result = await restoreSource({ sourcePath, original, savedSource });
       assert.equal(hash(await fs.readFile(sourcePath)), hash(original));
-      await record('Cleanup', { restoredHash: hash(original) });
-    } else {
-      throw new Error(`Source differs beyond this run's heading edit; preserve those changes and restore this run manually using ${evidence}/before.tsx`);
+      await record('Cleanup', { result, restoredHash: hash(original) });
+    } catch (error) {
+      await fs.writeFile(path.join(evidence, 'preserved.tsx'), await fs.readFile(sourcePath));
+      await record('Cleanup preserved changed source', { error: String(error), backup: path.join(evidence, 'before.tsx') });
+      throw error;
     }
   }
   if (failure) throw failure;

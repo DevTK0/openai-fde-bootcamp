@@ -122,10 +122,10 @@ confirm its evidence files still exist after the server stops.
 The executable `scripts/verify-native-editability.cjs` exercises Ridership's
 heading and chart objects through local Playwright. It saves before/after source,
 ARIA snapshots, screenshots, a browser trace, selection state, and an action log.
-It restores the source only when changes remain limited to its selected heading,
+It restores the source only when it exactly matches the recorded native save,
 then confirms the original heading in a fresh browser. Native Save may reformat
-that heading; the rest of the file must remain unchanged. Unexpected edits cause
-a failure and leave the backup available for manual reconciliation.
+that heading; the rest of the file must remain unchanged. Any later edit or a missing saved snapshot causes a failure. The helper preserves
+the current file, a copy in `preserved.tsx`, and the backup for manual reconciliation.
 
 Use this path when local browser testing is requested or the session's browser
 rules permit it. Use an existing Playwright installation if available. Otherwise
@@ -158,6 +158,7 @@ The helper does not launch or stop the app; perform the Launch and Cleanup steps
 Use existing checks from the repository root:
 
 ```bash
+node --test .agents/skills/verify-slides/scripts/restore-source.test.cjs
 pnpm --filter @workspace/slides test
 pnpm check
 ```
