@@ -6,7 +6,17 @@ import { defineConfig } from "vitest/config"
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "native-sqlite-for-tests",
+      enforce: "pre",
+      resolveId(id) {
+        // Vitest 5's client external list omits Node's prefix-only SQLite module.
+        if (id === "node:sqlite") return { id, external: true }
+      },
+    },
+  ],
   resolve: {
     alias: {
       "@": dirname,
