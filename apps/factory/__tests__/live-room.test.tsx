@@ -324,3 +324,49 @@ it.each([false, true])(
     ).toHaveProperty("value", "")
   }
 )
+
+for (const kind of ["segment", "create"]) {
+  it(`keeps one ${kind} after restoring edits and retrying an uncertain save`, async () => {
+    const save = deferredResponse()
+    const ids: string[] = []
+    const stored = new Set<string>()
+    vi.stubGlobal(
+      "fetch",
+      vi.fn<typeof fetch>(async (_url, init) => {
+        if (init?.method === "POST") {
+          const command = commandSchema.parse(JSON.parse(String(init.body)))
+          if (command.kind !== "segment" && command.kind !== "create")
+            throw new Error("Unexpected command")
+          ids.push(command.id)
+          stored.add(command.id)
+          return ids.length === 1 ? save.promise : Response.json(snapshot())
+        }
+        return Response.json(snapshot())
+      })
+    )
+    await connect()
+    const input = screen.getByRole("textbox", {
+      name:
+        kind === "segment"
+          ? "Or add to the transcript"
+          : "New conversation name",
+    })
+    const submit = screen.getByRole("button", {
+      name: kind === "segment" ? "Add to conversation" : "Create conversation",
+    })
+    const text = "I think we can get the software factory to do this"
+    fireEvent.change(input, { target: { value: text } })
+    fireEvent.click(submit)
+    fireEvent.change(input, { target: { value: text + "!" } })
+    fireEvent.change(input, { target: { value: text } })
+    await act(async () =>
+      save.resolve(
+        Response.json({ error: "Response lost after save" }, { status: 503 })
+      )
+    )
+    fireEvent.click(submit)
+    await waitFor(() => expect(ids).toHaveLength(2))
+    expect(stored.size).toBe(1)
+    expect(ids[1]).toBe(ids[0])
+  })
+}

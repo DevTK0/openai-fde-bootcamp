@@ -11,8 +11,26 @@ export async function POST(request: Request) {
     )
   if (Number(request.headers.get("content-length") || 0) > 64000)
     return new Response("SDP offer is too large.", { status: 413 })
-  const sdp = await request.text()
-  if (Buffer.byteLength(sdp) > 64000 || !sdp.startsWith("v=0"))
+  const reader = request.body?.getReader()
+  if (!reader) return new Response("An SDP offer is required.", { status: 400 })
+  const chunks: Uint8Array[] = []
+  let bytes = 0
+  try {
+    while (true) {
+      const chunk = await reader.read()
+      if (chunk.done) break
+      bytes += chunk.value.byteLength
+      if (bytes > 64000) {
+        await reader.cancel()
+        return new Response("SDP offer is too large.", { status: 413 })
+      }
+      chunks.push(chunk.value)
+    }
+  } finally {
+    reader.releaseLock()
+  }
+  const sdp = Buffer.concat(chunks).toString("utf8")
+  if (!sdp.startsWith("v=0"))
     return new Response("A valid SDP offer is required.", { status: 400 })
   const body = new FormData()
   body.set("sdp", sdp)

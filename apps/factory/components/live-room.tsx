@@ -461,7 +461,9 @@ export function LiveRoom() {
                       .then(() => {
                         if (createCommand.current === command) {
                           createCommand.current = null
-                          setTitle("")
+                          setTitle((current) =>
+                            current === command.title ? "" : current
+                          )
                         }
                         setSelected(null)
                       })
@@ -474,7 +476,6 @@ export function LiveRoom() {
                     maxLength={160}
                     value={title}
                     onChange={(event) => {
-                      createCommand.current = null
                       setTitle(event.target.value)
                     }}
                   />
@@ -635,7 +636,9 @@ export function LiveRoom() {
                         void mutate(command)
                           .then(() => {
                             if (typedCommand.current === command) {
-                              setDraft("")
+                              setDraft((current) =>
+                                current === command.text ? "" : current
+                              )
                               typedCommand.current = null
                             }
                           })
@@ -651,7 +654,6 @@ export function LiveRoom() {
                         maxLength={12000}
                         value={draft}
                         onChange={(event) => {
-                          typedCommand.current = null
                           setDraft(event.target.value)
                         }}
                       />
