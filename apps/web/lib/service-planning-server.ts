@@ -26,7 +26,7 @@ export async function getPlanningReport(
       },
       {
         sql: `SELECT p.route_id AS route, p.stop_order AS "order", p.stop_id AS stop, COALESCE(s.description, p.stop_id) AS name,
-      p.stop_order < (SELECT max(last.stop_order) FROM route_stops last WHERE last.route_id = p.route_id) AS boarding
+      p.stop_order < (SELECT max(last.stop_order) FROM route_stops last WHERE last.route_id = p.route_id) AS boarding, s.latitude, s.longitude
       FROM route_stops p LEFT JOIN stops s USING(stop_id) ORDER BY p.route_id, p.stop_order`,
       },
       {

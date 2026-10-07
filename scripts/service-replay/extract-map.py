@@ -1,43 +1,66 @@
-import argparse, json, math, re, pathlib, xml.etree.ElementTree as E
-parser=argparse.ArgumentParser(description='Extract the validated Singapore replay geography')
+"""Extract source geography without baking services or stop positions into the UI."""
+import argparse
+import hashlib
+import json
+import pathlib
+import re
+import urllib.request
+import xml.etree.ElementTree as ET
+
+parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--maps', type=pathlib.Path, required=True)
-parser.add_argument('--kml', type=pathlib.Path, required=True)
-args=parser.parse_args()
-source=args.maps
-kml=args.kml
-data=json.loads((source/'network-map-data.json').read_text()); p=data['meta']['projection']
-def project(lon,lat): return [round((lon-p['lon0'])*p['cos']*p['scale'],5),round(-(lat-p['lat0'])*p['scale'],5)]
-r=E.parse(source/'lionlink-operations-network-map.svg').getroot()
-land=[]; labels=[]
-for g in r.iter():
- if g.get('id')=='geography':
-  for path in g:
-   for part in re.findall(r'M([^M]+)',path.get('d','')):
-    pts=[[float(x)-700,float(y)-450] for x,y in re.findall(r'(-?[\d.]+),(-?[\d.]+)',part)]
-    if len(pts)>2: land.append(pts)
- if g.get('id')=='place-labels':
-  for t in g.iter():
-   if t.tag.endswith('text'): labels.append({'name':''.join(t.itertext()),'point':[float(t.get('x'))-700,float(t.get('y'))-450]})
-routes=[]
-for service in ['132','159']:
- for direction in [1,2]:
-  raw=E.parse(kml/f'LTA-KML-{service}-{direction}.kml')
-  coords=raw.find('.//{*}LineString/{*}coordinates').text.split()
-  points=[project(*map(float,c.split(',')[:2])) for c in coords]
-  distances=[0]
-  for a,b in zip(points,points[1:]): distances.append(distances[-1]+math.dist(a,b))
-  route=data['routes'][f'B{service}_{direction}']; stops=[]
-  for stop in route['stops']:
-   info=data['stops'][stop['code']]; q=project(*info['coord']); best=None
-   for i,(a,b) in enumerate(zip(points,points[1:])):
-    dx,dy=b[0]-a[0],b[1]-a[1]; length=dx*dx+dy*dy
-    t=max(0,min(1,((q[0]-a[0])*dx+(q[1]-a[1])*dy)/length)) if length else 0
-    foot=[a[0]+t*dx,a[1]+t*dy]; err=math.dist(q,foot)
-    hit=(err,distances[i]+t*math.sqrt(length),foot)
-    if best is None or err<best[0]: best=hit
-   stops.append({'order':stop['seq'],'id':stop['code'],'name':info['name'],'point':q,'distance':best[1],'offsetMetres':best[0]*111195/p['scale']})
-  assert all(a['distance']<=b['distance'] for a,b in zip(stops,stops[1:])),route['id']
-  routes.append({'id':route['id'],'service':service,'direction':direction,'origin':route['origin'],'destination':route['destination'],'points':points,'distances':distances,'stops':stops})
-out={'land':land,'labels':labels,'routes':routes}
-pathlib.Path('apps/web/components/service-replay/map-data.json').write_text(json.dumps(out,separators=(',',':')))
-print(len(land),'land polygons;',len(routes),'validated ordered paths')
+parser.add_argument('--kml', type=pathlib.Path, required=True, help='Download cache')
+args = parser.parse_args()
+args.kml.mkdir(parents=True, exist_ok=True)
+network = json.loads((args.maps / 'network-map-data.json').read_text())
+projection = network['meta']['projection']
+
+def project(lon, lat):
+    return [round((lon-projection['lon0'])*projection['cos']*projection['scale'], 5),
+            round(-(lat-projection['lat0'])*projection['scale'], 5)]
+
+def sources(value):
+    if isinstance(value, dict):
+        if str(value.get('source_id', '')).startswith('LTA-KML-'):
+            yield value
+        for child in value.values():
+            yield from sources(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from sources(child)
+
+registry = json.loads((args.maps / 'map-source-registry.json').read_text())
+shapes = []
+provenance = []
+for source in sources(registry):
+    file = args.kml / (source['source_id'] + '.kml')
+    if not file.exists():
+        file.write_bytes(urllib.request.urlopen(source['url'], timeout=45).read())
+    raw = file.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != source['sha256']:
+        raise ValueError(f"Source hash mismatch: {source['source_id']}")
+    _, _, service, direction = source['source_id'].split('-')
+    parts = []
+    for line in ET.fromstring(raw).findall('.//{*}LineString/{*}coordinates'):
+        parts.append([project(*map(float, coord.split(',')[:2])) for coord in line.text.split()])
+    shapes.append({'service': service, 'direction': int(direction), 'parts': parts})
+    provenance.append({key: source[key] for key in ('source_id', 'url', 'sha256')})
+
+land, labels = [], []
+for group in ET.parse(args.maps / 'lionlink-operations-network-map.svg').getroot().iter():
+    if group.get('id') == 'geography':
+        for path in group:
+            for part in re.findall(r'M([^M]+)', path.get('d', '')):
+                points = [[float(x)-700, float(y)-450] for x, y in re.findall(r'(-?[\d.]+),(-?[\d.]+)', part)]
+                if len(points) > 2:
+                    land.append(points)
+    if group.get('id') == 'place-labels':
+        for label in group.iter():
+            if label.tag.endswith('text'):
+                labels.append({'name': ''.join(label.itertext()), 'point': [float(label.get('x'))-700, float(label.get('y'))-450]})
+
+out = pathlib.Path('apps/web/components/service-replay')
+(out / 'map-data.json').write_text(json.dumps({'land': land, 'labels': labels, 'projection': projection}, separators=(',', ':')))
+(out / 'road-shapes.json').write_text(json.dumps(shapes, separators=(',', ':')))
+pathlib.Path('apps/web/public/service-replay/routes-source.json').write_text(json.dumps({'snapshot': registry['snapshot_local_date'], 'sources': provenance}, indent=2)+'\n')
+print(f'{len(shapes)} route directions from {len(set(s["service"] for s in shapes))} services; all source hashes verified')

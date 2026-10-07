@@ -2,7 +2,7 @@ import data from "./map-data.json"
 import type { PlanningDetail } from "@/lib/service-planning"
 
 export const mapData = data
-export type Route = (typeof data.routes)[number]
+import type { Route } from "./route-geometry"
 export type Point = { x: number; z: number }
 export function point(values: number[]): Point {
   return { x: values[0] ?? 0, z: values[1] ?? 0 }
@@ -43,10 +43,11 @@ export function routeHeading(
 export function busPositions(
   detail: PlanningDetail,
   at: number,
-  roads: boolean
+  roads: boolean,
+  routes: Route[]
 ) {
   return detail.trips.flatMap((trip) => {
-    const route = data.routes.find((r) => r.id === trip.route)
+    const route = routes.find((r) => r.id === trip.route)
     if (!route) return []
     const calls = detail.calls
       .filter((c) => c.trip === trip.id)

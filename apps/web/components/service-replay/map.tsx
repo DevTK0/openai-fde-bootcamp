@@ -4,13 +4,14 @@ import { useMemo, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { LogIn, LogOut, UserRoundX } from "lucide-react"
 import { replayAt, type PlanningReport } from "@/lib/service-planning"
-import { busPositions, mapData, point } from "./geometry"
+import { busPositions, point } from "./geometry"
 import { exchangesAt } from "./passenger-exchange"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
+import { buildRoutes } from "./route-geometry"
 import { Scene, type Marker } from "./scene"
 
 export function ServiceReplayMap({
@@ -28,8 +29,9 @@ export function ServiceReplayMap({
     "service"
   )
   const [selected, setSelected] = useState("")
+  const routes = useMemo(() => buildRoutes(report.detail), [report.detail])
   const state = useMemo(() => {
-    const buses = busPositions(report.detail, at, roads)
+    const buses = busPositions(report.detail, at, roads, routes)
     const queues = replayAt(report.detail, at).queues
     const exchanges = exchangesAt(
       report.detail.calls,
@@ -48,7 +50,7 @@ export function ServiceReplayMap({
       count: null,
     }))
     for (const queue of queues) {
-      const stop = mapData.routes
+      const stop = routes
         .find((r) => r.id === queue.route)
         ?.stops.find((s) => s.order === queue.order)
       if (stop)
@@ -61,17 +63,25 @@ export function ServiceReplayMap({
         })
     }
     return { buses, queues, markers }
-  }, [report, at, roads])
-  const routes = mapData.routes.filter((r) => r.service === service)
-  if (!routes.length)
+  }, [report, at, roads, routes])
+  if (routes.every((route) => route.stops.length === 0))
     return (
       <p className="text-sm text-muted-foreground">
-        Road geometry is available for services 132 and 159. Use the recorded
-        evidence below for this service.
+        No stop coordinates are available for this service. Recorded evidence
+        remains available below.
       </p>
     )
   return (
     <section aria-label="Service replay map" className="space-y-4">
+      {routes.some(
+        (r) => r.legs.some((leg) => leg.kind === "direct") || r.missingStops > 0
+      ) && (
+        <p className="text-sm text-muted-foreground">
+          Amber segments are direct stop-to-stop estimates where road geometry
+          is missing or disconnected. Stops without coordinates cannot be placed
+          on the map.
+        </p>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <Button
@@ -145,6 +155,7 @@ export function ServiceReplayMap({
       <div className="space-y-3">
         <div className="space-y-3">
           <Scene
+            routes={routes}
             selected={selected}
             cameraVersion={cameraVersion}
             service={service}
@@ -217,8 +228,10 @@ export function ServiceReplayMap({
           icon groups show boarded, alighted and left-behind totals, in that
           order. Numbers give exact recorded counts; a question mark means
           missing evidence. They fade completely after three replay minutes.
-          These are departure events, not current waiting counts. Only services
-          132 and 159 have been validated for this visualization.
+          These are departure events, not current waiting counts. Routes are
+          assembled from the selected service’s ordered database stops and
+          available road geometry. Connections along road geometry are
+          estimated, including terminal connectors and ambiguous road junctions.
         </p>
       </details>
     </section>

@@ -2,7 +2,7 @@
 
 Open **Planning → Service planning → Timeline & replay**. The Three.js map uses the existing replay clock, selected service, date, observation window and database report. The scene loads only when the replay tab is opened.
 
-Boarded, alighted and remaining counts come from the same SQLite stop-call records as the evidence tables. The operating records are synthetic. There is no separate example date or service selector. Services without validated geometry retain the evidence tables and show a coverage notice.
+Boarded, alighted and remaining counts come from the same SQLite stop-call records as the evidence tables. The operating records are synthetic. There is no separate example date or service selector. Routes use the current database stop order and coordinates, with no service allowlist. New services render immediately when stop coordinates are available.
 
 ## Behavior
 
@@ -14,13 +14,17 @@ Boarded, alighted and remaining counts come from the same SQLite stop-call recor
 
 ## Geography and limits
 
-Four official LTA route paths match the supplied snapshot hashes, with monotonically ordered stop projections. Only these services have been validated. URA Master Plan 2019 subzones provide the land backdrop.
+The committed LTA shapes cover all 24 database services and 36 directions. Their source hashes match the supplied registry. URA Master Plan 2019 subzones provide the land backdrop.
+
+At runtime, the route builder uses a graph of each service/direction's source line segments. It joins multipart geometry at shared vertices, projects the current database stops onto that graph, and finds paths between successive stop occurrences. The stop sequence determines travel direction, including repeated visits on loops. Intermediate movement and junction choices are estimates, not measured trajectories. Original stop coordinates remain unchanged. A 250 m display tolerance limits the distance of a stop-to-road connector.
+
+Without a source shape or a connected path, the builder uses an amber direct estimate for that leg. Missing coordinates omit the affected stop and its bus position, with an explicit notice. Add new source geometry through the registry and extraction script for road-following paths; no renderer changes or per-service branches are required. See `apps/web/public/service-replay/routes-source.json` for source URLs and hashes.
 
 The committed city extract comes from OpenFreeMap's `20261004_113936_pt` OpenStreetMap snapshot. Roads cover Singapore. Buildings, parks and water details cover the central/northeast corridor, 103.78–103.94 E and 1.26–1.415 N. Building heights use tile estimates with an 8 m fallback. Symbols are enlarged for readability. The scene does not represent live GPS or photorealistic buildings.
 
 Attribution appears on the map. See `apps/web/public/service-replay/source.json`, [OpenStreetMap copyright](https://www.openstreetmap.org/copyright), and [OpenFreeMap](https://openfreemap.org/).
 
-The city asset loads as one file, about 17 MB before transfer compression. Camera presets rebuild the scene. Streaming visible tiles and broader route coverage remain future work.
+The city asset loads as one file, about 17 MB before transfer compression. Camera presets rebuild the scene. Streaming visible tiles remains future work.
 
 ## Regenerate assets
 
@@ -32,10 +36,10 @@ python3 -m pip install requests mapbox-vector-tile shapely
 python3 scripts/service-replay/extract-streets.py
 ```
 
-The KML directory must contain `LTA-KML-{service}-{direction}.kml` for services 132/159 and directions 1/2. The street extractor downloads the current OpenFreeMap snapshot, caches tiles under `.audit/vector-tiles`, and records provenance. A new snapshot may change the geometry.
+The extractor iterates every LTA KML entry in the supplied registry, downloads missing files to the KML cache, verifies hashes, and preserves all line segments. The street extractor downloads the current OpenFreeMap snapshot, caches tiles under `.audit/vector-tiles`, and records provenance. A new snapshot may change the geometry.
 
 ## Verification
 
-Run `pnpm check`. Focused tests cover passenger counts, departure/expiry boundaries, missing evidence, zero values, distinct directions, bends, endpoints and repeated route vertices.
+Run `pnpm check`. Focused tests cover passenger counts, departure/expiry boundaries, missing evidence, zero values, distinct directions, bends, endpoints and repeated route vertices. A database-wide test builds all 36 routes and 1,353 stop occurrences and checks that every current leg has a connected road path. Synthetic fixtures cover a new service ID, reversed multipart lines, loops, disconnected geometry and missing coordinates.
 
-In the running application, open the replay through Planning. Check both services, the dated passenger exchange, 1× and 5× playback, pause, camera presets, and road-aligned bus headings. At 06:03:36, vehicle NW-V009 dwells at Hougang; at 06:04 it travels toward Blk 302.
+In the running application, open the replay through Planning. Check a two-direction service, a loop and a multipart route such as 261, the dated passenger exchange, 1× and 5× playback, pause, camera presets, and road-aligned bus headings. At 06:03:36, vehicle NW-V009 dwells at Hougang; at 06:04 it travels toward Blk 302.

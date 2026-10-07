@@ -34,6 +34,8 @@ export const planningSourcesSchema = z.object({
       stop: z.string(),
       name: z.string(),
       boarding: z.number(),
+      latitude: z.number().min(-90).max(90).nullable().optional(),
+      longitude: z.number().min(-180).max(180).nullable().optional(),
     })
   ),
   vehicles: z.array(z.object({ id: z.string(), service: z.string() })),

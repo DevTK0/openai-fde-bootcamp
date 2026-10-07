@@ -1,0 +1,185 @@
+{
+  "snapshot": "2026-10-02",
+  "sources": [
+    {
+      "source_id": "LTA-KML-22-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/22-1.kml",
+      "sha256": "49ce151ab4d098ce160de337df4be48719066a45b31babc7a2e471906d287656"
+    },
+    {
+      "source_id": "LTA-KML-22-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/22-2.kml",
+      "sha256": "587b83b565db902d7348ecfe50ba6c77c18df4058f0f381ee7e424bae2fca7a0"
+    },
+    {
+      "source_id": "LTA-KML-54-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/54-1.kml",
+      "sha256": "7c42195a77584c6fef8f6c0b38c5e3a0a47861014610c5fef188e05c1e01fe64"
+    },
+    {
+      "source_id": "LTA-KML-54-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/54-2.kml",
+      "sha256": "e26f2d37125e50ab64a40acdb99eeeba2836ab3bcf98764e4bd36900bd759a21"
+    },
+    {
+      "source_id": "LTA-KML-56-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/56-1.kml",
+      "sha256": "3a3658c2f4b846da714b580e000f5e455fe77aa2a81bf9183773b22f555aacea"
+    },
+    {
+      "source_id": "LTA-KML-56-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/56-2.kml",
+      "sha256": "a4de9649ba72322ecc8a45b1c11731d0cd51a24e18d759cb1911b0b70d7c8196"
+    },
+    {
+      "source_id": "LTA-KML-57-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/57-1.kml",
+      "sha256": "456141f8b4606c48d5542b076d4ab00aa38e7fe8aca4524740f99301677faa0b"
+    },
+    {
+      "source_id": "LTA-KML-57-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/57-2.kml",
+      "sha256": "1ccdf419442bcece0cd9857afcd5874f7e04002afe0566953b26d202e02753d0"
+    },
+    {
+      "source_id": "LTA-KML-70-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/70-1.kml",
+      "sha256": "7e0a9ad38bf9fa4274add3ea4ab867c2269961fb622cf4f849a114acaadc45e9"
+    },
+    {
+      "source_id": "LTA-KML-70-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/70-2.kml",
+      "sha256": "68616ee448d49fe1e06a2690eaa71096ccdef67bb8105984151a909f7cf3da40"
+    },
+    {
+      "source_id": "LTA-KML-73-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/73-1.kml",
+      "sha256": "83926cbeed4c1e76b21b410665a6a6742c5bfaf43dcfaf99b98b765f6964927d"
+    },
+    {
+      "source_id": "LTA-KML-76-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/76-1.kml",
+      "sha256": "bc701a3a0fc28533f1aedc96c3d6407c824f901e6d28d780cf8403ad64a2800e"
+    },
+    {
+      "source_id": "LTA-KML-76-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/76-2.kml",
+      "sha256": "ca6ed4d69fb65b71f1bdc4f2095017aba0b93a9ceaf00d3b230b55bb8880cdbb"
+    },
+    {
+      "source_id": "LTA-KML-130-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/130-1.kml",
+      "sha256": "5ec5d5a42309c6e7fe837d66a89a787496439cc5a99ec7ff895e0940e1eceea8"
+    },
+    {
+      "source_id": "LTA-KML-130-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/130-2.kml",
+      "sha256": "4c8b50aa1b165864f98990d73fcf4b1f1e2d6789ba061c673ac4bedfca6f66bd"
+    },
+    {
+      "source_id": "LTA-KML-132-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/132-1.kml",
+      "sha256": "06c34668df1de3fc27229d69a993512f3ee5303c520c78ab3253cf4a1cbd6738"
+    },
+    {
+      "source_id": "LTA-KML-132-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/132-2.kml",
+      "sha256": "c253c487071bf63532361f1607c94f4712a5746e7250362879192828371f4d3a"
+    },
+    {
+      "source_id": "LTA-KML-133-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/133-1.kml",
+      "sha256": "9f28c15faf645948d034a6b32ff18b9977ea9fbba48eccd7fec44d8b4e5786c2"
+    },
+    {
+      "source_id": "LTA-KML-133-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/133-2.kml",
+      "sha256": "2d3629bcecaf48fb2c1d1f698b8f2fe170c69fe2dbd78f276cce5b523db76ce8"
+    },
+    {
+      "source_id": "LTA-KML-141-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/141-1.kml",
+      "sha256": "153ecea674e5c6808effbe394a04e440f2c70925941b1a7310ae32c807baffb8"
+    },
+    {
+      "source_id": "LTA-KML-141-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/141-2.kml",
+      "sha256": "b766537e78026cc7c2ef18dd969993178ac298ef64f4b91fa6e45dc856671c5d"
+    },
+    {
+      "source_id": "LTA-KML-159-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/159-1.kml",
+      "sha256": "ca6c00864082a2493c7493b99559510d409848ed9a03eec460d49759253f868b"
+    },
+    {
+      "source_id": "LTA-KML-159-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/159-2.kml",
+      "sha256": "aaed7d033e9024c9da94098305572ee0453ff1f23edb4a2df5a1bdeb5fe2e09e"
+    },
+    {
+      "source_id": "LTA-KML-162-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/162-1.kml",
+      "sha256": "72089c622affc74e98c2cfb79c6b2cee8301e1dedbf923c5b8ebbf5f745d4c6b"
+    },
+    {
+      "source_id": "LTA-KML-163-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/163-1.kml",
+      "sha256": "01d0bd8bacfd456c46ba0a561741edede1bf88bcbad89bd1e7fe4ba95a7fe157"
+    },
+    {
+      "source_id": "LTA-KML-163-2",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/163-2.kml",
+      "sha256": "01775098a8ad897885fcea4a5ceb22333616819ac89feb73b874aa1d11aae37b"
+    },
+    {
+      "source_id": "LTA-KML-231-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/231-1.kml",
+      "sha256": "1e8f11cdf4138a4757e25ab62c60aebde4a96f1ce4b854e58092205646c0c4b1"
+    },
+    {
+      "source_id": "LTA-KML-232-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/232-1.kml",
+      "sha256": "96c1ddc62d7af259ff7ee8d36219aa878b2543a84d6c1599db15498bf4771eb2"
+    },
+    {
+      "source_id": "LTA-KML-235-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/235-1.kml",
+      "sha256": "49cbb2fe686fd378de06844a759667ec98176fe227420c8397e41d4af28ed430"
+    },
+    {
+      "source_id": "LTA-KML-238-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/238-1.kml",
+      "sha256": "f4b2a0c7b34b80249bf0d742de691100a45d77f20a9f8d8fbc014e7b75d2b200"
+    },
+    {
+      "source_id": "LTA-KML-261-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/261-1.kml",
+      "sha256": "28780bd70440200ffd3cc3f1c9881b603ae32b25312efe85b30f47bd718d2946"
+    },
+    {
+      "source_id": "LTA-KML-262-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/262-1.kml",
+      "sha256": "3852de6aecc9344b5bbca55bced642453c07bcd1eebb14892a9ff773b1dbca64"
+    },
+    {
+      "source_id": "LTA-KML-265-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/265-1.kml",
+      "sha256": "892916addd72632ad8798781df1ef41d6dcb16dccbf10b94a37a8d6936a8a5f6"
+    },
+    {
+      "source_id": "LTA-KML-269-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/269-1.kml",
+      "sha256": "68e330a49030270affb46fe273ec2654faacecd4fb99dae503df4efab6ec8974"
+    },
+    {
+      "source_id": "LTA-KML-410G-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/410G-1.kml",
+      "sha256": "0761ae2ffb5db1be001eff09fd6490d8785c52ac7b536a981f18ebd2ea84ecd9"
+    },
+    {
+      "source_id": "LTA-KML-410W-1",
+      "url": "https://www.lta.gov.sg/map/busService/bus_route_kml/410W-1.kml",
+      "sha256": "e5564824e4729f7e0fb70f76bcc4086ba6f82f5ed36d2882568b84e81dcda59b"
+    }
+  ]
+}

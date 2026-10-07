@@ -8,7 +8,8 @@ import { passengerSymbols } from "./passenger-symbols"
 import type { Exchange } from "./passenger-exchange"
 import { addCity, loadCity } from "./city"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
-import { mapData, point, along, type Point } from "./geometry"
+import type { Route } from "./route-geometry"
+import { mapData, point, type Point } from "./geometry"
 
 export type Marker = Point & {
   key: string
@@ -41,6 +42,7 @@ function dispose(object: THREE.Object3D) {
 }
 
 export function Scene({
+  routes,
   selected,
   cameraVersion,
   service,
@@ -50,6 +52,7 @@ export function Scene({
   markers,
   onPick,
 }: {
+  routes: Route[]
   selected: string
   cameraVersion: number
   service: string
@@ -145,7 +148,6 @@ export function Scene({
     renderer.domElement.addEventListener("wheel", panWithWheel, {
       passive: false,
     })
-    const routes = mapData.routes.filter((r) => r.service === service)
     const bounds = new THREE.Box3().setFromPoints(
       routes.flatMap((r) =>
         r.points.map((p) => new THREE.Vector3(point(p).x, 0, point(p).z))
@@ -166,8 +168,11 @@ export function Scene({
         ? 1100
         : extent === "neighborhood"
           ? 95
-          : Math.max(bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) *
-            1.65
+          : Math.max(
+              60,
+              bounds.max.x - bounds.min.x,
+              bounds.max.z - bounds.min.z
+            ) * 1.65
     controls.target.copy(center)
     camera.position
       .copy(center)
@@ -233,23 +238,19 @@ export function Scene({
     }
     for (const route of routes) {
       const color = route.direction === 1 ? 0x35dec6 : 0x799bff
-      line(
-        roads
-          ? route.points.map(point)
-          : route.stops.map((s) => point(s.point)),
-        color,
-        3 + route.direction * 0.2
-      )
-      if (roads)
-        for (const stop of route.stops) {
-          if (stop.offsetMetres > 25)
-            line(
-              [point(stop.point), along(route, stop.distance)],
-              0xa8bac4,
-              2.8,
-              0.18
-            )
-        }
+      if (roads) {
+        for (const leg of route.legs)
+          line(
+            leg.points.map(point),
+            leg.kind === "road" ? color : 0xffb347,
+            3 + route.direction * 0.2
+          )
+      } else
+        line(
+          route.stops.map((s) => point(s.point)),
+          color,
+          3 + route.direction * 0.2
+        )
     }
     for (const label of mapData.labels) {
       const canvas = document.createElement("canvas")
@@ -365,7 +366,7 @@ export function Scene({
       renderer.dispose()
       renderer.domElement.remove()
     }
-  }, [service, roads, view, extent, onPick, cameraVersion])
+  }, [routes, service, roads, view, extent, onPick, cameraVersion])
   useEffect(() => {
     const group = dynamic.current
     if (!group) return
@@ -416,7 +417,7 @@ export function Scene({
       mesh.userData.key = marker.key
       group.add(mesh)
     }
-  }, [markers, selected, service, roads, view, extent, cameraVersion])
+  }, [routes, markers, selected, service, roads, view, extent, cameraVersion])
   function zoom(factor: number) {
     const controls = orbit.current
     if (!controls) return
