@@ -34,6 +34,14 @@ Do not implement the feature, open a PR, or deploy anything.
 Replace the example path with your actual transcript path. Expect a brief with
 source pointers followed by the requested documentation.
 
+For a plan without implementation, use:
+
+```text
+/pstack Use /absolute/path/to/handover-transcript.txt to plan the readiness indicator.
+Inspect the existing handover flow. Name dependencies, success criteria, and how
+we would verify each unit. Stop after the plan. Do not implement or open a PR.
+```
+
 For implementation, state that explicitly:
 
 ```text

@@ -54,14 +54,20 @@ Produce a concise brief containing:
 - The requested outcome and stopping point.
 - Relevant pain points and decisions, with source pointers.
 - In-scope behavior and explicit exclusions.
-- Acceptance criteria stated as observable outcomes.
+- Acceptance criteria stated as observable outcomes, with a proposed way to verify each.
 - Assumptions, conflicts, and any blocking questions.
-- The relevant repository area and selected delivery workflow.
+- Repository findings, with file pointers, and the selected delivery workflow.
 
 Keep user instructions distinct from transcript evidence and agent inferences.
 Inspect the repository before asserting where a change belongs or that a feature
 is absent. Acceptance criteria proposed by the agent are proposals, not quotes
 or invented agreements.
+
+Keep the transcript's problem separate from its proposed solution. Check whether
+the repository already provides the behavior before planning new code. Carry
+relevant findings from `how` into `architect` as constraints instead of repeating
+the same exploration. Let `architect` own the design and its rationale; the intake
+brief does not prescribe types or a module structure from conversation alone.
 
 For a small task, the brief can remain in the response. For work that spans
 phases, save it under `.audit/transcript-to-feature/<task>/brief.md` unless the
@@ -79,10 +85,17 @@ Pass the brief and its evidence pointers into the relevant workflow. When pstack
 routed here, continue from the brief rather than re-entering transcript intake.
 
 - For a brief-only request, return the brief and stop.
+- For a plan-only request, ground the affected system and produce ordered units with dependencies, success criteria, and verification evidence. Stop before implementation. Read supporting skills only for their planning work; do not enter `architect` implementation or figure-it-out execution merely because their later phases exist.
+- For an investigation request within feature intake, use [how](../how/SKILL.md) to answer the scoped question with evidence. Do not turn the answer into an implementation or a PR.
 - For documentation, use [technical-writing](../technical-writing/SKILL.md) and stop at the requested documentation deliverable.
 - For implementation, inspect the system with [how](../how/SKILL.md), use [architect](../architect/SKILL.md) when needed, and use [figure-it-out](../figure-it-out/SKILL.md) when no narrower workflow fits.
 - Use autopilot or swarm only when the user explicitly requests those workflows. A transcript with several ideas does not start a parallel queue.
 - Preserve the user's commit, PR, merge, and deployment boundaries. This skill grants no additional publishing or landing authority.
+
+Resolve factual uncertainties from repository inspection or permitted checks before
+asking the user. Ask the user about intent or a product choice that evidence cannot
+settle. Several requested changes need dependency ordering, not an automatic stack
+or swarm. Do not impose a queue when one cohesive change is sufficient.
 
 When implementation is already requested and the brief is sufficiently clear,
 state the brief and continue in the same turn. Do not stop with an offer to build.
@@ -90,3 +103,6 @@ Use pstack's verification requirements and compare the result with the brief's
 acceptance criteria. Report what was completed, supporting evidence, assumptions,
 and any unresolved requirement. Never claim a transcript idea was implemented
 because it was merely extracted.
+
+When changing this integration, read [Upstream integration](references/upstream-integration.md)
+for the pinned comparison and the deliberate local adaptations.
