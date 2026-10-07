@@ -71,7 +71,11 @@ export function sourceTable(id: string) {
   )
 }
 
-export async function getOperationsReport(service: string, date: string) {
+export async function getOperationsReport(
+  service: string,
+  date: string,
+  signal?: AbortSignal
+) {
   const groups = new Map<string, OperationGroup>()
   const tripSchema = z.object({
     date: z.string(),
@@ -88,45 +92,48 @@ export async function getOperationsReport(service: string, date: string) {
     "(? = 'all' OR t.service_no = ?) AND (? = 'all' OR t.service_date = ?)"
   const params = [service, service, date, date]
   const [tripRows, callRows, movementRows, hotspotRows, workshopRows] =
-    await queryDatabase([
-      {
-        sql: `SELECT t.service_date AS date, t.service_no AS service,
+    await queryDatabase(
+      [
+        {
+          sql: `SELECT t.service_date AS date, t.service_no AS service,
       t.actual_vehicle_id AS vehicle, t.planned_vehicle_id AS planned, t.completion_state AS state,
       t.published_distance_km AS km,
       unixepoch(t.actual_arrival_at) - unixepoch(t.actual_departure_at) AS seconds,
       unixepoch(t.actual_departure_at) - unixepoch(t.scheduled_departure_at) AS departure,
       unixepoch(t.actual_arrival_at) - unixepoch(t.scheduled_arrival_at) AS arrival
       FROM trips t WHERE ${filter} ORDER BY t.rowid`,
-        parameters: params,
-      },
-      {
-        sql: `
+          parameters: params,
+        },
+        {
+          sql: `
       SELECT t.service_date AS date, t.service_no AS service, count(*) AS calls,
         sum(c.boarded_people) AS boardings, sum(c.alighted_people) AS alightings,
         sum(c.queue_after_people > 0) AS queuedCalls, sum(c.onboard_departing >= c.capacity_people) AS fullCalls,
         sum(1.0 * c.onboard_departing / c.capacity_people) AS occupancySum
       FROM trips t JOIN stop_calls c USING (trip_id) WHERE ${filter} GROUP BY t.service_date, t.service_no`,
-        parameters: params,
-      },
-      {
-        sql: `
+          parameters: params,
+        },
+        {
+          sql: `
       SELECT t.service_date AS date, t.service_no AS service, sum(m.planning_distance_km) AS km,
         sum(unixepoch(m.actual_end_at) - unixepoch(m.actual_start_at)) AS seconds
       FROM terminal_movements m JOIN trips t ON t.trip_id = m.to_trip_id WHERE ${filter}
       GROUP BY t.service_date, t.service_no`,
-        parameters: params,
-      },
-      {
-        sql: `
+          parameters: params,
+        },
+        {
+          sql: `
       SELECT q.service_date AS date, r.service_no AS service, q.route_id AS route, q.stop_order AS "order",
         q.stop_id AS stop, s.description AS name, q.total_arrivals_people AS arrivals,
         q.total_boarded_people AS boardings, q.remaining_queue_people AS remaining, q.initial_queue_people AS initial
       FROM queue_windows q JOIN routes r USING (route_id) JOIN stops s USING (stop_id)
       WHERE (? = 'all' OR r.service_no = ?) AND (? = 'all' OR q.service_date = ?) ORDER BY q.rowid`,
-        parameters: params,
-      },
-      { sql: "SELECT * FROM workshop_work_orders ORDER BY rowid" },
-    ])
+          parameters: params,
+        },
+        { sql: "SELECT * FROM workshop_work_orders ORDER BY rowid" },
+      ],
+      signal
+    )
   const trips = tripSchema.array().parse(tripRows)
   for (const trip of trips) {
     const key = `${trip.date}/${trip.service}`
@@ -235,7 +242,8 @@ export async function getOperationsReport(service: string, date: string) {
 export async function queryOperationsTable(
   id: string,
   query: string,
-  page: number
+  page: number,
+  signal?: AbortSignal
 ) {
   const table = sourceTable(id)
   if (!table) throw new Error("Unknown table")
@@ -244,13 +252,16 @@ export async function queryOperationsTable(
     ? ` WHERE ${table.columns.map((column) => `instr(search_text(${quote(column)}), ?) > 0`).join(" OR ")}`
     : ""
   const parameters = search ? table.columns.map(() => search) : []
-  const [counts, records] = await queryDatabase([
-    { sql: `SELECT count(*) AS count FROM ${quote(id)}${where}`, parameters },
-    {
-      sql: `SELECT * FROM ${quote(id)}${where} ORDER BY rowid LIMIT 25 OFFSET ?`,
-      parameters: [...parameters, page * 25],
-    },
-  ])
+  const [counts, records] = await queryDatabase(
+    [
+      { sql: `SELECT count(*) AS count FROM ${quote(id)}${where}`, parameters },
+      {
+        sql: `SELECT * FROM ${quote(id)}${where} ORDER BY rowid LIMIT 25 OFFSET ?`,
+        parameters: [...parameters, page * 25],
+      },
+    ],
+    signal
+  )
   const total = z.array(z.object({ count: z.number() })).parse(counts)[0]!.count
   const rows = rowsSchema.parse(records)
   return {

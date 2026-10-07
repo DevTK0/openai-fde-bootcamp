@@ -158,6 +158,47 @@ describe("SQLite dashboard queries", () => {
     expect(await after.json()).toMatchObject({ total: 6900, pageSize: 25 })
   })
 
+  it("cancels abandoned API reads and admits replacement requests", async () => {
+    const controllers = Array.from({ length: 4 }, () => new AbortController())
+    const pending = controllers.map((controller) =>
+      GET(
+        new Request(
+          "http://localhost/api/operations?view=records&table=stop_calls&q=absent-cancellation-proof",
+          { signal: controller.signal }
+        )
+      )
+    )
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    controllers.forEach((controller) => controller.abort())
+    const responses = await Promise.all(pending)
+    expect(responses.map((response) => response.status)).toEqual([
+      499, 499, 499, 499,
+    ])
+    const replacements = await Promise.all(
+      Array.from({ length: 4 }, () =>
+        GET(
+          new Request(
+            "http://localhost/api/operations?view=records&table=trips"
+          )
+        )
+      )
+    )
+    expect(replacements.map((response) => response.status)).toEqual([
+      200, 200, 200, 200,
+    ])
+    const cancelled = new AbortController()
+    cancelled.abort()
+    expect(
+      (
+        await GET(
+          new Request("http://localhost/api/operations", {
+            signal: cancelled.signal,
+          })
+        )
+      ).status
+    ).toBe(499)
+  }, 20000)
+
   it("releases failed workers so later reads can succeed", async () => {
     const database = new DatabaseSync(path)
     try {

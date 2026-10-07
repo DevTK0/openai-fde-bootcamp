@@ -42,15 +42,21 @@ export class DatabaseBusyError extends Error {
 let activeReads = 0
 
 export async function queryDatabase(
-  queries: { sql: string; parameters?: SQLInputValue[] }[]
+  queries: { sql: string; parameters?: SQLInputValue[] }[],
+  signal?: AbortSignal
 ): Promise<unknown[]> {
+  signal?.throwIfAborted()
   if (activeReads >= 4) throw new DatabaseBusyError()
   const worker = new Worker(resolve(process.cwd(), "lib/database-worker.mjs"), {
     workerData: { path: databasePath(), queries },
   })
   activeReads++
+  let abort: (() => void) | undefined
   try {
     return await new Promise<unknown[]>((resolve, reject) => {
+      abort = () => reject(signal?.reason)
+      signal?.addEventListener("abort", abort, { once: true })
+      if (signal?.aborted) abort()
       worker.once("message", (message: unknown) => {
         const parsed = z.array(z.unknown()).safeParse(message)
         if (parsed.success) resolve(parsed.data)
@@ -66,6 +72,7 @@ export async function queryDatabase(
       )
     })
   } finally {
+    if (abort) signal?.removeEventListener("abort", abort)
     try {
       await worker.terminate()
     } finally {
