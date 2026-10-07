@@ -1,0 +1,40 @@
+{
+  "component_ids": [
+    "body",
+    "centre_door",
+    "display_fleet_front",
+    "display_fleet_left",
+    "display_fleet_rear",
+    "display_fleet_right",
+    "display_service_front",
+    "display_service_rear",
+    "display_service_side",
+    "engine_bay",
+    "front_door",
+    "front_lights",
+    "mirrors",
+    "rear_lights",
+    "roof_ac",
+    "underbody",
+    "wheel_1_l",
+    "wheel_1_r",
+    "wheel_2_l",
+    "wheel_2_r",
+    "wheel_3_l",
+    "wheel_3_r",
+    "windows",
+    "windshield",
+    "wipers"
+  ],
+  "glb_bytes": 3934612,
+  "coordinate_system": "Y up, metres, front -X; curb side +Z",
+  "sign_ids": [
+    "display_service_front",
+    "display_service_side",
+    "display_service_rear",
+    "display_fleet_left",
+    "display_fleet_right",
+    "display_fleet_front",
+    "display_fleet_rear"
+  ]
+}

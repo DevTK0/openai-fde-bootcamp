@@ -1,0 +1,12 @@
+{
+  "triangles": 151988,
+  "materials": 14,
+  "glb_bytes": 4480412,
+  "dimensions_metres": {
+    "length": 12,
+    "body_width": 2.5,
+    "height": 4.51
+  },
+  "coordinate_system": "glTF Y up; front faces -X; ground at Y=0",
+  "editable_objects": 579
+}
