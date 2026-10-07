@@ -46,11 +46,13 @@ function dispose(object: THREE.Object3D) {
 export function Scene({
   routes,
   selected,
+  showStops,
   markers,
   onPick,
 }: {
   routes: Route[]
   selected: string
+  showStops: boolean
   markers: Marker[]
   onPick: (key: string) => void
 }) {
@@ -366,6 +368,7 @@ export function Scene({
           }
           group.add(exchange)
         }
+        if (!showStops) continue
         const anchor = new THREE.Mesh(
           new THREE.RingGeometry(active ? 0.45 : 0.7, 1, 24),
           new THREE.MeshBasicMaterial({
@@ -434,7 +437,7 @@ export function Scene({
         }
       }
     }
-  }, [routes, network, markers, selected, cameraVersion])
+  }, [routes, network, markers, selected, showStops, cameraVersion])
   function zoom(factor: number) {
     const controls = orbit.current
     if (!controls) return
