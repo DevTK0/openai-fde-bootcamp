@@ -63,6 +63,9 @@ export function LiveRoom() {
   const [microphone, setMicrophone] = useState<Microphone>("off")
   const [pending, setPending] = useState<PendingSegment[]>([])
   const [selected, setSelected] = useState<string | null>(null)
+  const createCommand = useRef<Extract<Command, { kind: "create" }> | null>(
+    null
+  )
   const typedCommand = useRef<PendingSegment | null>(null)
   const controller = useRef<AbortController | null>(null)
   const audio = useRef<Awaited<ReturnType<typeof startTranscription>> | null>(
@@ -88,10 +91,7 @@ export function LiveRoom() {
           cache: "no-store",
         }
       )
-      if (!response.ok) {
-        const body = await response.text()
-        throw new Error(body || `Factory returned ${response.status}`)
-      }
+      if (!response.ok) throw new Error(await responseError(response))
       const result = snapshotSchema.parse(await response.json())
       if (version === revision.current && sessionId === session.current) {
         setSnapshot(result)
@@ -431,12 +431,18 @@ export function LiveRoom() {
                   className="flex gap-2"
                   onSubmit={(event) => {
                     event.preventDefault()
-                    void mutate({
-                      kind: "create",
-                      id: crypto.randomUUID(),
-                      title,
-                    })
+                    if (
+                      !createCommand.current ||
+                      createCommand.current.title !== title
+                    )
+                      createCommand.current = {
+                        kind: "create",
+                        id: crypto.randomUUID(),
+                        title,
+                      }
+                    void mutate(createCommand.current)
                       .then(() => {
+                        createCommand.current = null
                         setTitle("")
                         setSelected(null)
                       })

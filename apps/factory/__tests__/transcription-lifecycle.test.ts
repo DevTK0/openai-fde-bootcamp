@@ -150,3 +150,72 @@ it("does not resume listening or install an audio analyser after setup is cancel
   expect(stop).toHaveBeenCalledOnce()
   expect(Peer.instances[0]?.channel.readyState).toBe("closed")
 })
+
+it.each(["stop", "silence"])(
+  "commits quiet speech on %s and does not commit its late deltas again",
+  async (ending) => {
+    vi.useFakeTimers()
+    setup()
+    vi.stubGlobal("fetch", async () => new Response("answer"))
+    vi.stubGlobal(
+      "AudioContext",
+      class {
+        async close() {}
+        async resume() {}
+        createAnalyser() {
+          return { fftSize: 1024, getFloatTimeDomainData: () => undefined }
+        }
+        createMediaStreamSource() {
+          return { connect: () => undefined }
+        }
+      }
+    )
+    const callbacks = options(new AbortController().signal)
+    const session = await startTranscription(callbacks)
+    const channel = Peer.instances[0]?.channel
+    const receive = (event: unknown) =>
+      channel?.dispatchEvent(
+        new MessageEvent("message", { data: JSON.stringify(event) })
+      )
+    receive({
+      type: "conversation.item.input_audio_transcription.delta",
+      item_id: "quiet",
+      delta: "Please add a download button",
+    })
+    const stopped = ending === "stop" ? session.stop() : undefined
+    if (ending === "silence") await vi.advanceTimersByTimeAsync(1000)
+    expect(channel?.send).toHaveBeenCalledWith(
+      '{"type":"input_audio_buffer.commit"}'
+    )
+    receive({
+      type: "conversation.item.input_audio_transcription.delta",
+      item_id: "quiet",
+      delta: "!",
+    })
+    receive({
+      type: "input_audio_buffer.committed",
+      item_id: "quiet",
+      previous_item_id: null,
+    })
+    receive({
+      type: "conversation.item.input_audio_transcription.delta",
+      item_id: "quiet",
+      delta: ".",
+    })
+    receive({
+      type: "conversation.item.input_audio_transcription.completed",
+      item_id: "quiet",
+      transcript: "Please add a download button.",
+    })
+    await vi.advanceTimersByTimeAsync(1000)
+    await stopped
+    if (ending === "silence") await session.stop()
+    expect(channel?.send).toHaveBeenCalledOnce()
+    expect(callbacks.onFinal).toHaveBeenCalledWith({
+      id: "quiet",
+      text: "Please add a download button.",
+    })
+    expect(callbacks.onError).not.toHaveBeenCalled()
+    expect(channel?.readyState).toBe("closed")
+  }
+)
