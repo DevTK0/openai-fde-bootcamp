@@ -226,6 +226,7 @@ export function LiveRoom() {
   const request =
     snapshot?.requests.find((item) => item.id === selected) ??
     snapshot?.requests.at(-1)
+  const answerKey = request ? `${request.id}:${request.attempt}` : ""
   const micActive = microphone !== "off"
   const worker = snapshot?.configuration
 
@@ -736,11 +737,11 @@ export function LiveRoom() {
                 key={request.id}
                 request={request}
                 busy={busy}
-                answer={answers[request.id] ?? ""}
+                answer={answers[answerKey] ?? ""}
                 onAnswerChange={(answer) =>
                   setAnswers((current) => ({
                     ...current,
-                    [request.id]: answer,
+                    [answerKey]: answer,
                   }))
                 }
                 act={(command) =>
@@ -748,8 +749,8 @@ export function LiveRoom() {
                     .then(() => {
                       if (command.kind === "answer")
                         setAnswers((current) =>
-                          current[command.requestId] === command.answer
-                            ? { ...current, [command.requestId]: "" }
+                          current[answerKey] === command.answer
+                            ? { ...current, [answerKey]: "" }
                             : current
                         )
                     })

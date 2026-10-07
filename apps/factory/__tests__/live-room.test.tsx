@@ -370,3 +370,63 @@ for (const kind of ["segment", "create"]) {
     expect(ids[1]).toBe(ids[0])
   })
 }
+
+it("starts a later clarification with an empty draft after another client answers", async () => {
+  const request: Snapshot["requests"][number] = {
+    id: "44444444-4444-4444-8444-444444444444",
+    conversationId: roomA.id,
+    triggerSegmentId: "55555555-5555-4555-8555-555555555555",
+    context: [],
+    createdAt: "2026-01-01",
+    updatedAt: "2026-01-01",
+    attempt: 1,
+    answers: [],
+    state: { kind: "clarification", question: "Which report?" },
+  }
+  let current: Snapshot = {
+    ...snapshot(),
+    requests: [
+      request,
+      {
+        ...request,
+        id: "66666666-6666-4666-8666-666666666666",
+        state: { kind: "queued" },
+      },
+    ],
+  }
+  vi.stubGlobal(
+    "fetch",
+    vi.fn<typeof fetch>(async () => Response.json(current))
+  )
+  await connect()
+  fireEvent.click(screen.getByRole("button", { name: /Needs your input/ }))
+  fireEvent.change(screen.getByRole("textbox", { name: "Which report?" }), {
+    target: { value: "Monthly report" },
+  })
+  fireEvent.click(screen.getByRole("button", { name: /Queued/ }))
+  current = {
+    ...current,
+    requests: current.requests.map((item) =>
+      item.id === request.id
+        ? {
+            ...item,
+            attempt: 2,
+            answers: [{ question: "Which report?", answer: "Weekly report" }],
+            state: { kind: "clarification", question: "Which region?" },
+          }
+        : item
+    ),
+  }
+  await waitFor(
+    () =>
+      expect(
+        screen.getByRole("button", { name: /Needs your input/ }).textContent
+      ).toContain("Attempt 2"),
+    { timeout: 4000 }
+  )
+  fireEvent.click(screen.getByRole("button", { name: /Needs your input/ }))
+  expect(screen.getByRole("textbox", { name: "Which region?" })).toHaveProperty(
+    "value",
+    ""
+  )
+})
