@@ -1,6 +1,7 @@
 import { constants } from "node:fs"
-import { access, realpath } from "node:fs/promises"
-import { dirname, isAbsolute, join } from "node:path"
+import { access, readFile, realpath } from "node:fs/promises"
+import { basename, dirname, isAbsolute, join, resolve } from "node:path"
+import { z } from "zod"
 
 async function executable(command: string) {
   const candidates = isAbsolute(command)
@@ -16,16 +17,40 @@ async function executable(command: string) {
   }
   throw new Error(`Validation executable is unavailable: ${command}`)
 }
+const packageSchema = z.object({
+  bin: z.union([z.string(), z.record(z.string(), z.string())]),
+})
 async function installation(path: string) {
   let directory = dirname(path)
   while (directory !== dirname(directory)) {
+    let manifest: string
     try {
-      await access(join(directory, "package.json"))
-      return directory
+      manifest = await readFile(join(directory, "package.json"), "utf8")
     } catch {
-      /* Standalone executables need only their own file. */
+      directory = dirname(directory)
+      continue
     }
-    directory = dirname(directory)
+    // Only installed packages may expose their supporting files to checks.
+    const parent = dirname(directory)
+    const owner = basename(parent).startsWith("@") ? dirname(parent) : parent
+    if (basename(owner) !== "node_modules") return path
+    try {
+      const parsed = packageSchema.safeParse(JSON.parse(manifest))
+      if (!parsed.success) return path
+      const bins =
+        typeof parsed.data.bin === "string"
+          ? [parsed.data.bin]
+          : Object.values(parsed.data.bin)
+      for (const bin of bins) {
+        if (
+          (await realpath(resolve(directory, bin)).catch(() => null)) === path
+        )
+          return directory
+      }
+    } catch {
+      /* An invalid manifest cannot establish package ownership. */
+    }
+    return path
   }
   return path
 }

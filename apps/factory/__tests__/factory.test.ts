@@ -125,6 +125,37 @@ describe("durable factory", () => {
     expect(submit("hi" + MAGIC_PHRASE).requests).toHaveLength(0)
     expect(submit(MAGIC_PHRASE + ". Next task.").requests).toHaveLength(1)
   })
+  it("claims requests in insertion order across conversations and skips cancellation", async () => {
+    const { store, submit, conversationId } = await setup()
+    const first = submit(MAGIC_PHRASE).requests[0]
+    const cancelled = submit(MAGIC_PHRASE).requests[1]
+    if (!first || !cancelled) throw new Error("Missing requests")
+    const other = randomUUID()
+    store.apply({ kind: "create", id: other, title: "Other conversation" })
+    const third = store.apply({
+      kind: "segment",
+      id: randomUUID(),
+      conversationId: other,
+      speaker: "Dispatcher",
+      text: MAGIC_PHRASE,
+    }).requests[0]
+    if (!third) throw new Error("Missing other request")
+    store.apply({ kind: "cancel", requestId: cancelled.id })
+    expect(
+      store.snapshot(conversationId).requests.map((request) => request.id)
+    ).toEqual([first.id, cancelled.id])
+    expect(store.snapshot().requests.map((request) => request.id)).toEqual([
+      third.id,
+    ])
+    expect(store.claim()?.id).toBe(first.id)
+    expect(store.claim()?.id).toBe(third.id)
+    expect(store.claim()).toBe(null)
+    store.apply({ kind: "cancel", requestId: first.id })
+    store.finish(first.id, 1, { kind: "failed", reason: "Late result" })
+    expect(store.getRequest(first.id).state).toEqual({ kind: "cancelled" })
+    expect(store.getRequest(cancelled.id).attempt).toBe(0)
+    expect(store.getRequest(third.id).attempt).toBe(1)
+  })
   it("decodes split UTF-8 characters independently on stdout and stderr", async () => {
     const { directory } = await setup()
     const result = await execute(
@@ -223,12 +254,45 @@ setTimeout(() => process.exit(0), 20000);
       { mode: 0o755 }
     )
     await writeFile(join(directory, "private"), "local dummy data")
+    await writeFile(
+      join(directory, "package.json"),
+      JSON.stringify({
+        name: "unrelated-parent",
+        bin: { "fixture-check": "toolchain/bin/fixture-check" },
+      })
+    )
     process.env.PATH = bin + ":" + process.env.PATH
     submit(MAGIC_PHRASE)
     await runOnce(
       { ...config, check: { command: "fixture-check", args: [] } },
       store
     )
+    expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
+  })
+  it("mounts the owning Node package for its declared executable", async () => {
+    const { config, directory, submit, store } = await setup()
+    const tool = join(directory, "node_modules", "fixture-check")
+    await mkdir(join(tool, "bin"), { recursive: true })
+    await writeFile(join(directory, "private"), "local dummy data")
+    await writeFile(
+      join(tool, "package.json"),
+      JSON.stringify({
+        name: "fixture-check",
+        bin: { "fixture-check": "bin/check.cjs" },
+      })
+    )
+    await writeFile(
+      join(tool, "check.cjs"),
+      "require('node:assert/strict').equal(require('node:fs').existsSync(" +
+        JSON.stringify(join(directory, "private")) +
+        "), false)"
+    )
+    const check = join(tool, "bin", "check.cjs")
+    await writeFile(check, "#!/usr/bin/env node\nrequire('../check.cjs')\n", {
+      mode: 0o755,
+    })
+    submit(MAGIC_PHRASE)
+    await runOnce({ ...config, check: { command: check, args: [] } }, store)
     expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
   })
   it("runs the installed pnpm check command in the validation sandbox", async () => {

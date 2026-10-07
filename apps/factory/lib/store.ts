@@ -40,7 +40,8 @@ export class Store {
       CREATE TABLE IF NOT EXISTS requests (id TEXT PRIMARY KEY, conversation_id TEXT NOT NULL, data TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS worker (id INTEGER PRIMARY KEY CHECK(id=1), pid INTEGER NOT NULL, heartbeat INTEGER NOT NULL, reason TEXT, child_pid INTEGER);
       CREATE INDEX IF NOT EXISTS segment_conversation ON segments(conversation_id);
-      CREATE INDEX IF NOT EXISTS request_conversation ON requests(conversation_id);`)
+      CREATE INDEX IF NOT EXISTS request_conversation ON requests(conversation_id);
+      CREATE INDEX IF NOT EXISTS request_state ON requests(json_extract(data, '$.state.kind'));`)
   }
   close() {
     this.db.close()
@@ -106,9 +107,14 @@ export class Store {
       conversation,
       segments,
       requests: conversation
-        ? this.allRequests().filter(
-            (request) => request.conversationId === conversation.id
-          )
+        ? this.db
+            .prepare(
+              "SELECT data FROM requests WHERE conversation_id=? ORDER BY rowid"
+            )
+            .all(conversation.id)
+            .map((row) =>
+              requestSchema.parse(JSON.parse(rowSchema.parse(row).data))
+            )
         : [],
       configuration: live
         ? { worker: worker.reason ? "blocked" : "ready", reason: worker.reason }
@@ -277,10 +283,13 @@ export class Store {
   }
   claim(): FactoryRequest | null {
     return this.transaction(() => {
-      const request = this.allRequests().find(
-        (value) => value.state.kind === "queued"
-      )
-      if (!request) return null
+      const row = this.db
+        .prepare(
+          "SELECT data FROM requests WHERE json_extract(data, '$.state.kind')='queued' ORDER BY rowid LIMIT 1"
+        )
+        .get()
+      if (!row) return null
+      const request = requestSchema.parse(JSON.parse(rowSchema.parse(row).data))
       const now = new Date().toISOString()
       const claimed: FactoryRequest = {
         ...request,
