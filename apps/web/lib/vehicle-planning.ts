@@ -13,6 +13,24 @@ export const vehiclePlanningSchema = z.object({
     .array(),
   readiness: planningSourcesSchema.shape.releases,
   holds: planningSourcesSchema.shape.holds,
+  workOrders: z.array(
+    z.object({
+      id: z.string(),
+      vehicle: z.string(),
+      source: z.string(),
+      opened: z.number().nullable(),
+      updated: z.number().nullable(),
+      expected: z.number().nullable(),
+      released: z.number().nullable(),
+      fault: z.string().nullable(),
+      finding: z.string().nullable(),
+      action: z.string().nullable(),
+      status: z.string().nullable(),
+      releaseStatus: z.string().nullable(),
+      note: z.string().nullable(),
+      facility: z.string().nullable(),
+    })
+  ),
 })
 export type VehiclePlanningData = z.infer<typeof vehiclePlanningSchema>
 export function vehicleRows(
@@ -36,11 +54,30 @@ export function vehicleRows(
       const record = data.vehicles.find((v) => v.id === vehicle)
       const holds = relevantHolds.filter((h) => h.vehicle === vehicle)
       const readiness = data.readiness.filter((r) => r.vehicle === vehicle)
+      const workOrders = data.workOrders
+        .filter(
+          (o) => o.vehicle === vehicle && (o.opened === null || o.opened < end)
+        )
+        .sort(
+          (a, b) =>
+            (b.opened ?? -Infinity) - (a.opened ?? -Infinity) ||
+            a.id.localeCompare(b.id)
+        )
       const trips = data.trips
         .filter((t) => t.vehicle === vehicle)
         .sort((a, b) => (a.departure ?? Infinity) - (b.departure ?? Infinity))
       const lanes: number[] = []
       const assignments = trips.map((trip) => {
+        const maintenanceHolds =
+          timedTrip(trip) && vehicle
+            ? holds.filter(
+                (h) =>
+                  h.start !== null &&
+                  (h.end === null || h.end > h.start) &&
+                  h.start < trip.arrival &&
+                  (h.end === null || h.end > trip.departure)
+              )
+            : []
         const conflicts: string[] = [],
           unverified: string[] = []
         let lane = 0
@@ -61,14 +98,8 @@ export function vehicleRows(
                 other.departure < trip.arrival
               )
                 conflicts.push(`Overlaps trip ${other.id}`)
-            for (const h of holds)
-              if (
-                h.start !== null &&
-                (h.end === null || h.end > h.start) &&
-                h.start < trip.arrival &&
-                (h.end === null || h.end > trip.departure)
-              )
-                conflicts.push(`Maintenance hold ${h.id} (${h.source})`)
+            for (const h of maintenanceHolds)
+              conflicts.push(`Maintenance hold ${h.id} (${h.source})`)
           }
           const covering = readiness.filter(
             (r) =>
@@ -93,16 +124,26 @@ export function vehicleRows(
           )
         )
           unverified.push("Maintenance timing evidence incomplete")
-        return { trip, conflicts, unverified, lane }
+        return { trip, conflicts, unverified, maintenanceHolds, lane }
       })
       return {
         vehicle,
         record,
         holds,
         readiness,
+        workOrders,
         assignments,
         lanes: Math.max(1, lanes.length),
       }
     })
 }
 export type VehicleRow = ReturnType<typeof vehicleRows>[number]
+
+export function vehicleRecordTime(at: number | null) {
+  return at === null
+    ? "Unknown"
+    : new Date(at * 1000 + 8 * 3600 * 1000)
+        .toISOString()
+        .slice(0, 16)
+        .replace("T", " ")
+}

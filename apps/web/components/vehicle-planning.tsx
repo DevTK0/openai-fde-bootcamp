@@ -13,8 +13,10 @@ import {
 } from "@workspace/ui/components/sheet"
 import { useDashboard } from "./dashboard-provider"
 import { Pick } from "./report-ui"
+import { VehicleMaintenance } from "./vehicle-maintenance"
 import { AssignmentTimeline } from "./assignment-timeline"
 import {
+  vehicleRecordTime,
   vehiclePlanningSchema,
   vehicleRows,
   type VehiclePlanningData,
@@ -328,6 +330,13 @@ function VehicleTimeline({
                 )}
               </>
             )}
+            {row?.vehicle && (
+              <VehicleMaintenance
+                row={row}
+                date={date}
+                onSelectTrip={(tripId) => openVehicle(row, tripId)}
+              />
+            )}
             <p className="text-xs text-muted-foreground">
               Readiness does not confirm turnaround, positioning or crew
               feasibility. Hold coverage is incomplete; gaps are not release
@@ -347,7 +356,7 @@ function VehicleTimeline({
                     {crewClock(r.start)}–{crewClock(r.end)}
                   </p>
                   <p>Location: {r.location ?? "Unknown"}</p>
-                  <p>Issued: {fullTime(r.issued)}</p>
+                  <p>Issued: {vehicleRecordTime(r.issued)}</p>
                 </div>
               ))
             ) : (
@@ -363,12 +372,12 @@ function VehicleTimeline({
                   className="space-y-1 rounded-lg border p-3 text-sm"
                 >
                   <p className="font-medium">{h.id}</p>
-                  <p>Opened: {fullTime(h.start)}</p>
+                  <p>Opened: {vehicleRecordTime(h.start)}</p>
                   <p>
                     Confirmed release:{" "}
                     {h.end === null
                       ? "Not recorded; hold remains open"
-                      : fullTime(h.end)}
+                      : vehicleRecordTime(h.end)}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Source: {h.source}
@@ -385,12 +394,4 @@ function VehicleTimeline({
       </Sheet>
     </>
   )
-}
-function fullTime(at: number | null) {
-  return at === null
-    ? "Unknown"
-    : new Date(at * 1000 + 8 * 3600 * 1000)
-        .toISOString()
-        .slice(0, 16)
-        .replace("T", " ")
 }
