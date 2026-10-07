@@ -1,13 +1,8 @@
 import { readFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { z } from "zod";
-import {
-  dataset,
-  filterHistory,
-  sum,
-  money,
-  fmt,
-} from "../../../web/lib/fleet";
+import { createFleet, sum, money, fmt } from "../../../web/lib/fleet";
+import { fleetSchema } from "../../../web/lib/dashboard-data";
 import {
   buildOperationsReport,
   type OperationsSnapshot,
@@ -70,6 +65,12 @@ const snapshot = snapshotSchema.parse(
 );
 export const operations = buildOperationsReport(snapshot, "all", "all");
 export { money, fmt };
+
+const { dataset, filterHistory } = createFleet(
+  fleetSchema.parse(
+    JSON.parse(readFileSync("../web/lib/fleet-data.json", "utf8")),
+  ),
+);
 
 const earlier = filterHistory("all", "earlier");
 const latest = filterHistory("all", "latest");

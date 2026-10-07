@@ -1,17 +1,29 @@
 import { createHash } from "node:crypto"
-import { createReadStream, statSync } from "node:fs"
-import { join } from "node:path"
-import { createGunzip } from "node:zlib"
-import { createInterface } from "node:readline"
+import { statSync } from "node:fs"
 import { DatabaseSync } from "node:sqlite"
-import { operationsManifest } from "@/lib/operations"
+import { databasePath, withDatabase } from "@/lib/database"
+import { readOperationsManifest } from "@/lib/operations-server"
 import { liveDatabasePath } from "./store"
 
-export const contextTables = operationsManifest.tables
-  .filter((table) => !table.id.startsWith("rail_"))
+function sourceManifest() {
+  return withDatabase(readOperationsManifest)
+}
+export const contextTables = sourceManifest()
+  .tables.filter((table) => !table.id.startsWith("rail_"))
   .map((table) => table.id)
 let conn: DatabaseSync | undefined
 let importing: Promise<void> | undefined
+let importedSourceSignature: string | undefined
+function sourceSignature() {
+  const path = databasePath()
+  const fingerprint = (file: string) => {
+    const stat = statSync(file, { bigint: true, throwIfNoEntry: false })
+    return stat
+      ? `${stat.dev}:${stat.ino}:${stat.size}:${stat.mtimeNs}:${stat.ctimeNs}`
+      : "missing"
+  }
+  return `${path}:${fingerprint(path)}:${fingerprint(`${path}-wal`)}`
+}
 function db() {
   if (conn) return conn
   conn = new DatabaseSync(liveDatabasePath)
@@ -30,7 +42,7 @@ function db() {
     END;`)
   return conn
 }
-const directory = join(process.cwd(), "data/operations")
+
 function recordId(table: string, row: Record<string, unknown>) {
   if (table === "route_stops") return `${row.route_id}:${row.stop_order}`
   const keys: Record<string, string> = {
@@ -75,6 +87,8 @@ function knownAt(table: string, row: Record<string, unknown>) {
 }
 export async function ensureContextDatabase() {
   if (importing) return importing
+  const before = sourceSignature()
+  if (before === importedSourceSignature) return
   importing = (async () => {
     const connection = db()
     connection.prepare("UPDATE ops_import_state SET active=1 WHERE id=1").run()
@@ -82,27 +96,35 @@ export async function ensureContextDatabase() {
       const insert = connection.prepare(
         "INSERT OR REPLACE INTO ops_records VALUES(?,?,?,?,?,?)"
       )
-      for (const table of contextTables) {
-        const path = join(directory, `${table}.jsonl.gz`)
-        const stat = statSync(path),
-          fingerprint = `v2:${stat.size}:${stat.mtimeMs}`
-        const prior = connection
-          .prepare("SELECT fingerprint FROM ops_imports WHERE table_name=?")
-          .get(table) as { fingerprint: string } | undefined
-        if (prior?.fingerprint === fingerprint) continue
-        const stream = createReadStream(path),
-          unzip = createGunzip()
-        stream.on("error", (error) => unzip.destroy(error))
-        const lines = createInterface({
-          input: stream.pipe(unzip),
-          crlfDelay: Infinity,
-        })
-        let count = 0,
-          batch: Record<string, unknown>[] = []
-        const flush = () => {
+      connection.exec(`CREATE TEMP TABLE IF NOT EXISTS ops_before (
+        record_id TEXT PRIMARY KEY, payload TEXT NOT NULL,
+        service_date TEXT, service_no TEXT, known_at TEXT
+      )`)
+      withDatabase((source) => {
+        for (const table of contextTables) {
+          const rows = source
+            .prepare(`SELECT * FROM "${table}" ORDER BY rowid`)
+            .all() as Record<string, unknown>[]
+          const fingerprint = `sqlite-v1:${createHash("sha256").update(JSON.stringify(rows)).digest("hex")}`
+          const prior = connection
+            .prepare("SELECT fingerprint FROM ops_imports WHERE table_name=?")
+            .get(table) as { fingerprint: string } | undefined
+          if (prior?.fingerprint === fingerprint) continue
           connection.exec("BEGIN IMMEDIATE")
           try {
-            for (const row of batch)
+            connection.exec("DELETE FROM ops_before")
+            if (prior)
+              connection
+                .prepare(
+                  `INSERT INTO ops_before
+              SELECT record_id,payload,service_date,service_no,known_at
+              FROM ops_records WHERE table_name=?`
+                )
+                .run(table)
+            connection
+              .prepare("DELETE FROM ops_records WHERE table_name=?")
+              .run(table)
+            for (const row of rows)
               insert.run(
                 table,
                 recordId(table, row),
@@ -114,36 +136,50 @@ export async function ensureContextDatabase() {
                 knownAt(table, row),
                 JSON.stringify(row)
               )
+            if (prior) {
+              connection
+                .prepare(
+                  `INSERT INTO ops_changes
+                (table_name,record_id,service,service_date,known_at,at)
+                SELECT n.table_name,n.record_id,
+                  COALESCE(n.service_no,CAST(json_extract(n.payload,'$.assigned_service_no') AS TEXT),CAST(json_extract(n.payload,'$.qualified_service_no') AS TEXT)),
+                  n.service_date,n.known_at,strftime('%Y-%m-%dT%H:%M:%fZ','now')
+                FROM ops_records n LEFT JOIN ops_before b ON b.record_id=n.record_id
+                WHERE n.table_name=? AND (b.record_id IS NULL OR b.payload<>n.payload)`
+                )
+                .run(table)
+              connection
+                .prepare(
+                  `INSERT INTO ops_changes
+                (table_name,record_id,service,service_date,known_at,at)
+                SELECT ?,b.record_id,
+                  COALESCE(b.service_no,CAST(json_extract(b.payload,'$.assigned_service_no') AS TEXT),CAST(json_extract(b.payload,'$.qualified_service_no') AS TEXT)),
+                  b.service_date,b.known_at,strftime('%Y-%m-%dT%H:%M:%fZ','now')
+                FROM ops_before b LEFT JOIN ops_records n
+                  ON n.table_name=? AND n.record_id=b.record_id
+                WHERE n.record_id IS NULL`
+                )
+                .run(table, table)
+            }
+            connection
+              .prepare("INSERT OR REPLACE INTO ops_imports VALUES(?,?,?,?)")
+              .run(table, fingerprint, rows.length, new Date().toISOString())
             connection.exec("COMMIT")
-            count += batch.length
-            batch = []
           } catch (error) {
             connection.exec("ROLLBACK")
             throw error
           }
         }
-        // Replace this table on import; importing runs before the worker accepts assessments.
-        connection
-          .prepare("DELETE FROM ops_records WHERE table_name=?")
-          .run(table)
-        for await (const line of lines) {
-          if (!line.trim()) continue
-          batch.push(JSON.parse(line))
-          if (batch.length >= 1000) flush()
-        }
-        flush()
-        connection
-          .prepare("INSERT OR REPLACE INTO ops_imports VALUES(?,?,?,?)")
-          .run(table, fingerprint, count, new Date().toISOString())
-      }
+      })
+      // An edit during import must trigger another refresh on the next request.
+      if (before === sourceSignature()) importedSourceSignature = before
     } finally {
       connection
         .prepare("UPDATE ops_import_state SET active=0 WHERE id=1")
         .run()
     }
-  })().catch((error) => {
+  })().finally(() => {
     importing = undefined
-    throw error
   })
   return importing
 }
@@ -166,7 +202,7 @@ export function readContextRecords(
 ) {
   if (!contextTables.includes(table))
     throw new Error("Unknown operational table")
-  const metadata = operationsManifest.tables.find((item) => item.id === table)!
+  const metadata = sourceManifest().tables.find((item) => item.id === table)!
   const where = [
     "table_name=?",
     "(service_date IS NULL OR service_date<=?)",
@@ -255,8 +291,8 @@ export function allContextRecords(
 }
 export function contextCatalog() {
   return {
-    tables: operationsManifest.tables
-      .filter((table) => contextTables.includes(table.id))
+    tables: sourceManifest()
+      .tables.filter((table) => contextTables.includes(table.id))
       .map((table) => ({
         table: table.id,
         columns: table.columns,

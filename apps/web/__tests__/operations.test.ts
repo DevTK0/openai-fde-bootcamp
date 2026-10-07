@@ -1,21 +1,20 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest"
 import { readFileSync } from "node:fs"
-import boardingHistory from "@/lib/boarding-history.json"
+import { readDashboardData } from "@/lib/dashboard-server"
 import { createHash } from "node:crypto"
 import { gunzipSync } from "node:zlib"
 import {
+  getOperationsManifest,
   getOperationsReport,
   queryOperationsTable,
   readOperationsDownload,
 } from "@/lib/operations-server"
-import {
-  operationsManifest,
-  operationMetrics,
-  quantile,
-} from "@/lib/operations"
+import { operationMetrics, quantile } from "@/lib/operations"
 import { GET } from "@/app/api/operations/route"
-import passengerMatches from "@/lib/operations-passengers.json"
+const operationsManifest = getOperationsManifest()
+const { boardingHistory, operationsPassengers: passengerMatches } =
+  readDashboardData()
 
 describe("Broader operations reporting", () => {
   it("keeps the boarding comparison complete and reconciled to source calls", () => {
@@ -27,7 +26,9 @@ describe("Broader operations reporting", () => {
         .toString()
         .trim()
         .split("\n")
-        .filter((line) => line.includes(`"route_id":"${boardingHistory.route}"`))
+        .filter((line) =>
+          line.includes(`"route_id":"${boardingHistory.route}"`)
+        )
         .map((line) => JSON.parse(line))
         .filter(
           (r) => r.route_id === boardingHistory.route && r.stop_order === 1

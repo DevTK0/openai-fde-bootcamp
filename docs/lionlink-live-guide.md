@@ -16,11 +16,13 @@ pnpm --filter web monitor
 ```
 
 Both processes must use the same `PLANNING_DB_PATH`, which defaults to
-`apps/web/.local/planning.sqlite`. The first worker run indexes 307,087 source
-records from 19 operational tables into `ops_records`. Imports preserve source
-IDs, repeated route-stop occurrences and distinct service patterns. The database
-survives browser reloads and app builds. SQLite is local single-instance storage;
-a deployed worker needs a process supervisor and durable storage.
+`apps/web/.local/planning.sqlite`. The first worker run indexes the operational
+records from `data/operations/lionlink-network.sqlite` into `ops_records`. Imports
+preserve source IDs, repeated route-stop occurrences and distinct service
+patterns. Later domain-workspace database edits refresh changed context and queue
+an assessment for affected services. The planning database survives browser reloads
+and app builds. SQLite is local single-instance storage; a deployed worker needs
+a process supervisor and durable storage.
 
 Configure `OPENAI_API_KEY` and optionally `OPENAI_MODEL` in `apps/.env`. Credentials
 stay on the server. The current configured default is `gpt-5.4-mini`. The agent has
@@ -158,9 +160,11 @@ Python `json.dumps`. To test without inventing a fleet resource, copy an existin
 readiness record, change its issue time/availability consistently, and update that
 record with the accompanying `known_at`. Its change automatically queues an
 assessment. Keep all donor trip commitments in the database; deleting them to
-appear free would invalidate the exercise. Source JSONL files are imported once
-per source fingerprint; changing a source file rebuilds that table on worker restart.
-Direct database context edits persist while the source fingerprint is unchanged.
+appear free would invalidate the exercise. Domain workspace edits in the dashboard
+SQLite database refresh the corresponding `ops_records` table on the next monitor
+scan and queue changed records for assessment. Direct edits to `ops_records` are
+supported for external telemetry, but may be replaced on the next source-table
+refresh if they reuse an imported record ID.
 
 ## Inspect decisions
 

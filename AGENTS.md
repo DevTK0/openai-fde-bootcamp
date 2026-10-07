@@ -22,12 +22,12 @@ Developer setup:
 2. Open an agent session in this checkout. Skills are versioned under `.agents/skills/`.
 3. Start with `/pstack <task>`. In Codex's native skill UI, use `$pstack` or
    select it through `/skills`. The checked-in `.agents/skills/` directories
-   register all 36 skills for this repository. Restart the session if the new entry does not appear.
+   register all 43 skills for this repository. Restart the session if the new entry does not appear.
 4. If the client intercepts `/pstack`, use `$pstack` or
    `Read .agents/skills/pstack/SKILL.md and use it for <task>`.
 
 See [.agents/skills/README.md](.agents/skills/README.md) for the included skills, all 24
-principles, the seven playbooks, upstream revision, and local adaptations.
+principles, the nine playbooks, upstream revision, and local adaptations.
 For upstream skill imports or updates, follow [.agents/skills/pstack/playbooks/adapting-skills.md](.agents/skills/pstack/playbooks/adapting-skills.md). It contains the adaptation procedure without requiring a README read.
 No global installation or companion plugin is required. Edit skill sources directly in `.agents/skills/`.
 
@@ -44,9 +44,32 @@ lasts only for the active Codex session; stop workers and persist a handoff when
 the session ends. Do not claim an unattended scheduler is running. Report unavailable capabilities honestly. Run
 `pnpm check` and the playbook's task-specific verification before handing off.
 
+## Preview ownership
+
+Use the app's `pnpm dev` script for app previews, including prototypes that depend
+on existing components, app state, routing, or integration. The shared Portless launcher assigns separate
+addresses to each worktree and app. For docs, run
+`pnpm --filter @workspace/docs dev` in your worktree and share its full HTTPS
+`Preview:` URL, including `/docs/`. See
+[the preview guide](docs/development/previews.md) for all apps and troubleshooting.
+
+Standalone throwaway prototypes may use plain HTML, CSS, and JavaScript in an
+isolated scratch directory outside production source, with a lightweight local
+server. They do not require an app worktree or the app preview launcher. Use an
+isolated app worktree when the decision depends on the app. Label scratch
+artifacts as disposable and rebuild the chosen design under the production rules.
+
+Retain the terminal session handle for every preview you start. Stop only your
+own launch through that session. Do not use broad process kills, force-replace
+another preview, reset Tailscale Serve, or stop the shared Portless proxy to free
+a port. If another server owns the same app directory, use an isolated worktree.
+
 ## UI components: use shadcn/ui
 
-All UI must be built from shadcn/ui components living in `packages/ui`.
+Production UI and prototypes inside an app must be built from shadcn/ui components
+living in `packages/ui`. Standalone throwaway prototypes described above may use
+native HTML controls and plain CSS without shadcn or Tailwind. Keep this exception
+confined to the scratch artifact.
 
 - **Do not hand-roll UI primitives** (buttons, inputs, dialogs, dropdowns, tabs, tooltips, tables, forms, toasts, etc.). If a primitive is needed and is not yet in `packages/ui/src/components`, add it with the shadcn CLI from the repo root:
 

@@ -30,6 +30,7 @@ const beat = setInterval(() => {
 try {
   await ensureContextDatabase()
   while (!stopped) {
+    await ensureContextDatabase()
     await processLiveEvent(owner)
     await delay(2000)
   }

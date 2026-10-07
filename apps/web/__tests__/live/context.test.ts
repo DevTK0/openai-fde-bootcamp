@@ -1,11 +1,12 @@
 // @vitest-environment node
-import { mkdtempSync } from "node:fs"
+import { copyFileSync, mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { DatabaseSync } from "node:sqlite"
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
 import type { LiveEvent } from "@/lib/live/contracts"
-import { operationsManifest } from "@/lib/operations"
+import { getOperationsManifest } from "@/lib/operations-server"
+import { databasePath } from "@/lib/database"
 let context: typeof import("@/lib/live/context-db")
 let proposals: typeof import("@/lib/live/proposals")
 let path: string
@@ -38,6 +39,45 @@ const event: LiveEvent = {
   source: "demo",
 }
 describe("agent operational database", () => {
+  it("refreshes imported records after a domain workspace edit", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "context-source-"))
+    const alternate = join(directory, "operations.sqlite")
+    copyFileSync(databasePath(), alternate)
+    try {
+      vi.stubEnv("DASHBOARD_DATABASE_PATH", alternate)
+      const source = new DatabaseSync(alternate)
+      source
+        .prepare("UPDATE routes SET service_no=? WHERE route_id=?")
+        .run("239", "B238_1")
+      source.close()
+      await context.ensureContextDatabase()
+      expect(
+        context.readContextRecords(
+          "routes",
+          [{ field: "route_id", op: "eq", value: "B238_1" }],
+          asOf
+        ).rows[0]?.record.service_no
+      ).toBe("239")
+      const imported = new DatabaseSync(path, { readOnly: true })
+      try {
+        expect(
+          (
+            imported
+              .prepare(
+                "SELECT COUNT(*) AS count FROM ops_changes WHERE table_name='routes' AND record_id='B238_1'"
+              )
+              .get() as { count: number }
+          ).count
+        ).toBe(1)
+      } finally {
+        imported.close()
+      }
+    } finally {
+      vi.unstubAllEnvs()
+      await context.ensureContextDatabase()
+      rmSync(directory, { recursive: true, force: true })
+    }
+  })
   it("keeps raw reports untyped and lets the agent interpret multiple signals before checking allocations", async () => {
     const { reportSchema } = await import("@/lib/live/contracts")
     const report = reportSchema.parse({
@@ -114,7 +154,7 @@ describe("agent operational database", () => {
   })
   it("preserves every source row including fleet inventory, route versions and repeated stop occurrences", () => {
     const db = new DatabaseSync(path)
-    for (const table of operationsManifest.tables.filter(
+    for (const table of getOperationsManifest().tables.filter(
       (table) => !table.id.startsWith("rail_")
     )) {
       const count = (

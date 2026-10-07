@@ -11,8 +11,12 @@ config.server = {
   ...config.server,
   host: "127.0.0.1",
   strictPort: true,
+  port: Number(process.env.PORT ?? config.server?.port ?? 3001),
   // nginx preserves the host for both the public site and collaborative preview.
   allowedHosts: [
+    ...[process.env.PORTLESS_URL, process.env.PORTLESS_TAILSCALE_URL]
+      .filter(Boolean)
+      .map((url) => new URL(url).hostname),
     "valley-or-edit.exe.xyz",
     "valley-or-edit.halibut-bass.ts.net",
   ],

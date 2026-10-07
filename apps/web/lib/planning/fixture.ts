@@ -1,11 +1,6 @@
 import { createHash } from "node:crypto"
-import { createReadStream, stat } from "node:fs"
-import { readFile } from "node:fs/promises"
-import { join } from "node:path"
-import { promisify } from "node:util"
-import { createGunzip, gunzipSync } from "node:zlib"
-import { createInterface } from "node:readline"
-import { operationsManifest } from "../operations"
+import { withDatabase } from "../database"
+import { readOperationsManifest } from "../operations-server"
 import type {
   PlanningFixture,
   PlanningMode,
@@ -14,7 +9,6 @@ import type {
   ScenarioKind,
 } from "./contracts"
 
-const operationsDirectory = join(process.cwd(), "data", "operations")
 const dates235 = ["2026-10-07", "2026-10-14"]
 const tablesNeeded = [
   "trips",
@@ -36,21 +30,7 @@ const tablesNeeded = [
 ] as const
 
 type DataRow = Record<string, unknown>
-type ReadResult = { rows: DataRow[]; jsonlHash: string; count: number }
-
-const statAsync = promisify(stat)
-const verifiedSourceHashes = new Map<
-  string,
-  { fingerprint: string; hash: string }
->()
-
-function byId(id: string) {
-  const table = operationsManifest.tables.find(
-    (candidate) => candidate.id === id
-  )
-  if (!table) throw new Error(`Missing planning source table: ${id}`)
-  return table
-}
+type ReadResult = { rows: DataRow[]; hash: string; count: number }
 
 function isoAt(date: string, time: string) {
   return `${date}T${time}+08:00`
@@ -91,7 +71,9 @@ function descriptor(
 }
 
 export async function listScenarios(): Promise<ScenarioDescriptor[]> {
-  const dates238 = operationsManifest.dates
+  const dates238 = withDatabase(
+    (database) => readOperationsManifest(database).dates
+  )
   return [
     ...dates235.map((date) =>
       descriptor("service-235-recovery", date, "retrospective")
@@ -102,82 +84,50 @@ export async function listScenarios(): Promise<ScenarioDescriptor[]> {
   ]
 }
 
-async function fileFingerprint(path: string) {
-  const info = await statAsync(path, { bigint: true })
-  return `${info.dev}:${info.ino}:${info.size}:${info.mtimeNs}:${info.ctimeNs}`
-}
-
-async function verifySource(id: string) {
-  const table = byId(id)
-  const csvPath = join(operationsDirectory, `${id}.csv.gz`)
-  const jsonlPath = join(operationsDirectory, `${id}.jsonl.gz`)
-  const [csvFingerprint, jsonlFingerprint] = await Promise.all([
-    fileFingerprint(csvPath),
-    fileFingerprint(jsonlPath),
-  ])
-  const fingerprint = `${csvFingerprint}|${jsonlFingerprint}`
-  const cached = verifiedSourceHashes.get(id)
-  if (cached?.fingerprint === fingerprint) {
-    return { jsonlHash: cached.hash, fingerprint: jsonlFingerprint }
-  }
-  const [csvGzip, jsonlGzip] = await Promise.all([
-    readFile(csvPath),
-    readFile(jsonlPath),
-  ])
-  const csvHash = createHash("sha256").update(gunzipSync(csvGzip)).digest("hex")
-  if (csvHash !== table.sha256) {
-    throw new Error(`Planning fixture checksum mismatch for ${id}.csv.gz`)
-  }
-  const jsonlHash = createHash("sha256").update(jsonlGzip).digest("hex")
-  const [csvFingerprintAfter, jsonlFingerprintAfter] = await Promise.all([
-    fileFingerprint(csvPath),
-    fileFingerprint(jsonlPath),
-  ])
-  if (`${csvFingerprintAfter}|${jsonlFingerprintAfter}` !== fingerprint) {
-    throw new Error(`Planning fixture changed while loading ${id}`)
-  }
-  verifiedSourceHashes.set(id, { fingerprint, hash: jsonlHash })
-  return { jsonlHash, fingerprint: jsonlFingerprint }
-}
-
-async function readJsonl(
+// Called inside one SQLite read transaction so both the rows and their provenance
+// describe the same domain-workspace revision, including local edits.
+function readTable(
+  database: import("node:sqlite").DatabaseSync,
   id: string,
-  select: (row: DataRow) => boolean
-): Promise<ReadResult> {
-  const expectedCount = byId(id).count
-  const { jsonlHash, fingerprint } = await verifySource(id)
-  const stream = createReadStream(join(operationsDirectory, `${id}.jsonl.gz`))
-  const unzip = createGunzip()
-  stream.on("error", (error) => unzip.destroy(error))
-  const lines = createInterface({
-    input: stream.pipe(unzip),
-    crlfDelay: Infinity,
-  })
-  const rows: DataRow[] = []
-  let count = 0
-  try {
-    for await (const line of lines) {
-      if (!line) continue
-      count++
-      const row = JSON.parse(line) as DataRow
-      if (select(row)) rows.push(row)
+  select: (row: DataRow) => boolean,
+  date: string,
+  routeIds: string[]
+): ReadResult {
+  const filter =
+    id === "trips" ||
+    [
+      "control_actions",
+      "resource_updates",
+      "crew_duties",
+      "vehicle_readiness",
+      "terminal_movements",
+      "stop_calls",
+      "origin_arrivals",
+    ].includes(id)
+      ? "service_date = ?"
+      : ["service_patterns", "route_stops", "routes"].includes(id)
+        ? `route_id IN (${routeIds.map(() => "?").join(",")})`
+        : "1=1"
+  const parameters =
+    filter === "service_date = ?"
+      ? [date]
+      : filter.startsWith("route_id")
+        ? routeIds
+        : []
+  const rows = database
+    .prepare(`SELECT * FROM "${id}" WHERE ${filter} ORDER BY rowid`)
+    .all(...parameters) as DataRow[]
+  const selected = rows.filter(select)
+  const count = (
+    database.prepare(`SELECT COUNT(*) AS count FROM "${id}"`).get() as {
+      count: number
     }
-  } finally {
-    lines.close()
-    stream.destroy()
-    unzip.destroy()
+  ).count
+  return {
+    rows: selected,
+    count,
+    hash: createHash("sha256").update(JSON.stringify(rows)).digest("hex"),
   }
-  if (count !== expectedCount) {
-    throw new Error(`Planning fixture row count mismatch for ${id}: ${count}`)
-  }
-  if (
-    (await fileFingerprint(join(operationsDirectory, `${id}.jsonl.gz`))) !==
-    fingerprint
-  ) {
-    verifiedSourceHashes.delete(id)
-    throw new Error(`Planning fixture changed while reading ${id}`)
-  }
-  return { rows, jsonlHash, count }
 }
 
 function stamp(row: DataRow, field: string) {
@@ -258,6 +208,19 @@ export async function loadScenario(
   mode: PlanningMode = "retrospective",
   sourceCutoffAt?: string
 ): Promise<PlanningFixture> {
+  return withDatabase((database) =>
+    loadFromDatabase(database, id, date, mode, sourceCutoffAt)
+  )
+}
+
+function loadFromDatabase(
+  database: import("node:sqlite").DatabaseSync,
+  id: ScenarioKind,
+  date: string,
+  mode: PlanningMode,
+  sourceCutoffAt?: string
+): PlanningFixture {
+  const operationsManifest = readOperationsManifest(database)
   if (!operationsManifest.dates.includes(date)) {
     throw new Error(`Unknown planning date: ${date}`)
   }
@@ -331,18 +294,22 @@ export async function loadScenario(
       return stamp(row, "record_issued_at") <= cutoff
     return true
   }
-  const loaded = await Promise.all(
-    tablesNeeded.map(
-      async (tableId) =>
-        [
+  const loaded = tablesNeeded.map(
+    (tableId) =>
+      [
+        tableId,
+        readTable(
+          database,
           tableId,
-          await readJsonl(tableId, (row) => relevant(tableId, row)),
-        ] as const
-    )
+          (row) => relevant(tableId, row),
+          date,
+          scenario.routeIds
+        ),
+      ] as const
   )
   const all = new Map(loaded.map(([tableId, result]) => [tableId, result.rows]))
   const sourceHashes = Object.fromEntries(
-    loaded.map(([tableId, result]) => [tableId, result.jsonlHash])
+    loaded.map(([tableId, result]) => [tableId, result.hash])
   )
   const dateTrips = all.get("trips")!
   const selectedRaw = dateTrips.filter(
@@ -429,7 +396,7 @@ export async function loadScenario(
     workshopVehicles: byTable("workshop_vehicles"),
     workshopWorkOrders: byTable("workshop_work_orders"),
     sourceCounts: Object.fromEntries(
-      tablesNeeded.map((tableId) => [tableId, byId(tableId).count])
+      loaded.map(([tableId, result]) => [tableId, result.count])
     ),
     sourceHash,
     admittedThrough,

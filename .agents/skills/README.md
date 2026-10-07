@@ -1,4 +1,4 @@
-# Pstack for this repository
+# Repository skills
 
 A selected port of [pstack](https://github.com/cursor/plugins/tree/main/pstack).
 The entrypoint is **`/pstack`**, adapted from upstream `poteto-mode`. The original
@@ -19,7 +19,7 @@ our repository prompt alias, not a new built-in Codex command. If a client
 intercepts unknown slash commands, use `$pstack` or explicitly ask the agent to
 read `.agents/skills/pstack/SKILL.md`. See the [official skill discovery documentation](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
 
-All 36 skills (the entrypoint, 11 supporting skills, and 24 principles) are
+All 43 skills (the pstack entrypoint, 12 supporting skills, 24 principles, five open-slide authoring skills, and verify-slides) are
 stored directly in `.agents/skills/`. Playbooks are loaded
 by `/pstack`. Edit the skill sources in place. The skills are available to Codex on the next turn.
 No global installation, model configuration, or companion plugin is required.
@@ -27,7 +27,40 @@ The original pstack repository is a provenance reference, not a runtime
 dependency. Agent-facing skill edits use Codex's built-in `skill-creator`, resolved
 from the session skill catalog. Removed pstack skills are not fetched or invoked.
 
-## Included subset
+## Open-slide skills
+
+The five skills from the [official open-slide overview](https://open-slide.dev/docs/skills/overview) target the existing `apps/slides/` workspace. Paths such as `slides/` and `themes/` in those skills are relative to that workspace.
+
+| Skill | Purpose |
+| --- | --- |
+| [create-slide](create-slide/SKILL.md) | Draft a new presentation. |
+| [slide-authoring](slide-authoring/SKILL.md) | Author and edit slide pages, with seven framework references. |
+| [apply-comments](apply-comments/SKILL.md) | Apply inspector comments to slide source. |
+| [create-theme](create-theme/SKILL.md) | Create a reusable theme and its demo. |
+| [current-slide](current-slide/SKILL.md) | Resolve the slide, page, and element selected in the viewer. |
+
+The [pstack entrypoint](pstack/SKILL.md#open-slide-routing) selects these skills
+directly. For example:
+
+```text
+/pstack create a deck about fleet maintenance for the operations team
+/pstack add speaker notes to the scheduling deck
+/pstack apply the inspector comments in the ridership deck
+/pstack extract a reusable slide theme from the maintenance deck
+/pstack fix the spacing on this slide
+```
+
+For the last example, pstack reads the current viewer selection before editing.
+Slide content changes use [verify-slides](verify-slides/SKILL.md), its mapped
+native-editability checks, and `pnpm check`. Add "open a PR" to use the existing PR workflow after authoring.
+
+Imported from [`open-slide/open-slide`, `packages/core/skills`, at `ad82b8966793`](https://github.com/open-slide/open-slide/tree/ad82b8966793a90113e7d69988f6dc354bfec421/packages/core/skills). The MIT notice is preserved in [LICENSE.open-slide](LICENSE.open-slide). Local changes resolve the app directory, use available Codex tools, honor existing user preferences, and follow the repository's UI and preview rules. The framework examples remain upstream reference material; repository styling rules take precedence.
+
+To update, use the skill-installer helper with that repository, a pinned `--ref`, and the five `packages/core/skills/<name>` paths. Import into a temporary `--dest`, compare against the pinned source, and preserve local adaptations when copying changes here. Do not run `open-slide sync:skills` over the adapted copies.
+
+Count discoverable skills with `find .agents/skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l`.
+
+## Included pstack subset
 
 All **24 principles** are included. Their index and triggers are in
 [pstack/SKILL.md](pstack/SKILL.md#principles); each full text lives in its
@@ -40,6 +73,7 @@ All **24 principles** are included. Their index and triggers are in
 | [typescript-best-practices](typescript-best-practices/SKILL.md) | Apply the type-system principles to TypeScript. |
 | [swarm](swarm/SKILL.md) | Coordinate independent workers and aggregate evidence-backed coverage. |
 | [figure-it-out](figure-it-out/SKILL.md) | Design an auditable workflow when no narrower playbook fits. |
+| [transcript-to-feature](transcript-to-feature/SKILL.md) | Turn a transcript and steering prompt into a brief, then carry out the requested pstack workflow. |
 | [how](how/SKILL.md) | Trace the system before changing it. |
 | [architect](architect/SKILL.md) | Sketch usage, types, and boundaries before implementation. |
 | [tdd](tdd/SKILL.md) | Failing-before, passing-after evidence for cheap regression tests. |
@@ -47,21 +81,27 @@ All **24 principles** are included. Their index and triggers are in
 | [technical-writing](technical-writing/SKILL.md) | Structure clear documentation and technical explanations. |
 | [show-me-your-work](show-me-your-work/SKILL.md) | Preserve decision evidence, as referenced by Prove It Works. |
 
-The **7 playbooks** cover:
+The **9 playbooks** cover:
 
 | Area | Playbooks |
 | --- | --- |
 | Autopilot | [autopilot-full](pstack/playbooks/autopilot-full.md), [autopilot-stack](pstack/playbooks/autopilot-stack.md) |
+| Feature delivery | [feature](pstack/playbooks/feature.md) |
+| Design exploration | [prototype](pstack/playbooks/prototype.md) |
 | Autonomous execution | [autonomous run](pstack/playbooks/autonomous-run.md) |
 | Skill maintenance | [adapting skills](pstack/playbooks/adapting-skills.md) |
 | PR lifecycle | [opening a PR](pstack/playbooks/opening-a-pr.md), [babysit](pstack/playbooks/babysit.md), [shipping](pstack/playbooks/shipping.md) |
 
-There are **11 supporting skills**, plus the entrypoint and all 24 principles.
-The verification skills are generators and maintenance workflows; no app-specific
-`verify-*` skill has been generated yet. Invoke `/pstack create a verification
-skill for apps/web` to run that workflow separately.
+There are **12 supporting skills**, plus the entrypoint and all 24 principles.
+Count the playbooks with `rg --files .agents/skills/pstack/playbooks -g "*.md" | wc -l`.
+[verify-slides](verify-slides/SKILL.md) verifies the slides app through its native
+UI and a [feature map](verify-slides/features/README.md). Its local Playwright
+helper proves editable text, independent chart objects, native persistence,
+discard, and restoration. Use `/maintain-verification-skill` to audit the map.
+No app-specific verification skill exists for web yet; invoke `/pstack create a
+verification skill for apps/web` to generate one separately.
 
-General feature, bug-fix, investigation, prototype, refactoring, eval,
+General bug-fix, investigation, refactoring, eval,
 performance/forensics workflows, arena/interrogate, general orchestration,
 model setup, session handoff, and the remaining
 situational skills and playbooks are not included. Motivation and regression
@@ -76,6 +116,8 @@ Upstream's MIT notice is preserved in [LICENSE](LICENSE).
 
 - Added `autonomous-run` from the same revision, replacing Cursor loops and watcher defaults with bounded session waits, scoped fixes, and explicit handoff instructions.
 - Added `figure-it-out` from the same revision, with local skill resolution, sequential delivery, scoped rollback, and session-bound supervision. Removed Cursor-only invocation frontmatter, consistent with the other imported skills.
+- Added [prototype](pstack/playbooks/prototype.md) from [`9f451cf875ad1239912762f67741e8e5ba6ac0f1`](https://github.com/cursor/plugins/blob/9f451cf875ad1239912762f67741e8e5ba6ac0f1/pstack/skills/poteto-mode/playbooks/prototype.md). Standalone UI experiments use plain HTML, CSS, and JavaScript in scratch directories. Experiments that depend on the app use isolated worktrees, shadcn components, and the shared preview launcher. Local browser tools replace the upstream control skill. The chosen prototype now hands off to the local Feature playbook.
+- Added [feature](pstack/playbooks/feature.md) from the prototype revision. Existing skills provide grounding, design exploration, verification, and PR delivery. Sequential implementation and explicit self-review replace upstream mandatory delegation, Arena, and Interrogate. Shipping and autopilot keep their independent verification gates.
 - Renamed `poteto-mode` to `pstack` and trimmed its routing to the bundled subset.
 - Preserved the principles with focused corrections to nonnegative-duration
   modeling and test-assertion guidance. TypeScript examples also preserve tuple

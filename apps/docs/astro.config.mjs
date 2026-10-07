@@ -7,7 +7,15 @@ export default defineConfig({
   base: "/docs",
   trailingSlash: "always",
   output: "static",
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    server: { strictPort: true },
+  },
+  server: {
+    allowedHosts: [process.env.PORTLESS_URL, process.env.PORTLESS_TAILSCALE_URL]
+      .filter(Boolean)
+      .map((url) => new URL(url).hostname),
+  },
   integrations: [
     react(),
     starlight({
@@ -15,6 +23,17 @@ export default defineConfig({
       customCss: ["./src/styles/figures.css"],
       sidebar: [
         { label: "Overview", slug: "" },
+        {
+          label: "Transcript workflow",
+          items: [
+            {
+              label: "From a transcript to a feature",
+              slug: "software-factory",
+            },
+            { label: "Workflow reference", slug: "software-factory-behavior" },
+            { label: "Develop a feature", slug: "evaluate-software-factory" },
+          ],
+        },
         {
           label: "Tutorials",
           items: [
@@ -41,6 +60,12 @@ export default defineConfig({
         {
           label: "Explanation",
           items: [
+            {
+              label: "Problems and solutions",
+              items: [
+                { autogenerate: { directory: "explanations/opportunities" } },
+              ],
+            },
             {
               label: "Repair spending and distance",
               slug: "maintenance-findings",

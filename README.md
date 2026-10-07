@@ -11,24 +11,25 @@ presentations. Both use fictional sample data.
 
 ## Run it locally
 
-You'll need **Node.js 22.12+** and **pnpm 12.9.1**. From the repository root:
+You'll need **Node.js 24.21 or newer in the 24.x release line** and **pnpm 12.9.1**. From the repository root:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Then open:
+Open the HTTPS `Preview:` URLs printed by each app from a device on the same
+Tailscale network. Each app and worktree gets its own address. Keep the terminal
+running; Ctrl+C stops only that launch. Run `pnpm previews` to list addresses.
 
-- [Live operations room](http://localhost:3000/live)
-- [Planning copilot](http://localhost:3000/planner)
-- [Fleet dashboard](http://localhost:3000/dashboard)
-- [Slide decks](http://127.0.0.1:3001/slides/)
-- [Documentation](http://127.0.0.1:3002/docs/)
-
-If port 3000 is occupied, use the web address printed in the terminal.
-To start just one app, use `pnpm --filter web dev` or
+The web preview includes `/dashboard`, `/planner`, and `/live`.
+To start one app, use `pnpm --filter web dev`,
 `pnpm --filter @workspace/slides dev`, or `pnpm --filter @workspace/docs dev`.
+For local-only development, prefix the command with `PORTLESS_TAILSCALE=0`.
+
+See [Preview apps from multiple worktrees](docs/development/previews.md) for
+setup, build previews, and troubleshooting. The VM needs Linux `flock` and a
+connected Tailscale CLI with Serve access and tailnet HTTPS enabled.
 
 ## Ship changes with Codex
 
@@ -64,14 +65,15 @@ how this collection adapts the original pstack.
 
 The main places to work are:
 
-| Location                                                     | What's there                                     |
-| ------------------------------------------------------------ | ------------------------------------------------ |
-| [apps/web](apps/web)                                         | Dashboard pages and app components               |
-| [apps/slides](apps/slides)                                   | Presentations and supporting evidence            |
-| [apps/docs](apps/docs)                                       | Astro Starlight documentation served at `/docs/` |
-| [packages/ui](packages/ui)                                   | Shared shadcn/ui components and theme            |
-| [skills](.agents/skills)                                     | Codex workflows and principles                   |
-| [apps/web/lib/fleet-data.json](apps/web/lib/fleet-data.json) | Converted handout data and source documentation  |
+| Location | What's there |
+| --- | --- |
+| [apps/web](apps/web) | Dashboard, planner and live operations pages |
+| [apps/slides](apps/slides) | Presentations and supporting evidence |
+| [apps/docs](apps/docs) | Astro Starlight documentation served at `/docs/` |
+| [packages/ui](packages/ui) | Shared shadcn/ui components and theme |
+| [skills](.agents/skills) | Codex workflows and principles |
+| [data/operations/lionlink-network.sqlite](data/operations/lionlink-network.sqlite) | Runtime dashboard database |
+| [apps/web/lib/fleet-data.json](apps/web/lib/fleet-data.json) | Converted handout data and source documentation |
 
 Use the shared components for UI work. To add a missing shadcn component, run
 `pnpm dlx shadcn@latest add <component> -c apps/web` from the repo root.
@@ -108,11 +110,48 @@ The dashboard combines two sources with different coverage:
   complete original CSV files compressed with gzip. Reliability and crowding reports
   can be filtered by service and date; workshop resources are shown separately.
 
-The operations snapshot is checked in under `apps/web/data/operations/`, including
-compressed source tables, report aggregates, and a manifest with source definitions
-and checksums. Running the app does not require the external source directory.
-The original handout files and Python conversion scripts are no longer included
-in this repository. The apps use the checked-in snapshots directly.
+The dashboard reads `data/operations/lionlink-network.sqlite` through Node's built-in
+SQLite driver. The database contains all 21 operations tables, the 40 handout tables,
+source documents, passenger links, and the boarding comparison cohort. Handout tables
+have different column layouts, so SQLite stores their rows as JSON values in
+`handout_rows`, with metadata in `handout_tables`.
+
+The server loads handouts for the dashboard page and queries operations through
+`/api/operations`. Reports aggregate the current relational records. Passenger and
+boarding views join their recorded trip links to the current trips and stop calls.
+Each request opens a read-only database transaction. Operations searches and report
+queries run in worker threads, with at most four reads in flight per server process.
+Additional reads receive HTTP 503 with `Retry-After: 1`. Services, dates, and coverage
+come from the current database rows. There is no runtime fallback to JSON files. Reload the page to see database changes in the handout views.
+
+The compressed CSV downloads are original source attachments stored in SQLite.
+They preserve the supplied bytes and do not change when you edit operational rows.
+The source documents describe the original nineteen-table export; this app also
+includes the workshop and dashboard tables.
+
+The checked-in JSON and compressed CSV files remain rebuild inputs and slide or
+documentation fixtures. The dashboard does not read those files at runtime. Rebuild
+the database from those fixtures with Python 3:
+
+```bash
+python3 scripts/build-operations-sqlite.py --output /tmp/lionlink-network.sqlite
+```
+
+The builder follows `data/operations/schema.json` for the nineteen core tables and
+adds the dashboard tables. It checks database integrity before replacing the output.
+To replace the checked-in database, run the builder with `--force` and no `--output`.
+This discards database edits in favor of the source fixtures.
+
+Set `DASHBOARD_DATABASE_PATH` to an absolute path to use another compatible database.
+The default path is relative to the web app directory used by the pnpm scripts.
+The production image includes the database and uses Node 24.21.0. Both the dashboard
+page and operations API include the database in their Next.js deployment traces.
+The operations trace also includes `apps/web/lib/database-worker.mjs`.
+
+Run `pnpm check` to verify the migration. The web tests compare the old fixtures with
+SQLite reports, pagination, downloads, handouts, and passenger evidence. They also edit
+a temporary database to prove that requests use current SQLite values, then drive
+the dashboard sections and report tabs through React Testing Library.
 
 ## Refresh slide evidence
 
@@ -129,8 +168,8 @@ pnpm check
 ```
 
 Review the authored slide figures and conclusions after a refresh. They do not
-update automatically. Restart the dashboard to clear its cached reports, and
-rebuild it for production deployment. Dates use Singapore local time and costs are SGD excluding tax.
+update automatically. Rebuild the SQLite database after changing dashboard fixtures, and
+rebuild the app for production deployment. Dates use Singapore local time and costs are SGD excluding tax.
 
 The dashboard has no authentication, so keep deployments private if you replace
 the fictional records with sensitive data.

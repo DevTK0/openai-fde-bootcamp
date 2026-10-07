@@ -11,11 +11,14 @@ Authored slides use editable text, shapes, vector icons and the shared
 From the monorepo root:
 
 ```bash
-pnpm --filter @workspace/slides dev     # 127.0.0.1:3001/slides/
+pnpm --filter @workspace/slides dev     # open the printed Preview URL
 pnpm --filter @workspace/slides build   # apps/slides/dist
-pnpm --filter @workspace/slides start   # native authoring server on port 3001
+pnpm --filter @workspace/slides start   # authoring server at its printed URL
 pnpm check
 ```
+
+Development previews use [Portless and Tailscale](../../docs/development/previews.md).
+The fixed nginx deployment below uses a separate systemd entrypoint.
 
 The normal `pnpm dev` and `pnpm build` include this app. Evidence is generated
 before dev/build from `apps/web/lib/fleet-data.json` and the compressed operations
@@ -96,7 +99,20 @@ retain the original evidence and editorial reference; generating evidence does n
 overwrite browser edits. Refresh report-based figures in the authored deck files
 when evidence changes. There is no separate custom editor or saved-edits API.
 
-## nginx deployment
+## Coolify read-only deployment
+
+The root `Dockerfile` builds the slides and the Next.js app, then serves the
+static slide export at `/slides/` through nginx on port 3000. Nginx proxies all
+other routes to Next.js on the container's loopback port 3002. Select the
+**Dockerfile** build pack in Coolify, keep the repository root as the base
+and `/Dockerfile` as the Dockerfile path, keep container port `3000` and any
+existing host-port mapping, and clear the old Railpack build/start overrides.
+`deploy/nginx/coolify.conf` handles the slide browser, assets, and deep links.
+This is a read-only presentation: edit authored JSX in Git and redeploy to
+publish changes. Browser edits and saves require the separate live authoring
+setup below and are **not** available in Coolify's static route.
+
+## Live nginx authoring deployment
 
 Nginx proxies `/slides/` to the loopback Open Slide server on port 3001, including
 its WebSocket connection. Open Slide's root-relative authoring APIs internally enter the `/slides/` location
@@ -131,7 +147,8 @@ When upgrading from the custom editor service, disable
 `openai-fde-slides-editor.service`; its old data directory can remain as a backup.
 
 `pnpm --filter @workspace/slides build` still produces a read-only static export in
-`dist`; `pnpm --filter @workspace/slides preview` serves it on port 3004. Static
+`dist`; `pnpm --filter @workspace/slides preview` serves it at the printed
+HTTPS `Preview:` URL, including `/slides/`. Static
 exports do not include Open Slide's native editing tools. Do not replace the live
 authoring route with that static output if browser editing is required.
 

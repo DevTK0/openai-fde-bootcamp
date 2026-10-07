@@ -1,9 +1,35 @@
 // @vitest-environment node
-import { describe, expect, it } from "vitest"
+import { copyFileSync, mkdtempSync, rmSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { DatabaseSync } from "node:sqlite"
+import { describe, expect, it, vi } from "vitest"
+import { databasePath } from "@/lib/database"
 import { buildCandidates } from "@/lib/planning/engine"
 import { listScenarios, loadScenario } from "@/lib/planning/fixture"
 
 describe("bounded LionLink planning scenarios", () => {
+  it("reads revised workspace rows and changes provenance without a restart", async () => {
+    const original = await loadScenario("service-235-recovery", "2026-10-07")
+    const directory = mkdtempSync(join(tmpdir(), "planning-source-"))
+    const alternate = join(directory, "operations.sqlite")
+    copyFileSync(databasePath(), alternate)
+    try {
+      const source = new DatabaseSync(alternate)
+      source
+        .prepare("UPDATE trips SET planned_vehicle_id=? WHERE trip_id=?")
+        .run("NW-V999", original.trips[0]!.trip_id as string)
+      source.close()
+      vi.stubEnv("DASHBOARD_DATABASE_PATH", alternate)
+      const revised = await loadScenario("service-235-recovery", "2026-10-07")
+      expect(revised.trips[0]!.planned_vehicle_id).toBe("NW-V999")
+      expect(revised.sourceHash).not.toBe(original.sourceHash)
+      expect(revised.sourceCounts.trips).toBe(original.sourceCounts.trips)
+    } finally {
+      vi.unstubAllEnvs()
+      rmSync(directory, { recursive: true, force: true })
+    }
+  })
   it("lists the two 235 recovery dates and each supplied 238 date", async () => {
     const scenarios = await listScenarios()
     expect(

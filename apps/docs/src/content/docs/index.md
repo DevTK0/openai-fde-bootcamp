@@ -7,8 +7,14 @@ Fleet records describe different parts of the same operation: the cost of keepin
 vehicles running, the journeys they provide, and the experiences passengers report.
 This guide explains how those records support a finding and where the evidence ends.
 
-The examples use fictional sample records. Each article states its coverage and
-includes graphs with the source values behind them.
+The findings articles use fictional sample records and explain the limits of
+their evidence. Their graphs include the source values behind them. The project
+proposals explain what LionLink could build and what would justify that work.
+
+## Develop a feature from a conversation
+
+[From a transcript to a feature](/docs/software-factory/) explains how your prompt
+and an existing transcript guide the repository's pstack workflow.
 
 ## Learn to read a comparison
 
@@ -31,3 +37,9 @@ recorded distance, and the difference between a total and a rate.
 - [Why the workshop requests cannot run together](/docs/workshop-findings/)
 - [What six passenger accounts can tell us](/docs/passenger-findings/)
 - [Why a lower quote is not automatically the better option](/docs/cost-findings/)
+
+## Explore possible projects
+
+[Twenty LionLink projects and the case for building them](/docs/explanations/opportunities/)
+explains the operational problems, how each proposed solution would work, and
+what a useful first implementation would require.
