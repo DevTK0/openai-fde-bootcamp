@@ -37,11 +37,15 @@ const emptyFilters: EvidenceFilters = {
 }
 export function Workspace({
   initialRevisions,
+  initialRevision,
 }: {
   initialRevisions: Revision[]
+  initialRevision?: string
 }) {
   const [revisions, setRevisions] = useState(initialRevisions)
-  const [revision, setRevision] = useState(initialRevisions[0]?.id ?? "")
+  const [revision, setRevision] = useState(
+    initialRevision ?? initialRevisions[0]?.id ?? ""
+  )
   const [filters, setFilters] = useState(emptyFilters)
   const [problemId, setProblemId] = useState("repair-spend")
   const [notice, setNotice] = useState("")
@@ -52,6 +56,14 @@ export function Workspace({
   const analysis = useResource<EvidenceAnalysis>(
     revision ? `/api/workspace/${revision}?${scope}` : ""
   )
+  function selectRevision(value: string) {
+    setRevision(value)
+    setFilters(emptyFilters)
+    setTable({ id: "", serial: 0 })
+    const url = new URL(window.location.href)
+    url.searchParams.set("revision", value)
+    window.history.replaceState(null, "", url)
+  }
   async function refresh() {
     try {
       const result = await requestJson<{ revisions: Revision[] }>(
@@ -80,8 +92,7 @@ export function Workspace({
         result.revision,
         ...current.filter((item) => item.id !== result.revision.id),
       ])
-      setRevision(result.revision.id)
-      setFilters(emptyFilters)
+      selectRevision(result.revision.id)
       setNotice(
         result.created
           ? "Import complete. Analysis now uses the new revision."
@@ -137,10 +148,7 @@ export function Workspace({
                   value: item.id,
                   label: `${item.name}${item.seed ? " · supplied fixture" : ""}`,
                 }))}
-                onChange={(value) => {
-                  setRevision(value)
-                  setFilters(emptyFilters)
-                }}
+                onChange={selectRevision}
               />
               <p className="font-mono text-xs text-muted-foreground">
                 {revision.slice(0, 12)}

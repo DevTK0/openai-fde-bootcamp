@@ -11,7 +11,7 @@ export async function requestJson<T>(
 ): Promise<T> {
   const response = await fetch(url, { cache: "no-store", ...init })
   if (!response.ok) {
-    const body: unknown = await response.json()
+    const body: unknown = await response.json().catch(() => null)
     const message =
       body && typeof body === "object" && "error" in body
         ? String(body.error)

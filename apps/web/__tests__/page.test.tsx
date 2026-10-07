@@ -10,8 +10,8 @@ vi.mock("next/navigation", () => ({ redirect }))
 import Page from "@/app/page"
 
 describe("Home page", () => {
-  it("redirects to the dashboard", () => {
+  it("redirects to the decision workspace", () => {
     expect(() => Page()).toThrow("NEXT_REDIRECT")
-    expect(redirect).toHaveBeenCalledWith("/dashboard")
+    expect(redirect).toHaveBeenCalledWith("/workspace")
   })
 })
