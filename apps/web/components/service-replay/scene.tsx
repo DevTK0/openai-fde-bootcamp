@@ -9,6 +9,7 @@ import { passengerSymbols } from "./passenger-symbols"
 import type { Exchange } from "./passenger-exchange"
 import { addCity, loadCity } from "./city"
 import { loadBusFleet, type BusFleet } from "./bus-fleet"
+import { busPositionMarker } from "./bus-position-marker"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 import type { Route } from "./route-geometry"
 import { mapData, point, type Point } from "./geometry"
@@ -60,7 +61,7 @@ export function Scene({
   onPick: (key: string) => void
 }) {
   const network = new Set(routes.map((route) => route.service)).size > 1
-  const [cameraVersion, setCameraVersion] = useState(0)
+  const fitCamera = useRef<(() => void) | null>(null)
   const orbit = useRef<OrbitControls | null>(null)
   const host = useRef<HTMLDivElement>(null)
   const dynamic = useRef<THREE.Group | null>(null)
@@ -109,7 +110,7 @@ export function Scene({
       .catch(() => {
         if (!disposed)
           setBusStatus(
-            "LionLink bus model unavailable. Route data remains visible."
+            "LionLink bus model unavailable. Showing vehicle position markers."
           )
       })
     void loadCity()
@@ -175,11 +176,14 @@ export function Scene({
     const span =
       Math.max(60, bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) *
       1.65
-    controls.target.copy(center)
-    camera.position
-      .copy(center)
-      .add(new THREE.Vector3(0, span * 0.9, span * 0.65))
-    controls.update()
+    fitCamera.current = () => {
+      controls.target.copy(center)
+      camera.position
+        .copy(center)
+        .add(new THREE.Vector3(0, span * 0.9, span * 0.65))
+      controls.update()
+    }
+    fitCamera.current()
     for (const polygon of mapData.land) {
       const shape = new THREE.Shape(
         polygon.map((p) => new THREE.Vector2(point(p).x, -point(p).z))
@@ -369,6 +373,7 @@ export function Scene({
       resize.disconnect()
       renderer.setAnimationLoop(null)
       orbit.current = null
+      fitCamera.current = null
       renderer.domElement.removeEventListener("wheel", panWithWheel)
       controls.dispose()
       if (fleet.current) {
@@ -380,7 +385,7 @@ export function Scene({
       renderer.dispose()
       renderer.domElement.remove()
     }
-  }, [routes, network, onPick, cameraVersion])
+  }, [routes, network, onPick])
   useEffect(() => {
     latestMarkers.current = markers
     fleet.current?.update(markers.filter((marker) => marker.kind === "bus"))
@@ -416,6 +421,19 @@ export function Scene({
         group.add(anchor)
         continue
       }
+      const color =
+        network && marker.service
+          ? serviceColor(marker.service)
+          : marker.estimated
+            ? "#ffd269"
+            : "#ffffff"
+      const position = busPositionMarker(color)
+      position.position.set(marker.x, 3.5, marker.z)
+      position.rotation.y = marker.heading ?? 0
+      position.traverse((part) => {
+        part.userData.key = marker.key
+      })
+      group.add(position)
       if (network && marker.service) {
         const canvas = document.createElement("canvas")
         canvas.width = 120
@@ -448,7 +466,7 @@ export function Scene({
         }
       }
     }
-  }, [routes, network, markers, selected, showStops, cameraVersion])
+  }, [routes, network, markers, selected, showStops])
   function zoom(factor: number) {
     const controls = orbit.current
     if (!controls) return
@@ -495,7 +513,7 @@ export function Scene({
           variant="ghost"
           aria-label="Fit route"
           title="Fit route"
-          onClick={() => setCameraVersion((value) => value + 1)}
+          onClick={() => fitCamera.current?.()}
         >
           <LocateFixed />
         </Button>

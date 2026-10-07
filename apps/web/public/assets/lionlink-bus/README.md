@@ -11,7 +11,11 @@ The scheduled-service and historical replay maps use this double-deck model
 as an illustrative vehicle marker, not a statement about a vehicle's actual body type.
 The renderer preserves the materials, turns the model's front from -X to +Z,
 and scales its length to six map units for visibility. Route headings then rotate
-that normalized model. The wheels sit above the route layer.
+that normalized model. The wheels sit above the route layer. A position ring and heading arrow remain
+visible while the model loads or if the download fails. Single-service maps use
+amber for estimated positions and white for recorded dwell. Network maps retain
+service colours on the rings and labels. Fit route resets the camera without
+reloading the model.
 
 `BusFleet` owns one set of geometry and materials per map. Instanced meshes
 share those resources across vehicles. Marker updates change the instance

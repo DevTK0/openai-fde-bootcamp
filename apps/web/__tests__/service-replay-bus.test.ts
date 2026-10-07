@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import { BusFleet } from "@/components/service-replay/bus-fleet"
+import { busPositionMarker } from "@/components/service-replay/bus-position-marker"
 
 async function fleet() {
   const bytes = await readFile("public/assets/lionlink-bus/lionlink-bus.glb")
@@ -88,4 +89,29 @@ describe("LionLink buses on the route map", () => {
     expect(released).toContain("Tail_lamps")
     expect(buses.children).toHaveLength(0)
   })
+})
+
+it("keeps a coloured, directional, selectable position marker without a loaded bus", () => {
+  const marker = busPositionMarker("#ffd269")
+  marker.position.set(10, 3.5, 20)
+  marker.rotation.y = Math.PI / 2
+  marker.updateMatrixWorld(true)
+  const ray = new THREE.Raycaster(
+    new THREE.Vector3(13.6, 10, 20),
+    new THREE.Vector3(0, -1, 0)
+  )
+  const hit = ray.intersectObject(marker)[0]
+  expect(hit?.point.x).toBeCloseTo(13.6)
+  expect(hit?.point.y).toBeCloseTo(3.5)
+  expect(hit?.point.z).toBeCloseTo(20)
+  for (const child of marker.children) {
+    if (
+      child instanceof THREE.Mesh &&
+      child.material instanceof THREE.MeshBasicMaterial
+    ) {
+      expect(child.material.color.getHexString()).toBe("ffd269")
+      child.geometry.dispose()
+      child.material.dispose()
+    }
+  }
 })
