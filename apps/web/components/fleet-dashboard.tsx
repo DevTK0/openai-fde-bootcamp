@@ -1,5 +1,6 @@
 "use client"
 
+import { VehiclePlanning } from "./vehicle-planning"
 import { CrewPlanning } from "./crew-planning"
 import { ServiceHistory } from "./service-history"
 import { ServicePlanning } from "./service-planning"
@@ -512,11 +513,14 @@ function DashboardReport({
       return <Overview vehicle={vehicle} period={period} />
     case "vehicles":
       return (
-        <OperationsSources
-          key={view}
-          initialTable="vehicles"
-          allowedTables={["vehicles"]}
-        />
+        <div className="space-y-6">
+          <VehiclePlanning />
+          <OperationsSources
+            key={view}
+            initialTable="vehicles"
+            allowedTables={["vehicles"]}
+          />
+        </div>
       )
     case "day-schedule":
       return (

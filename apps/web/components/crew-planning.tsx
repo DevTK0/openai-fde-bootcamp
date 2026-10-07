@@ -1,16 +1,11 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import {
-  AlertTriangle,
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-} from "lucide-react"
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Badge } from "@workspace/ui/components/badge"
-import { Card, CardContent } from "@workspace/ui/components/card"
+import { AssignmentTimeline } from "./assignment-timeline"
 import {
   Sheet,
   SheetContent,
@@ -20,7 +15,6 @@ import {
 } from "@workspace/ui/components/sheet"
 import { Pick } from "./report-ui"
 import { useDashboard } from "./dashboard-provider"
-import { serviceColor } from "./service-replay/service-color"
 import {
   crewPlanningSchema,
   crewRows,
@@ -159,14 +153,6 @@ function CrewTimeline({
     Math.ceil((times.length ? Math.max(...times) : start + 6 * 3600) / 3600) *
       3600
   )
-  const ticks = Array.from(
-    { length: Math.round((end - start) / 3600) + 1 },
-    (_, i) => start + i * 3600
-  )
-  const position = (from: number, to: number) => ({
-    left: `${(100 * (from - start)) / (end - start)}%`,
-    width: `${(100 * (to - from)) / (end - start)}%`,
-  })
   const selectedTrip =
     selection?.kind === "trip"
       ? allRows
@@ -216,177 +202,47 @@ function CrewTimeline({
           Other services for these crews remain visible in muted colors.
         </p>
       )}
-      <Card className="overflow-hidden py-0">
-        <CardContent className="p-0">
-          <div
-            className="max-h-160 overflow-auto"
-            role="region"
-            aria-label="Crew assignment timeline"
-            tabIndex={0}
-          >
-            <div className="min-w-400">
-              <div className="sticky top-0 z-20 grid grid-cols-[10rem_1fr] border-b bg-card">
-                <div className="sticky left-0 z-30 bg-card px-4 py-3 text-xs font-medium">
-                  Crew
-                </div>
-                <div className="relative mr-5 h-10">
-                  {ticks.map((t) => (
-                    <span
-                      key={t}
-                      className="absolute top-3 -translate-x-1/2 text-[10px] text-muted-foreground tabular-nums first:translate-x-0 last:-translate-x-full"
-                      style={{
-                        left: `${(100 * (t - start)) / (end - start)}%`,
-                      }}
-                    >
-                      {crewClock(t)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              {visible.map((row) => {
-                const height = 36 * row.lanes + 36
-                const incomplete = row.assignments.filter(
-                  (a) => !timedTrip(a.trip)
-                )
-                return (
-                  <div
-                    key={row.crew ?? "unassigned"}
-                    className="grid grid-cols-[10rem_1fr] border-b last:border-0"
-                    role="group"
-                    aria-label={`Crew ${row.crew ?? "unassigned"}`}
-                  >
-                    <div className="sticky left-0 z-10 bg-card px-4 py-3">
-                      <p className="text-sm font-medium">
-                        {row.crew ?? "Unassigned"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {row.assignments.length}{" "}
-                        {row.assignments.length === 1 ? "trip" : "trips"} ·{" "}
-                        {row.duties.length}{" "}
-                        {row.duties.length === 1 ? "duty" : "duties"}
-                      </p>
-                    </div>
-                    <div className="mr-5">
-                      <div className="relative" style={{ height }}>
-                        {ticks.map((t) => (
-                          <div
-                            key={t}
-                            className="pointer-events-none absolute inset-y-0 border-l border-border/50"
-                            style={{
-                              left: `${(100 * (t - start)) / (end - start)}%`,
-                            }}
-                          />
-                        ))}
-                        {row.duties.map(
-                          (d) =>
-                            d.start !== null &&
-                            d.end !== null &&
-                            d.end > d.start && (
-                              <Button
-                                key={d.id}
-                                variant="ghost"
-                                className="absolute top-1 h-5 min-w-0 rounded-sm bg-muted p-0 hover:bg-muted-foreground/30"
-                                style={position(d.start, d.end)}
-                                aria-label={`Duty ${d.id}, ${crewClock(d.start)} to ${crewClock(d.end)}`}
-                                title={`Duty ${d.id}`}
-                                onClick={() =>
-                                  setSelection({ kind: "duty", id: d.id })
-                                }
-                              />
-                            )
-                        )}
-                        {row.assignments.map(
-                          (a) =>
-                            timedTrip(a.trip) && (
-                              <Button
-                                key={a.trip.id}
-                                variant="outline"
-                                className={`absolute h-8 min-w-0 flex-col items-start justify-center gap-0 overflow-hidden rounded-md px-1 text-[10px] leading-tight text-slate-950 ${a.conflicts.length ? "ring-2 ring-red-500 ring-offset-1 ring-offset-background" : ""}`}
-                                style={{
-                                  ...position(a.trip.departure, a.trip.arrival),
-                                  top: 28 + 36 * a.lane,
-                                  backgroundColor: serviceColor(a.trip.service),
-                                  opacity:
-                                    service === "all" ||
-                                    a.trip.service === service
-                                      ? 1
-                                      : 0.4,
-                                }}
-                                aria-label={`Trip ${a.trip.id}, service ${a.trip.service}, ${crewClock(a.trip.departure)} to ${crewClock(a.trip.arrival)}${a.conflicts.length ? ", timing conflict" : ""}`}
-                                title={`${a.trip.service} · ${a.trip.vehicle ?? "Unassigned bus"} · ${crewClock(a.trip.departure)}–${crewClock(a.trip.arrival)}`}
-                                onClick={() =>
-                                  setSelection({ kind: "trip", id: a.trip.id })
-                                }
-                              >
-                                <span className="flex items-center gap-1 font-semibold">
-                                  {a.unverified.length > 0 && (
-                                    <span className="size-1.5 shrink-0 rounded-full bg-amber-800" />
-                                  )}
-                                  {a.conflicts.length > 0 && (
-                                    <AlertTriangle className="size-3 shrink-0" />
-                                  )}
-                                  {a.trip.service}
-                                </span>
-                                <span className="max-w-full truncate text-[9px]">
-                                  {a.trip.vehicle ?? "Unassigned"}
-                                </span>
-                              </Button>
-                            )
-                        )}
-                        {row.duties.map(
-                          (d) =>
-                            d.breakStart !== null &&
-                            d.breakEnd !== null &&
-                            d.breakEnd > d.breakStart && (
-                              <Button
-                                key={`break:${d.id}`}
-                                variant="outline"
-                                className="absolute top-1 h-5 min-w-0 overflow-hidden rounded-sm border-muted-foreground/50 bg-[repeating-linear-gradient(135deg,transparent,transparent_4px,var(--border)_4px,var(--border)_7px)] p-0 text-[10px]"
-                                style={position(d.breakStart, d.breakEnd)}
-                                aria-label={`Protected break ${d.id}, ${crewClock(d.breakStart)} to ${crewClock(d.breakEnd)}`}
-                                onClick={() =>
-                                  setSelection({ kind: "duty", id: d.id })
-                                }
-                              >
-                                Break
-                              </Button>
-                            )
-                        )}
-                      </div>
-                      {incomplete.length > 0 && (
-                        <div className="flex flex-wrap gap-2 py-2">
-                          {incomplete.map((a) => (
-                            <Button
-                              key={a.trip.id}
-                              size="sm"
-                              variant="outline"
-                              onClick={() =>
-                                setSelection({ kind: "trip", id: a.trip.id })
-                              }
-                            >
-                              {a.trip.service} · Time unverified
-                            </Button>
-                          ))}
-                        </div>
-                      )}
-                      {!row.assignments.length && !row.duties.length && (
-                        <p className="text-xs text-muted-foreground">
-                          No supplied assignments
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-              {!rows.length && (
-                <p className="p-6 text-sm text-muted-foreground">
-                  No matching crew assignments.
-                </p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <AssignmentTimeline
+        label="Crew"
+        start={start}
+        end={end}
+        rows={visible.map((row) => ({
+          key: row.crew ?? "unassigned",
+          label: row.crew ?? "Unassigned",
+          lanes: row.lanes,
+          summary: `${row.assignments.length} ${row.assignments.length === 1 ? "trip" : "trips"} · ${row.duties.length} ${row.duties.length === 1 ? "duty" : "duties"}`,
+          bands: row.duties.flatMap((d) => [
+            {
+              key: d.id,
+              start: d.start,
+              end: d.end,
+              kind: "window",
+              label: `Duty ${d.id}, ${crewClock(d.start)} to ${crewClock(d.end)}`,
+              onSelect: () => setSelection({ kind: "duty", id: d.id }),
+            },
+            {
+              key: `break:${d.id}`,
+              start: d.breakStart,
+              end: d.breakEnd,
+              kind: "break",
+              label: `Protected break ${d.id}, ${crewClock(d.breakStart)} to ${crewClock(d.breakEnd)}`,
+              onSelect: () => setSelection({ kind: "duty", id: d.id }),
+            },
+          ]),
+          blocks: row.assignments.map((a) => ({
+            key: a.trip.id,
+            start: a.trip.departure,
+            end: a.trip.arrival,
+            service: a.trip.service,
+            secondary: a.trip.vehicle ?? "Unassigned",
+            lane: a.lane,
+            conflict: a.conflicts.length > 0,
+            unverified: a.unverified.length > 0,
+            muted: service !== "all" && a.trip.service !== service,
+            onSelect: () => setSelection({ kind: "trip", id: a.trip.id }),
+          })),
+        }))}
+      />
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
           {rows.length ? page * 25 + 1 : 0}–

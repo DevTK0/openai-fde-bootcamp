@@ -23,7 +23,7 @@ export const dashboardWorkspaces = [
         id: "vehicles",
         label: "Vehicle register",
         description:
-          "Operating vehicles, service assignments, and fleet characteristics.",
+          "Planned vehicle assignments, engineering evidence, and fleet records.",
       },
     ],
   },

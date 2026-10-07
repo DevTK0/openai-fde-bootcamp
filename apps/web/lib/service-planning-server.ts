@@ -44,20 +44,7 @@ export async function getPlanningReport(
       unixepoch(actual_end_at) AS end, from_stop_id AS "from", to_stop_id AS "to" FROM terminal_movements WHERE service_date = ?`,
         parameters: [selection.date],
       },
-      {
-        sql: `SELECT work_order_id AS id, vehicle_id AS vehicle, unixepoch(opened_at) AS start,
-      unixepoch(confirmed_release_at) AS end, 'workshop_work_orders' AS source FROM workshop_work_orders
-      UNION ALL
-      SELECT json_extract(r.data, '$."Work order ID"'), json_extract(r.data, '$."Vehicle ID"'),
-        unixepoch(replace(json_extract(r.data, '$."Opened at"'), ' ', 'T') || '+08:00'),
-        unixepoch(replace(json_extract(r.data, '$."Confirmed release at"'), ' ', 'T') || '+08:00'), t.id
-      FROM handout_rows r JOIN handout_tables t ON t.id = r.table_id WHERE json_extract(t.metadata, '$.title') = 'Selected work orders'
-      UNION ALL
-      SELECT json_extract(r.data, '$."Service ID"'), json_extract(r.data, '$."Vehicle ID"'),
-        unixepoch(replace(json_extract(r.data, '$."Started at"'), ' ', 'T') || '+08:00'),
-        unixepoch(replace(json_extract(r.data, '$."Completed at"'), ' ', 'T') || '+08:00'), t.id
-      FROM handout_rows r JOIN handout_tables t ON t.id = r.table_id WHERE json_extract(t.metadata, '$.title') = 'Service records'`,
-      },
+      maintenanceHoldQuery,
     ],
     signal
   )
@@ -131,4 +118,19 @@ export async function getScheduledService(date: string, signal?: AbortSignal) {
     signal
   )
   return scheduledServiceSchema.parse({ routes, positions, plannedTrips })
+}
+
+export const maintenanceHoldQuery = {
+  sql: `SELECT work_order_id AS id, vehicle_id AS vehicle, unixepoch(opened_at) AS start,
+      unixepoch(confirmed_release_at) AS end, 'workshop_work_orders' AS source FROM workshop_work_orders
+      UNION ALL
+      SELECT json_extract(r.data, '$."Work order ID"'), json_extract(r.data, '$."Vehicle ID"'),
+        unixepoch(replace(json_extract(r.data, '$."Opened at"'), ' ', 'T') || '+08:00'),
+        unixepoch(replace(json_extract(r.data, '$."Confirmed release at"'), ' ', 'T') || '+08:00'), t.id
+      FROM handout_rows r JOIN handout_tables t ON t.id = r.table_id WHERE json_extract(t.metadata, '$.title') = 'Selected work orders'
+      UNION ALL
+      SELECT json_extract(r.data, '$."Service ID"'), json_extract(r.data, '$."Vehicle ID"'),
+        unixepoch(replace(json_extract(r.data, '$."Started at"'), ' ', 'T') || '+08:00'),
+        unixepoch(replace(json_extract(r.data, '$."Completed at"'), ' ', 'T') || '+08:00'), t.id
+      FROM handout_rows r JOIN handout_tables t ON t.id = r.table_id WHERE json_extract(t.metadata, '$.title') = 'Service records'`,
 }
