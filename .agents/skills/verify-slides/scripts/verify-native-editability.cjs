@@ -120,7 +120,10 @@ async function run() {
   } finally {
     if (context) {
       await context.tracing.stop({ path: path.join(evidence, 'trace.zip') })
-        .catch((error) => record('Trace capture failed', String(error)));
+        .catch(async (error) => {
+          failure ??= error;
+          await record('Trace capture failed', String(error));
+        });
     }
     if (browser) await browser.close();
     try {
