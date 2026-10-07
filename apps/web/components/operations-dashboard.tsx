@@ -1,5 +1,7 @@
 "use client"
 
+import { useDashboard } from "@/components/dashboard-provider"
+
 import { Plot } from "@workspace/ui/components/report-chart"
 
 import { useEffect, useState } from "react"
@@ -34,10 +36,7 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { Metric, Notice, Pick, Records } from "@/components/report-ui"
-import {
-  operationsManifest as manifest,
-  type OperationsReport,
-} from "@/lib/operations"
+import { type OperationsReport } from "@/lib/operations"
 import { fmt, type Dataset, type Row } from "@/lib/fleet"
 
 function useReport<T>(url: string) {
@@ -91,20 +90,20 @@ function Pending({ error, retry }: { error?: string; retry: () => void }) {
     </div>
   )
 }
-function resourceDataset(rows: Row[]): Dataset {
-  const meta = manifest.tables.find((t) => t.id === "workshop_work_orders")!
+function resourceDataset(rows: Row[], columns: string[]): Dataset {
   return {
-    id: meta.id,
-    file: meta.file,
+    id: "workshop_work_orders",
+    file: "data/workshop/workshop_work_orders.csv",
     sheet: "Workshop supplement",
     title: "Held workshop work orders",
-    columns: meta.columns,
+    columns,
     rows,
     sourceRows: rows.map((_, i) => i + 2),
     notes: [],
   }
 }
 export function OperationsDashboard() {
+  const { operationsManifest: manifest } = useDashboard()
   const [service, setService] = useState("all"),
     [date, setDate] = useState("all"),
     [tab, setTab] = useState("reliability")
@@ -404,7 +403,13 @@ export function OperationsDashboard() {
                   detail={`${manifest.tables.find((t) => t.id === "resource_updates")!.count} contemporaneous resource updates`}
                 />
               </div>
-              <Records table={resourceDataset(report.workshop)} />
+              <Records
+                table={resourceDataset(
+                  report.workshop,
+                  manifest.tables.find((t) => t.id === "workshop_work_orders")!
+                    .columns
+                )}
+              />
               <Notice>
                 All eight NW-W workshop vehicles are held and all
                 confirmed-release fields are blank. Estimated completion does
@@ -427,6 +432,7 @@ export function OperationsSources({
   initialTable?: string
   compact?: boolean
 }) {
+  const { operationsManifest: manifest } = useDashboard()
   const [table, setTable] = useState(initialTable),
     [draft, setDraft] = useState(""),
     [query, setQuery] = useState(""),

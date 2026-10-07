@@ -1,6 +1,8 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalDependencies": ["data/operations/lionlink-network.sqlite"],
+  "globalEnv": ["DASHBOARD_DATABASE_PATH"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

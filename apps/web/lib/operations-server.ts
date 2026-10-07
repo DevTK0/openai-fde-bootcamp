@@ -1,147 +1,264 @@
-import { createReadStream } from "node:fs"
-import { readFile } from "node:fs/promises"
-import { join } from "node:path"
-import { createInterface } from "node:readline"
-import { createGunzip, gunzipSync } from "node:zlib"
-import {
-  operationsManifest,
-  buildOperationsReport,
-  type OperationsSnapshot,
-} from "./operations"
-import type { Row } from "./fleet"
-const directory = join(process.cwd(), "data", "operations")
-let snapshot: Promise<OperationsSnapshot> | undefined
-export async function getOperationsReport(service: string, date: string) {
-  if (!snapshot)
-    snapshot = readFile(join(directory, "summary.json.gz"))
-      .then(
-        (buffer) =>
-          JSON.parse(gunzipSync(buffer).toString()) as OperationsSnapshot
-      )
-      .catch((error) => {
-        snapshot = undefined
-        throw error
-      })
-  return buildOperationsReport(await snapshot, service, date)
-}
-export function sourceTable(id: string) {
-  return operationsManifest.tables.find((table) => table.id === id)
-}
-export class OperationsQueryBusyError extends Error {
-  constructor() {
-    super("Operations records are busy. Please retry shortly.")
+import type { DatabaseSync } from "node:sqlite"
+import { z } from "zod"
+import { withDatabase, readMetadata } from "./database"
+import { manifestSchema, rowSchema } from "./dashboard-data"
+import { buildOperationsReport, type OperationGroup } from "./operations"
+
+const rowsSchema = z.array(rowSchema)
+const quote = (name: string) => `"${name.replaceAll('"', '""')}"`
+
+export function readOperationsManifest(database: DatabaseSync) {
+  const manifest = readMetadata(database, "operations", manifestSchema)
+  return {
+    ...manifest,
+    tables: manifest.tables.map((table) => ({
+      ...table,
+      count: z
+        .object({ count: z.number() })
+        .parse(
+          database
+            .prepare(`SELECT COUNT(*) AS count FROM ${quote(table.id)}`)
+            .get()
+        ).count,
+    })),
   }
 }
-type QueryResult = {
-  table: string
-  columns: string[]
-  rows: Row[]
-  total: number
-  page: number
-  pageSize: number
+export function getOperationsManifest() {
+  return withDatabase(readOperationsManifest)
 }
-// The snapshot is immutable for the lifetime of this process. Cache only pages,
-// not entire parsed tables: stop_calls alone contains over 250,000 wide rows.
-const queryCache = new Map<string, QueryResult>()
-const pendingQueries = new Map<string, Promise<QueryResult>>()
-const cacheLimit = 32
-const scanLimit = 4
+export function sourceTable(id: string) {
+  return getOperationsManifest().tables.find((table) => table.id === id)
+}
+
+export async function getOperationsReport(service: string, date: string) {
+  return withDatabase((database) => {
+    const groups = new Map<string, OperationGroup>()
+    const tripSchema = z.object({
+      date: z.string(),
+      service: z.string(),
+      vehicle: z.string(),
+      planned: z.string(),
+      state: z.string(),
+      km: z.number(),
+      seconds: z.number(),
+      departure: z.number(),
+      arrival: z.number(),
+    })
+    const filter =
+      "(? = 'all' OR t.service_no = ?) AND (? = 'all' OR t.service_date = ?)"
+    const params = [service, service, date, date]
+    const trips = tripSchema.array().parse(
+      database
+        .prepare(
+          `SELECT t.service_date AS date, t.service_no AS service,
+      t.actual_vehicle_id AS vehicle, t.planned_vehicle_id AS planned, t.completion_state AS state,
+      t.published_distance_km AS km,
+      unixepoch(t.actual_arrival_at) - unixepoch(t.actual_departure_at) AS seconds,
+      unixepoch(t.actual_departure_at) - unixepoch(t.scheduled_departure_at) AS departure,
+      unixepoch(t.actual_arrival_at) - unixepoch(t.scheduled_arrival_at) AS arrival
+      FROM trips t WHERE ${filter} ORDER BY t.rowid`
+        )
+        .all(...params)
+    )
+    for (const trip of trips) {
+      const key = `${trip.date}/${trip.service}`
+      let group = groups.get(key)
+      if (!group) {
+        group = {
+          date: trip.date,
+          service: trip.service,
+          trips: 0,
+          completed: 0,
+          km: 0,
+          positioningKm: 0,
+          seconds: 0,
+          vehicles: [],
+          departureDelays: [],
+          arrivalDelays: [],
+          substitutions: 0,
+          calls: 0,
+          boardings: 0,
+          alightings: 0,
+          queuedCalls: 0,
+          fullCalls: 0,
+          occupancySum: 0,
+          initialQueue: 0,
+          arrivals: 0,
+          remainingQueue: 0,
+          windowBoardings: 0,
+          controlActions: 0,
+          resourceUpdates: 0,
+        }
+        groups.set(key, group)
+      }
+      group.trips++
+      group.completed += Number(trip.state === "completed")
+      group.km += trip.km
+      group.seconds += trip.seconds
+      group.vehicles.push(trip.vehicle)
+      group.departureDelays.push(trip.departure)
+      group.arrivalDelays.push(trip.arrival)
+      group.substitutions += Number(trip.vehicle !== trip.planned)
+    }
+    const calls = z
+      .object({
+        date: z.string(),
+        service: z.string(),
+        calls: z.number(),
+        boardings: z.number(),
+        alightings: z.number(),
+        queuedCalls: z.number(),
+        fullCalls: z.number(),
+        occupancySum: z.number(),
+      })
+      .array()
+      .parse(
+        database
+          .prepare(
+            `
+      SELECT t.service_date AS date, t.service_no AS service, count(*) AS calls,
+        sum(c.boarded_people) AS boardings, sum(c.alighted_people) AS alightings,
+        sum(c.queue_after_people > 0) AS queuedCalls, sum(c.onboard_departing >= c.capacity_people) AS fullCalls,
+        sum(1.0 * c.onboard_departing / c.capacity_people) AS occupancySum
+      FROM trips t JOIN stop_calls c USING (trip_id) WHERE ${filter} GROUP BY t.service_date, t.service_no`
+          )
+          .all(...params)
+      )
+    for (const call of calls)
+      Object.assign(groups.get(`${call.date}/${call.service}`)!, call)
+    const movements = z
+      .object({
+        date: z.string(),
+        service: z.string(),
+        km: z.number(),
+        seconds: z.number(),
+      })
+      .array()
+      .parse(
+        database
+          .prepare(
+            `
+      SELECT t.service_date AS date, t.service_no AS service, sum(m.planning_distance_km) AS km,
+        sum(unixepoch(m.actual_end_at) - unixepoch(m.actual_start_at)) AS seconds
+      FROM terminal_movements m JOIN trips t ON t.trip_id = m.to_trip_id WHERE ${filter}
+      GROUP BY t.service_date, t.service_no`
+          )
+          .all(...params)
+      )
+    for (const movement of movements) {
+      const group = groups.get(`${movement.date}/${movement.service}`)!
+      group.positioningKm += movement.km
+      group.seconds += movement.seconds
+    }
+    const hotspots = z
+      .object({
+        date: z.string(),
+        service: z.string(),
+        route: z.string(),
+        order: z.number(),
+        stop: z.string(),
+        name: z.string(),
+        arrivals: z.number(),
+        boardings: z.number(),
+        remaining: z.number(),
+        initial: z.number(),
+      })
+      .array()
+      .parse(
+        database
+          .prepare(
+            `
+      SELECT q.service_date AS date, r.service_no AS service, q.route_id AS route, q.stop_order AS "order",
+        q.stop_id AS stop, s.description AS name, q.total_arrivals_people AS arrivals,
+        q.total_boarded_people AS boardings, q.remaining_queue_people AS remaining, q.initial_queue_people AS initial
+      FROM queue_windows q JOIN routes r USING (route_id) JOIN stops s USING (stop_id)
+      WHERE (? = 'all' OR r.service_no = ?) AND (? = 'all' OR q.service_date = ?) ORDER BY q.rowid`
+          )
+          .all(...params)
+      )
+    for (const hotspot of hotspots) {
+      const group = groups.get(`${hotspot.date}/${hotspot.service}`)!
+      group.initialQueue += hotspot.initial
+      group.arrivals += hotspot.arrivals
+      group.remainingQueue += hotspot.remaining
+      group.windowBoardings += hotspot.boardings
+    }
+    return buildOperationsReport(
+      {
+        groups: [...groups.values()].sort((a, b) =>
+          `${a.date}/${a.service}`.localeCompare(`${b.date}/${b.service}`)
+        ),
+        hotspots: hotspots.map(({ initial: _initial, ...hotspot }) => hotspot),
+        workshop: rowsSchema.parse(
+          database
+            .prepare("SELECT * FROM workshop_work_orders ORDER BY rowid")
+            .all()
+        ),
+      },
+      service,
+      date
+    )
+  })
+}
 
 export async function queryOperationsTable(
   id: string,
   query: string,
   page: number
-): Promise<QueryResult> {
-  const table = sourceTable(id)
-  if (!table) throw new Error("Unknown table")
-  const search = query.toLowerCase()
-  const key = JSON.stringify([id, search, page])
-  const cached = queryCache.get(key)
-  if (cached) {
-    queryCache.delete(key)
-    queryCache.set(key, cached)
-    return cached
-  }
-  const pending = pendingQueries.get(key)
-  if (pending) return pending
-  // No search result can have more rows than the source table. Unfiltered
-  // out-of-range requests therefore need no file access at all.
-  if (!search && page * 25 >= table.count) {
+) {
+  return withDatabase((database) => {
+    const table = readMetadata(
+      database,
+      "operations",
+      manifestSchema
+    ).tables.find((table) => table.id === id)
+    if (!table) throw new Error("Unknown table")
+    database.function("search_text", (value) =>
+      String(value ?? "").toLowerCase()
+    )
+    const search = query.toLowerCase()
+    const where = search
+      ? ` WHERE ${table.columns.map((column) => `instr(search_text(${quote(column)}), ?) > 0`).join(" OR ")}`
+      : ""
+    const parameters = search ? table.columns.map(() => search) : []
+    const total = z
+      .object({ count: z.number() })
+      .parse(
+        database
+          .prepare(`SELECT count(*) AS count FROM ${quote(id)}${where}`)
+          .get(...parameters)
+      ).count
+    const rows = rowsSchema.parse(
+      database
+        .prepare(
+          `SELECT * FROM ${quote(id)}${where} ORDER BY rowid LIMIT 25 OFFSET ?`
+        )
+        .all(...parameters, page * 25)
+    )
     return {
       table: id,
       columns: table.columns,
-      rows: [],
-      total: table.count,
+      rows: rows.map((row) =>
+        Object.fromEntries(
+          Object.entries(row).map(([key, value]) => [
+            key,
+            value === "" ? null : value,
+          ])
+        )
+      ),
+      total,
       page,
       pageSize: 25,
     }
-  }
-  if (pendingQueries.size >= scanLimit) throw new OperationsQueryBusyError()
-  const request = scanOperationsTable(id, search, page)
-    .then((result) => {
-      queryCache.set(key, result)
-      if (queryCache.size > cacheLimit) {
-        queryCache.delete(queryCache.keys().next().value!)
-      }
-      return result
-    })
-    .finally(() => pendingQueries.delete(key))
-  pendingQueries.set(key, request)
-  return request
-}
-
-async function scanOperationsTable(id: string, query: string, page: number) {
-  const table = sourceTable(id)
-  if (!table) throw new Error("Unknown table")
-  const input = createReadStream(join(directory, `${table.id}.jsonl.gz`)),
-    unzip = createGunzip()
-  input.on("error", (error) => unzip.destroy(error))
-  const lines = createInterface({
-    input: input.pipe(unzip),
-    crlfDelay: Infinity,
   })
-  const rows: Row[] = [],
-    search = query.toLowerCase(),
-    size = 25
-  let total = 0
-  try {
-    for await (const line of lines) {
-      if (!search) {
-        // Skip earlier lines without parsing, and close the stream as soon
-        // as this page is complete. The manifest supplies the exact total.
-        if (total++ < page * size) continue
-        rows.push(JSON.parse(line) as Row)
-        if (rows.length === size) break
-        continue
-      }
-      const row = JSON.parse(line) as Row
-      if (
-        !Object.values(row).some((v) =>
-          String(v ?? "")
-            .toLowerCase()
-            .includes(search)
-        )
-      )
-        continue
-      if (total >= page * size && rows.length < size) rows.push(row)
-      total++
-    }
-  } finally {
-    lines.close()
-    input.destroy()
-    unzip.destroy()
-  }
-  return {
-    table: table.id,
-    columns: table.columns,
-    rows,
-    total: search ? total : table.count,
-    page,
-    pageSize: size,
-  }
 }
 export async function readOperationsDownload(id: string) {
-  const table = sourceTable(id)
-  if (!table) throw new Error("Unknown table")
-  return readFile(join(directory, `${table.id}.csv.gz`))
+  return withDatabase((database) => {
+    const row = database
+      .prepare("SELECT content FROM source_downloads WHERE table_id = ?")
+      .get(id)
+    if (!row || !(row.content instanceof Uint8Array))
+      throw new Error("Unknown table")
+    return Buffer.from(row.content)
+  })
 }

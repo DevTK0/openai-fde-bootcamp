@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the operations SQLite export from the checked-in compressed CSVs."""
+"""Build the dashboard SQLite database from the checked-in source fixtures."""
 
 import argparse
 import csv
@@ -13,6 +13,103 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "apps/web/data/operations"
 SCHEMA = ROOT / "data/operations/schema.json"
+
+
+def quote(name):
+    return '"' + name.replace('"', '""') + '"'
+
+
+def add_dashboard_data(connection):
+    manifest = json.loads((SOURCE / "manifest.json").read_text())
+    core = {table["name"] for table in json.loads(SCHEMA.read_text())["tables"]}
+    for table in manifest["tables"]:
+        if table["id"] in core:
+            continue
+        with gzip.open(SOURCE / (table["id"] + ".jsonl.gz"), "rt") as stream:
+            rows = [json.loads(line) for line in stream]
+        columns = table["columns"]
+        definitions = []
+        for column in columns:
+            values = [row[column] for row in rows if row[column] is not None]
+            kind = (
+                "INTEGER"
+                if values and all(isinstance(v, int) for v in values)
+                else "TEXT"
+            )
+            definitions.append(quote(column) + " " + kind)
+        connection.execute(
+            "CREATE TABLE " + quote(table["id"]) + " (" + ",".join(definitions) + ")"
+        )
+        connection.executemany(
+            "INSERT INTO "
+            + quote(table["id"])
+            + " VALUES ("
+            + ",".join("?" for _ in columns)
+            + ")",
+            [[row[column] for column in columns] for row in rows],
+        )
+    connection.execute(
+        "CREATE TABLE dashboard_metadata (name TEXT PRIMARY KEY, value TEXT NOT NULL CHECK(json_valid(value)))"
+    )
+    connection.execute(
+        "CREATE TABLE source_downloads (table_id TEXT PRIMARY KEY, content BLOB NOT NULL)"
+    )
+    connection.execute(
+        "CREATE TABLE handout_tables (position INTEGER PRIMARY KEY, id TEXT UNIQUE NOT NULL, metadata TEXT NOT NULL CHECK(json_valid(metadata)))"
+    )
+    connection.execute(
+        "CREATE TABLE handout_rows (table_id TEXT NOT NULL, position INTEGER NOT NULL, data TEXT NOT NULL CHECK(json_valid(data)), PRIMARY KEY(table_id, position))"
+    )
+    connection.execute(
+        "CREATE TABLE passenger_links (case_id TEXT NOT NULL, trip_id TEXT NOT NULL, PRIMARY KEY(case_id, trip_id))"
+    )
+    connection.execute(
+        "CREATE TABLE boarding_cohort (position INTEGER PRIMARY KEY, trip_id TEXT NOT NULL, reported INTEGER NOT NULL CHECK(reported IN (0,1)))"
+    )
+    fleet = json.loads((ROOT / "apps/web/lib/fleet-data.json").read_text())
+    for position, table in enumerate(fleet["tables"]):
+        rows = table.pop("rows")
+        connection.execute(
+            "INSERT INTO handout_tables VALUES (?, ?, ?)",
+            (position, table["id"], json.dumps(table)),
+        )
+        connection.executemany(
+            "INSERT INTO handout_rows VALUES (?, ?, ?)",
+            [(table["id"], i, json.dumps(row)) for i, row in enumerate(rows)],
+        )
+    for table in manifest["tables"]:
+        connection.execute(
+            "INSERT INTO source_downloads VALUES (?, ?)",
+            (table["id"], (SOURCE / (table["id"] + ".csv.gz")).read_bytes()),
+        )
+    passengers = json.loads(
+        (ROOT / "apps/web/lib/operations-passengers.json").read_text()
+    )
+    connection.executemany(
+        "INSERT INTO passenger_links VALUES (?, ?)",
+        [
+            (case["caseId"], trip["trip_id"])
+            for case in passengers
+            for trip in case["matches"]
+        ],
+    )
+    boarding = json.loads((ROOT / "apps/web/lib/boarding-history.json").read_text())
+    connection.executemany(
+        "INSERT INTO boarding_cohort VALUES (?, ?, ?)",
+        [
+            (i, row["tripId"], int(row["reported"]))
+            for i, row in enumerate(boarding.pop("rows"))
+        ],
+    )
+    for name, value in [
+        ("operations", manifest),
+        ("documents", fleet["documents"]),
+        ("boarding", boarding),
+    ]:
+        connection.execute(
+            "INSERT INTO dashboard_metadata VALUES (?, ?)", (name, json.dumps(value))
+        )
+    connection.execute("PRAGMA user_version = 2")
 
 
 def main():
@@ -71,11 +168,16 @@ def main():
 
                     placeholders = ",".join("?" for _ in columns)
                     connection.executemany(
-                        'INSERT INTO "' + table["name"] + '" VALUES (' + placeholders + ")",
+                        'INSERT INTO "'
+                        + table["name"]
+                        + '" VALUES ('
+                        + placeholders
+                        + ")",
                         rows(),
                     )
             for statement in schema["indexes"]:
                 connection.execute(statement)
+            add_dashboard_data(connection)
             if connection.execute("PRAGMA quick_check").fetchone()[0] != "ok":
                 raise ValueError("Database integrity check failed")
         connection.close()

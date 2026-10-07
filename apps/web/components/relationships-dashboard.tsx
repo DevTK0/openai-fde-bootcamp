@@ -1,9 +1,8 @@
 "use client"
 
+import { useDashboard } from "@/components/dashboard-provider"
+
 import { useState } from "react"
-import boardingHistory from "@/lib/boarding-history.json"
-import operationsPassengers from "@/lib/operations-passengers.json"
-import { operationsManifest } from "@/lib/operations"
 import {
   Bar,
   BarChart,
@@ -51,15 +50,8 @@ import {
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table"
-import { data, dataset, fmt, money, num, vehicles } from "@/lib/fleet"
-import {
-  annualTotals,
-  annualVehicles,
-  componentObservations,
-  matchPassengerReports,
-  monthlyPoints,
-  pearson,
-} from "@/lib/relationships"
+import { fmt, money, num } from "@/lib/fleet"
+import { pearson } from "@/lib/relationships"
 
 const palette = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)"]
 function Note({ children }: { children: React.ReactNode }) {
@@ -287,6 +279,8 @@ function Dots({
 }
 const pct = (a: number, b: number) => (b / a - 1) * 100
 function CostsAndUse() {
+  const { vehicles, annualTotals, annualVehicles, monthlyPoints } =
+    useDashboard()
   const [vehicle, setVehicle] = useState("all")
   const [measure, setMeasure] = useState("repair_cost_sgd")
   const points = monthlyPoints(vehicle, measure),
@@ -438,6 +432,7 @@ function CostsAndUse() {
   )
 }
 function Components() {
+  const { vehicles, annualVehicles, componentObservations } = useDashboard()
   const hvac = componentObservations.filter(
     (r) => typeof r.condenser_obstruction_before_pct === "number"
   )
@@ -534,6 +529,12 @@ const interpretations: Record<string, string> = {
   PC07: "Capacity: 115 people waited, 85 boarded, and 30 remained. This supports a boarding constraint; the passenger’s individual wait is not independently verified.",
 }
 function PassengerLinks() {
+  const {
+    matchPassengerReports,
+    operationsPassengers,
+    boardingHistory,
+    operationsManifest,
+  } = useDashboard()
   const links = matchPassengerReports()
   const confirmed = operationsPassengers.filter(
     (c) => c.matches.length === 1
@@ -670,6 +671,7 @@ function PassengerLinks() {
   )
 }
 function Constraints() {
+  const { dataset, annualVehicles } = useDashboard()
   const requests = dataset("Maintenance planning", "Requested maintenance").rows
   const capacity = dataset("Maintenance planning", "Bay and staffing capacity")
     .rows[0]!
@@ -773,6 +775,7 @@ function Constraints() {
   )
 }
 export function RelationshipsDashboard() {
+  const { data, operationsManifest } = useDashboard()
   return (
     <div className="space-y-6">
       <Note>
