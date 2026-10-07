@@ -14,10 +14,18 @@ The owner checked code revision `17a39d7c30c6a6f7f7fb9588ce4050990c3d3f44` on Oc
 
 ## Review dispositions
 
-Failed clarification answers remain in the form. Typed transcript retries and unchanged conversation creation retries reuse their command IDs. Disconnect is disabled while listening or while finalized speech is unsaved. Navigation warns when speech may be lost. Room selection updates the intended room before a poll can start. Only failed requests offer retry, matching the server state machine. Structured server errors display their message.
+Failed clarification answers remain in the form. Typed transcript retries and unchanged conversation creation retries reuse their command IDs. Disconnect is disabled while listening or while finalized speech is unsaved. Navigation warns when speech may be lost. Room selection pauses polling and capture until its snapshot loads. A failed selection keeps the previously loaded room active. Only failed requests offer retry, matching the server state machine. Structured server errors display their message.
 
-Quiet speech recognized by the provider counts as activity even below the local volume threshold. Committed item IDs prevent trailing transcript deltas from causing another commit. This follows the [OpenAI realtime transcription protocol](https://developers.openai.com/api/docs/guides/realtime-transcription), which allows live transcript deltas before the client commits the turn.
+The lifecycle tests supply transcript deltas and commit acknowledgements directly. These tests do not establish whether that event ordering matches the live provider. Review findings about quiet speech and delta-before-acknowledgement behavior require separate provider lifecycle verification.
 
 The shared textarea came from `pnpm dlx shadcn@latest add textarea -c apps/web`. The review claim that it was hand-written is incorrect.
 
 Provider audio still requires a live verification run with an OpenAI key, explicit microphone permission, and consenting speakers. Tests do not establish recognition accuracy or real provider connectivity. That review thread remains open.
+
+## UI race regression checks
+
+The follow-up owner reproduced three failures in `LiveRoom` component tests before changing production code. A completed transcript save erased a newer draft, a completed create request erased a newer conversation name, and room selection left microphone capture enabled against the old room.
+
+The fixes retain newer drafts by checking the submitted command identity. Room selection uses the existing busy state so polling, capture, and mutations wait for navigation. Clarification saves also preserve newer edits.
+
+`pnpm check` passes with 25 factory tests. Six component tests exercise pending-save edits, unchanged submitted text, successful room selection, failed room selection, and clarification edits through the rendered controls. `pnpm --filter factory build` passes. The component checks mock the network and transcription adapter; live browser and provider verification remain separate gates.

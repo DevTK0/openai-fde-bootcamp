@@ -164,7 +164,7 @@ export function LiveRoom() {
   }
   async function start() {
     const conversationId = snapshot?.conversation?.id
-    if (!conversationId) return
+    if (!conversationId || busy) return
     const abort = new AbortController()
     controller.current = abort
     setMicrophone("connecting")
@@ -417,10 +417,11 @@ export function LiveRoom() {
                       disabled={micActive || busy || pending.length > 0}
                       onClick={() => {
                         setSelected(null)
-                        currentRoom.current = room.id
-                        void api(access, undefined, room.id).catch(
-                          (e: unknown) => setError(message(e))
-                        )
+                        setBusy(true)
+                        setError("")
+                        void api(access, undefined, room.id)
+                          .catch((e: unknown) => setError(message(e)))
+                          .finally(() => setBusy(false))
                       }}
                     >
                       {room.title}
@@ -440,10 +441,13 @@ export function LiveRoom() {
                         id: crypto.randomUUID(),
                         title,
                       }
-                    void mutate(createCommand.current)
+                    const command = createCommand.current
+                    void mutate(command)
                       .then(() => {
-                        createCommand.current = null
-                        setTitle("")
+                        if (createCommand.current === command) {
+                          createCommand.current = null
+                          setTitle("")
+                        }
                         setSelected(null)
                       })
                       .catch((e: unknown) => setError(message(e)))
@@ -454,7 +458,10 @@ export function LiveRoom() {
                     placeholder="Name a conversation"
                     maxLength={160}
                     value={title}
-                    onChange={(event) => setTitle(event.target.value)}
+                    onChange={(event) => {
+                      createCommand.current = null
+                      setTitle(event.target.value)
+                    }}
                   />
                   <Button
                     aria-label="Create conversation"
@@ -509,7 +516,7 @@ export function LiveRoom() {
                         disabled={
                           !speaker.trim() ||
                           microphone === "stopping" ||
-                          (!micActive && pending.length > 0)
+                          (!micActive && (busy || pending.length > 0))
                         }
                         variant={micActive ? "destructive" : "default"}
                       >
@@ -612,8 +619,10 @@ export function LiveRoom() {
                         typedCommand.current = command
                         void mutate(command)
                           .then(() => {
-                            setDraft("")
-                            typedCommand.current = null
+                            if (typedCommand.current === command) {
+                              setDraft("")
+                              typedCommand.current = null
+                            }
                           })
                           .catch((e: unknown) => setError(message(e)))
                       }}
@@ -626,7 +635,10 @@ export function LiveRoom() {
                         placeholder="Describe a pain point, then use the signal phrase when you want the factory to act."
                         maxLength={12000}
                         value={draft}
-                        onChange={(event) => setDraft(event.target.value)}
+                        onChange={(event) => {
+                          typedCommand.current = null
+                          setDraft(event.target.value)
+                        }}
                       />
                       <div className="flex justify-end">
                         <Button
@@ -766,7 +778,8 @@ function RequestDetail({
               event.preventDefault()
               void act({ kind: "answer", requestId: request.id, answer }).then(
                 (saved) => {
-                  if (saved) setAnswer("")
+                  if (saved)
+                    setAnswer((current) => (current === answer ? "" : current))
                 }
               )
             }}
