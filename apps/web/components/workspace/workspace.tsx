@@ -446,7 +446,9 @@ export function Workspace({
                   initialTable={
                     table.id ||
                     analysis.data.tables.find(
-                      (item) => item.id === problem.preferredTable
+                      (item) =>
+                        revisions.find((entry) => entry.id === revision)?.seed &&
+                        item.id === problem.preferredTable
                     )?.id ||
                     analysis.data.tables.find(
                       (item) =>

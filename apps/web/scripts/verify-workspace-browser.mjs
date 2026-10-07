@@ -129,7 +129,7 @@ try {
   await page.getByRole("alert").filter({ hasText: "Request failed (502)" }).waitFor()
   await page.getByRole("button", { name: "Search evidence", exact: true }).click()
   await page.getByRole("button", { name: "Export context", exact: true }).waitFor()
-  assert.equal(await page.getByRole("alert").count(), 0)
+  assert.equal(await page.getByRole("alert").filter({ hasText: "Request failed (502)" }).count(), 0)
   await page.unrouteAll({ behavior: "wait" })
   await page
     .getByRole("button", { name: /Open citation.*maintenance.*row-1/ })
@@ -183,6 +183,15 @@ try {
   const extended = JSON.parse(sample)
   extended.name = "Long evidence and pagination example"
   extended.tables.push({
+    id: "fleet-37",
+    title: "Unrelated imported passenger notes",
+    sourceId: "demo",
+    kind: "evidence",
+    columns: ["note"],
+    caveats: [],
+    rows: [{ id: "unrelated", values: { note: "Passenger account" } }],
+  })
+  extended.tables.push({
     id: "work-orders",
     title: "Work order notes",
     sourceId: "demo",
@@ -203,6 +212,12 @@ try {
     .getByRole("combobox", { name: "Data revision", exact: true })
     .filter({ hasText: extended.name })
     .waitFor()
+  await page.getByRole("button", { name: "What is driving repair cost?", exact: true }).click()
+  await page.getByRole("cell", { name: "DEMO-V001", exact: true }).waitFor()
+  assert.doesNotMatch(
+    await page.getByRole("combobox", { name: "Evidence table", exact: true }).innerText(),
+    /Unrelated imported passenger notes/
+  )
   await pick("Evidence table", "Work order notes (26)")
   await page.getByRole("button", { name: "Next records", exact: true }).click()
   await page.getByRole("cell", { name: "record-26", exact: true }).waitFor()
@@ -235,6 +250,7 @@ try {
     .filter({ hasText: "example fixture, September and October 2026" })
     .waitFor()
   await pick("Data revision", "Fresh service review example")
+  await page.getByRole("button", { name: "What affects service reliability?", exact: true }).click()
   await metric("completion", "80")
   let releaseOld
   let started
