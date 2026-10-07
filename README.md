@@ -11,22 +11,24 @@ presentations. Both use fictional sample data.
 
 ## Run it locally
 
-You'll need **Node.js 22.12+** and **pnpm 12.9.1**. From the repository root:
+You'll need **Node.js 24.21 or newer in the 24.x release line** and **pnpm 12.9.1**. From the repository root:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Then open:
+Open the HTTPS `Preview:` URLs printed by each app from a device on the same
+Tailscale network. Each app and worktree gets its own address. Keep the terminal
+running; Ctrl+C stops only that launch. Run `pnpm previews` to list addresses.
 
-- [Fleet dashboard](http://localhost:3000/dashboard)
-- [Slide decks](http://127.0.0.1:3001/slides/)
-- [Documentation](http://127.0.0.1:3002/docs/)
-
-If port 3000 is occupied, use the web address printed in the terminal.
-To start just one app, use `pnpm --filter web dev` or
+To start one app, use `pnpm --filter web dev`,
 `pnpm --filter @workspace/slides dev`, or `pnpm --filter @workspace/docs dev`.
+For local-only development, prefix the command with `PORTLESS_TAILSCALE=0`.
+
+See [Preview apps from multiple worktrees](docs/development/previews.md) for
+setup, build previews, and troubleshooting. The VM needs Linux `flock` and a
+connected Tailscale CLI with Serve access and tailnet HTTPS enabled.
 
 ## Ship changes with Codex
 

@@ -81,6 +81,24 @@ for path, title in [
             assert response.read(), "Empty stylesheet"
     print(f"OK {path} and stylesheets")
 
+# Follow additional documentation pages exposed by the sidebar, including opportunities.
+pending = [href for page in pages.values() for href in page.links]
+while pending:
+    target = urlparse(urljoin(base + "/docs/", pending.pop()))
+    if target.netloc != urlparse(base).netloc or not target.path.startswith("/docs/"):
+        continue
+    if target.path in pages:
+        continue
+    with urlopen(base + target.path, timeout=10) as response:
+        assert response.status == 200
+        assert response.headers.get_content_type() == "text/html"
+        html = response.read().decode()
+    page = Links()
+    page.feed(html)
+    pages[target.path] = page
+    pending.extend(urljoin(target.path, href) for href in page.links)
+    print(f"OK discovered {target.path}")
+
 for path, page in pages.items():
     for href in page.links:
         target = urlparse(urljoin(base + path, href))

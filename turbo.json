@@ -23,7 +23,15 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "passThroughEnv": [
+        "PORTLESS_PORT",
+        "PORTLESS_STATE_DIR",
+        "PORTLESS_TAILSCALE",
+        "PORT",
+        "PORTLESS_URL",
+        "PORTLESS_TAILSCALE_URL"
+      ]
     },
     "@workspace/slides#build": {
       "dependsOn": ["^build"],

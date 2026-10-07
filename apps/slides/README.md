@@ -11,11 +11,14 @@ Authored slides use editable text, shapes, vector icons and the shared
 From the monorepo root:
 
 ```bash
-pnpm --filter @workspace/slides dev     # 127.0.0.1:3001/slides/
+pnpm --filter @workspace/slides dev     # open the printed Preview URL
 pnpm --filter @workspace/slides build   # apps/slides/dist
-pnpm --filter @workspace/slides start   # native authoring server on port 3001
+pnpm --filter @workspace/slides start   # authoring server at its printed URL
 pnpm check
 ```
+
+Development previews use [Portless and Tailscale](../../docs/development/previews.md).
+The fixed nginx deployment below uses a separate systemd entrypoint.
 
 The normal `pnpm dev` and `pnpm build` include this app. Evidence is generated
 before dev/build from `apps/web/lib/fleet-data.json` and the compressed operations
@@ -131,7 +134,8 @@ When upgrading from the custom editor service, disable
 `openai-fde-slides-editor.service`; its old data directory can remain as a backup.
 
 `pnpm --filter @workspace/slides build` still produces a read-only static export in
-`dist`; `pnpm --filter @workspace/slides preview` serves it on port 3004. Static
+`dist`; `pnpm --filter @workspace/slides preview` serves it at the printed
+HTTPS `Preview:` URL, including `/slides/`. Static
 exports do not include Open Slide's native editing tools. Do not replace the live
 authoring route with that static output if browser editing is required.
 
