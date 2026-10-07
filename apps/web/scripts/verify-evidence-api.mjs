@@ -1,6 +1,8 @@
 import assert from "node:assert/strict"
 import process from "node:process"
-import { readFile } from "node:fs/promises"
+import { randomUUID } from "node:crypto"
+import { join } from "node:path"
+import { readFile, writeFile } from "node:fs/promises"
 const base = process.argv[2] || "http://localhost:3011"
 const origin = process.argv[3] || new URL(base).origin
 const fixture = JSON.parse(
@@ -112,6 +114,68 @@ assert.equal(
     .status,
   "insufficient"
 )
+const scoped = structuredClone(fixture)
+scoped.name = "Short service scope verification"
+scoped.tables[1].rows[0].values.service = "12"
+scoped.tables[1].rows.push({
+  id: "other-service",
+  values: { ...scoped.tables[1].rows[0].values, service: "34", boardings: 900 },
+})
+const scopedRevision = (await request("/api/workspace", post(scoped))).body
+  .revision.id
+const query = async (question) =>
+  (
+    await request(
+      `/api/workspace/${scopedRevision}?view=context&q=${encodeURIComponent(question)}`
+    )
+  ).body
+assert.equal(
+  (await query("passenger boardings service 12")).metrics.find(
+    (m) => m.id === "boardings"
+  ).value,
+  200
+)
+assert.equal(
+  (await query("passenger boardings")).metrics.find((m) => m.id === "boardings")
+    .value,
+  1100
+)
+for (const question of [
+  "passenger boardings service 999999",
+  "passenger boardings services 12 and 34",
+]) {
+  const unresolved = await query(question)
+  assert.deepEqual(unresolved.metrics, [])
+  assert.equal(unresolved.status, "insufficient")
+  assert.ok(unresolved.unresolvedScope.length)
+}
+assert.ok(
+  context.body.missingEvidence.includes(
+    "Service-date operational aggregates cannot be allocated to an individual vehicle."
+  )
+)
+const concurrentBundle = {
+  ...fixture,
+  name: `Concurrent verification ${randomUUID()}`,
+}
+const concurrent = await Promise.all(
+  Array.from({ length: 20 }, () =>
+    request("/api/workspace", post(concurrentBundle))
+  )
+)
+assert.ok(concurrent.every((r) => r.status === 200))
+assert.equal(concurrent.filter((r) => r.body.created).length, 1)
+assert.equal(new Set(concurrent.map((r) => r.body.revision.id)).size, 1)
+if (process.argv[4]) {
+  const damagedId = concurrent[0].body.revision.id
+  assert.match(damagedId, /^[a-f0-9]{64}$/)
+  const path = join(process.argv[4], `${damagedId}.json`)
+  await writeFile(path, "broken verification revision")
+  const failed = await request("/api/workspace", post(concurrentBundle))
+  assert.equal(failed.status, 500)
+  assert.equal(failed.body.error, "Evidence workspace unavailable")
+  assert.equal(await readFile(path, "utf8"), "broken verification revision")
+}
 const listed = await request("/api/workspace")
 assert.ok(listed.body.revisions.some((r) => r.id === id))
 console.log(
@@ -121,7 +185,10 @@ console.log(
       revision: id,
       newRevision: newer.body.revision.id,
       checks:
-        "import, idempotency, immutable isolation, metrics, filters, citations, insufficient evidence, malformed input, same-origin",
+        "import, idempotency, immutable isolation, metrics, filters, citations, insufficient evidence, malformed input, same-origin, short service scope, unknown scope, concurrent deduplication",
+      corruptReimport: process.argv[4]
+        ? "PASS"
+        : "not run; pass the isolated server data directory as the third argument",
       persistence:
         "Run this driver again after server restart; revision ID must match.",
     },

@@ -25,6 +25,102 @@ const stopWords = new Set([
   "did",
   "which",
 ])
+function resolveScope(
+  bundle: DatasetBundle,
+  question: string,
+  filters: EvidenceFilters
+) {
+  const scopeText = question
+    .toLowerCase()
+    .replace(
+      /\b\d+(?:\.\d+)?\s*(?:km|minutes?|hours?|seconds?|days?|percent)\b/g,
+      ""
+    )
+  const tokens = [...new Set(scopeText.match(/[a-z0-9][a-z0-9_-]*/g) ?? [])]
+  const dates = tokens.filter((t) => /^\d{4}-\d{2}(?:-\d{2})?$/.test(t))
+  const explicitIdentifiers = [
+    ...question
+      .toLowerCase()
+      .matchAll(
+        /\b(?:services?|routes?|vehicles?)(?:\s+|[:=#]\s*)(?:(?:id|number|no)\.?\s*|#\s*)?([a-z0-9][a-z0-9_-]*(?:\s*(?:,|and|or|\/|&)\s*[a-z0-9][a-z0-9_-]*)*)/g
+      ),
+  ].flatMap((match) => match[1]?.match(/[a-z0-9][a-z0-9_-]*/g) ?? [])
+  const identifiers = [
+    ...new Set([
+      ...explicitIdentifiers.filter((token) => /\d/.test(token)),
+      ...tokens.filter((token) => /\d/.test(token) && /[-_]/.test(token)),
+    ]),
+  ].filter((token) => !dates.includes(token))
+  const vehicles = [
+    ...new Set(
+      bundle.tables.flatMap((t) =>
+        t.kind === "maintenance"
+          ? t.rows.map((r) => String(r.values.vehicle_id))
+          : []
+      )
+    ),
+  ].filter((v) => tokens.includes(v.toLowerCase()))
+  const services = [
+    ...new Set(
+      bundle.tables.flatMap((t) =>
+        t.kind === "operations"
+          ? t.rows.map((r) => String(r.values.service))
+          : []
+      )
+    ),
+  ].filter((v) => tokens.includes(v.toLowerCase()))
+  const effectiveFilters = { ...filters }
+  if (!filters.vehicle && vehicles.length === 1)
+    effectiveFilters.vehicle = vehicles[0] ?? ""
+  if (!filters.service && services.length === 1)
+    effectiveFilters.service = services[0] ?? ""
+  const date = dates[0]
+  if (dates.length === 1 && date) {
+    const bounds = dateBounds(date)
+    if (bounds) {
+      if (!filters.from) effectiveFilters.from = bounds.start
+      if (!filters.to) effectiveFilters.to = bounds.end
+    }
+  }
+  const unknownIdentifiers = identifiers.filter(
+    (id) => ![...vehicles, ...services].some((v) => v.toLowerCase() === id)
+  )
+  const inferredScopeValid = filterSchema.safeParse(effectiveFilters).success
+  const ambiguousScope =
+    !inferredScopeValid ||
+    dates.some((value) => !dateBounds(value)) ||
+    vehicles.length > 1 ||
+    services.length > 1 ||
+    dates.length > 1 ||
+    unknownIdentifiers.length > 0 ||
+    vehicles.some((v) =>
+      services.some((service) => service.toLowerCase() === v.toLowerCase())
+    )
+  const conflictingScope =
+    vehicles.some((v) => filters.vehicle && v !== filters.vehicle) ||
+    services.some((v) => filters.service && v !== filters.service) ||
+    Boolean(
+      date &&
+      ((filters.from && date < filters.from.slice(0, date.length)) ||
+        (filters.to && date > filters.to.slice(0, date.length)))
+    )
+
+  return {
+    filters: effectiveFilters,
+    issues: [
+      ...unknownIdentifiers.map((id) => `Unrecognized identifier ${id}.`),
+      ...(ambiguousScope
+        ? [
+            "Question scope does not resolve to a single valid entity and date selection.",
+          ]
+        : []),
+      ...(conflictingScope
+        ? ["Question scope conflicts with the selected filters."]
+        : []),
+    ],
+  }
+}
+
 export function retrieveContext(
   bundle: DatasetBundle,
   revision: string,
@@ -47,59 +143,8 @@ export function retrieveContext(
   ]
     .filter((t) => !stopWords.has(t))
     .slice(0, 20)
-  const dates = terms.filter((t) => /^\d{4}-\d{2}(?:-\d{2})?$/.test(t))
-  const identifiers = terms.filter(
-    (t) => /\d/.test(t) && /[-_]/.test(t) && !dates.includes(t)
-  )
-  const vehicles = [
-    ...new Set(
-      bundle.tables.flatMap((t) =>
-        t.kind === "maintenance"
-          ? t.rows.map((r) => String(r.values.vehicle_id))
-          : []
-      )
-    ),
-  ].filter((v) => terms.includes(v.toLowerCase()))
-  const services = [
-    ...new Set(
-      bundle.tables.flatMap((t) =>
-        t.kind === "operations"
-          ? t.rows.map((r) => String(r.values.service))
-          : []
-      )
-    ),
-  ].filter((v) => terms.includes(v.toLowerCase()))
-  const effectiveFilters = { ...filters }
-  if (!filters.vehicle && vehicles.length === 1)
-    effectiveFilters.vehicle = vehicles[0] ?? ""
-  if (!filters.service && services.length === 1)
-    effectiveFilters.service = services[0] ?? ""
-  const date = dates[0]
-  if (dates.length === 1 && date) {
-    const bounds = dateBounds(date)
-    if (bounds) {
-      if (!filters.from) effectiveFilters.from = bounds.start
-      if (!filters.to) effectiveFilters.to = bounds.end
-    }
-  }
-  const inferredScopeValid = filterSchema.safeParse(effectiveFilters).success
-  const ambiguousScope =
-    !inferredScopeValid ||
-    dates.some((value) => !dateBounds(value)) ||
-    vehicles.length > 1 ||
-    services.length > 1 ||
-    dates.length > 1 ||
-    identifiers.some(
-      (id) => ![...vehicles, ...services].some((v) => v.toLowerCase() === id)
-    )
-  const conflictingScope =
-    vehicles.some((v) => filters.vehicle && v !== filters.vehicle) ||
-    services.some((v) => filters.service && v !== filters.service) ||
-    Boolean(
-      date &&
-      ((filters.from && date < filters.from.slice(0, date.length)) ||
-        (filters.to && date > filters.to.slice(0, date.length)))
-    )
+  const scope = resolveScope(bundle, question, filters)
+  const effectiveFilters = scope.filters
 
   const score = (text: string) => {
     const words = new Set(
@@ -107,18 +152,10 @@ export function retrieveContext(
     )
     return terms.reduce((n, term) => n + (words.has(term) ? 1 : 0), 0)
   }
-  const rows = bundle.tables
+  const rows = (scope.issues.length ? [] : bundle.tables)
     .flatMap((table) =>
       selectedRows(table, effectiveFilters).flatMap((row) => {
         const text = JSON.stringify(row.values)
-        const values = Object.values(row.values).map((v) =>
-          String(v).toLowerCase()
-        )
-        if (
-          identifiers.length &&
-          !identifiers.every((id) => values.includes(id))
-        )
-          return []
         const relevance = score(text + " " + table.title)
         return relevance
           ? [
@@ -170,20 +207,24 @@ export function retrieveContext(
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, 4)
-  const analysis = analyse(bundle, revision, effectiveFilters)
-  const metrics = analysis.metrics
-    .filter(
-      (m) =>
-        !ambiguousScope &&
-        !conflictingScope &&
-        score(`${m.label} ${m.definition}`) > 0
-    )
-    .map(({ citations, series, ...metric }) => ({
-      ...metric,
-      caveats: caveats(metric.caveats),
-      citations: citations.slice(0, 3),
-      series: series.slice(-12),
-    }))
+  const metrics = (
+    scope.issues.length
+      ? []
+      : analyse(bundle, revision, effectiveFilters).metrics
+  )
+    .filter((m) => score(`${m.label} ${m.definition}`) > 0)
+    .map(({ citations, series, ...metric }) => {
+      const citationsTruncated =
+        metric.citationsTruncated || citations.length > 3
+      if (citationsTruncated || series.length > 12) truncated = true
+      return {
+        ...metric,
+        citationsTruncated,
+        caveats: caveats(metric.caveats),
+        citations: citations.slice(0, 3),
+        series: series.slice(-12),
+      }
+    })
   const insufficient =
     rows.length === 0 && !metrics.some((m) => m.status === "available")
   const result = {
@@ -191,8 +232,9 @@ export function retrieveContext(
     question,
     filters: effectiveFilters,
     requestedFilters: filters,
+    unresolvedScope: scope.issues,
     scopeNote:
-      ambiguousScope || conflictingScope
+      scope.issues.length > 0
         ? "Numeric context omitted because question identifiers need an unambiguous matching scope. Set explicit filters."
         : "Explicit filters take precedence. A single recognized vehicle, service or date in the question supplies missing filters.",
     status: insufficient
@@ -210,7 +252,7 @@ export function retrieveContext(
       ...(insufficient
         ? ["Supply records for the requested entities, dates and measures."]
         : []),
-      ...(filters.vehicle
+      ...(effectiveFilters.vehicle
         ? [
             "Service-date operational aggregates cannot be allocated to an individual vehicle.",
           ]

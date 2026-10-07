@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { mkdtemp, rm, writeFile } from "node:fs/promises"
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { afterEach, describe, expect, it } from "vitest"
@@ -35,7 +35,7 @@ describe("evidence revisions", () => {
     const directory = await mkdtemp(join(tmpdir(), "evidence-"))
     directories.push(directory)
     const results = await Promise.all(
-      Array.from({ length: 5 }, () => saveBundle(fixture, directory))
+      Array.from({ length: 20 }, () => saveBundle(fixture, directory))
     )
     expect(results.filter((r) => r.created)).toHaveLength(1)
     const first = results[0]
@@ -63,6 +63,88 @@ describe("evidence revisions", () => {
       saved.revision.id,
     ])
   })
+  it.each(["broken", JSON.stringify({ ...fixture, name: "Tampered" })])(
+    "rejects duplicate imports of a damaged revision without overwriting it",
+    async (damage) => {
+      const directory = await mkdtemp(join(tmpdir(), "evidence-"))
+      directories.push(directory)
+      const saved = await saveBundle(fixture, directory)
+      const path = join(directory, `${saved.revision.id}.json`)
+      await writeFile(path, damage)
+      await expect(saveBundle(fixture, directory)).rejects.toThrow()
+      expect(await readFile(path, "utf8")).toBe(damage)
+    }
+  )
+  it.each(["1", "12", "012", "123456"])(
+    "uses complete service identifiers %s independently of ranking terms",
+    (service) => {
+      const bundle = bundleSchema.parse(fixture)
+      const table = bundle.tables.find((t) => t.kind === "operations")
+      const row = table?.rows[0]
+      if (!table || !row) throw new Error("Missing operations")
+      row.values.service = service
+      table.rows.push({
+        id: "other",
+        values: { ...row.values, service: "34", boardings: 900 },
+      })
+      const context = (question: string, selected = filters) =>
+        retrieveContext(bundle, "rev", question, selected)
+      const result = context(`passenger boardings service ${service}`)
+      expect(result.filters.service).toBe(service)
+      expect(result.metrics.find((m) => m.id === "boardings")?.value).toBe(200)
+      expect(
+        context("passenger boardings").metrics.find((m) => m.id === "boardings")
+          ?.value
+      ).toBe(1100)
+      expect(
+        context(
+          `passenger boardings service ${service} on 2026-10-05`
+        ).metrics.find((m) => m.id === "boardings")?.value
+      ).toBe(200)
+      for (const question of [
+        "passenger boardings service 999999",
+        "passenger boardings service:999999",
+        `passenger boardings services ${service} and 999999`,
+        `passenger boardings services ${service} and 34`,
+        `passenger boardings service ${service} on 2026-99-01`,
+        `passenger boardings service ${service} on 2026-10-05 and 2026-10-06`,
+      ]) {
+        const unresolved = context(question)
+        expect(unresolved.metrics).toEqual([])
+        expect(unresolved.status).toBe("insufficient")
+      }
+      expect(
+        context(`passenger boardings service ${service}`, {
+          ...filters,
+          service: "34",
+        }).metrics
+      ).toEqual([])
+      expect(
+        context(`passenger boardings service ${service} on 2026-10-05`, {
+          ...filters,
+          from: "2026-11-01",
+        }).metrics
+      ).toEqual([])
+      const longQuestion = `${Array.from({ length: 25 }, (_, i) => `term${i}`).join(" ")} service ${service}`
+      expect(context(longQuestion).filters.service).toBe(service)
+    }
+  )
+  it.each(["repair cost per 1000 km", "departures within 5 minutes"])(
+    "keeps quantities out of entity scope for %s",
+    (question) => {
+      const bundle = bundleSchema.parse(fixture)
+      const row = bundle.tables.find((t) => t.kind === "operations")?.rows[0]
+      if (!row) throw new Error("Missing operations")
+      row.values.service = question.includes("1000") ? "1000" : "5"
+      const result = retrieveContext(bundle, "rev", question, filters)
+      expect(result.filters.service).toBe("")
+      expect(result.unresolvedScope).toEqual([])
+      expect(result.status).toBe("evidence-found")
+      expect(
+        result.metrics.some((metric) => metric.status === "available")
+      ).toBe(true)
+    }
+  )
   it("recognizes metric evidence without literal row matches", () => {
     const result = retrieveContext(
       bundleSchema.parse(fixture),
@@ -72,6 +154,41 @@ describe("evidence revisions", () => {
     )
     expect(result.status).toBe("evidence-found")
     expect(result.metrics.find((m) => m.id === "completion")?.value).toBe(80)
+  })
+  it.each([5, 15, 30])(
+    "reports context truncation for %s supporting rows",
+    (count) => {
+      const bundle = bundleSchema.parse(fixture)
+      const table = bundle.tables.find((t) => t.kind === "operations")
+      const row = table?.rows[0]
+      if (!table || !row) throw new Error("Missing operations")
+      table.rows = Array.from({ length: count }, (_, i) => ({
+        id: `day-${i + 1}`,
+        values: {
+          ...row.values,
+          date: `2026-09-${String(i + 1).padStart(2, "0")}`,
+        },
+      }))
+      const result = retrieveContext(
+        bundle,
+        "rev",
+        "passenger boardings",
+        filters
+      )
+      const metric = result.metrics.find((m) => m.id === "boardings")
+      expect(metric?.citations).toHaveLength(3)
+      expect(metric?.citationsTruncated).toBe(true)
+      expect(result.truncation.truncated).toBe(true)
+    }
+  )
+  it("preserves explanatory prose around dynamic figures in original findings", () => {
+    const source = seedBundle.sources.find(
+      (s) => s.id === "guide-crowding-findings"
+    )
+    expect(source?.text).toContain("boardings** are events, not unique people.")
+    expect(source?.text).toContain(
+      "It is not a count of people waiting simultaneously"
+    )
   })
   it("filters supporting date aliases and early-year monthly records", () => {
     const bundle = bundleSchema.parse(fixture)
@@ -250,6 +367,9 @@ describe("evidence revisions", () => {
       filters
     )
     expect(result.filters.vehicle).toBe("DEMO-V001")
+    expect(result.missingEvidence).toContain(
+      "Service-date operational aggregates cannot be allocated to an individual vehicle."
+    )
     expect(result.metrics.find((m) => m.id === "repair_cost")?.value).toBe(500)
     expect(
       retrieveContext(bundle, "rev", "repair cost DEMO-V999", filters).metrics

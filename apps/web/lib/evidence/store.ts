@@ -55,9 +55,17 @@ export async function saveBundle(input: unknown, directory = dataDirectory()) {
   try {
     await link(temp, target)
   } catch (error) {
-    if (error instanceof Error && "code" in error && error.code === "EEXIST")
+    if (error instanceof Error && "code" in error && error.code === "EEXIST") {
+      try {
+        await loadBundle(id, directory)
+      } catch (cause) {
+        throw new Error(
+          "Existing revision is unreadable or failed integrity validation",
+          { cause }
+        )
+      }
       created = false
-    else throw error
+    } else throw error
   } finally {
     await unlink(temp)
   }

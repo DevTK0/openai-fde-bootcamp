@@ -109,9 +109,7 @@ for (const file of readdirSync(
     .replace(/^---[\s\S]*?---\s*/, "")
     .replace(/import[\s\S]*?from\s+["'][^"']+["'];?/g, "")
     .replace(/<[A-Z][\s\S]*?\/>/g, "")
-    .split(/\n\s*\n/)
-    .filter((p) => !/[{}]/.test(p))
-    .join("\n\n")
+    .replace(/\{[^{}]*\}/g, "[value in original report]")
   sources.push({
     id: `guide-${file.replace(/\.mdx?$/, "")}`,
     title: file.replace(/\.mdx?$/, ""),
