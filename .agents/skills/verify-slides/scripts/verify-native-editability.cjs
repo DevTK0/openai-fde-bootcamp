@@ -54,6 +54,8 @@ async function run() {
   try {
     browser = await chromium.launch({ headless: true });
     context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    context.setDefaultTimeout(15000);
+    context.setDefaultNavigationTimeout(30000);
     await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
     page = await context.newPage();
     const snapshot = async (name) => {
@@ -140,6 +142,8 @@ async function run() {
   const checkBrowser = await chromium.launch({ headless: true });
   try {
     const restoredPage = await checkBrowser.newPage();
+    restoredPage.setDefaultTimeout(15000);
+    restoredPage.setDefaultNavigationTimeout(30000);
     await restoredPage.goto(pageUrl);
     await poll(async () => assert.equal(await restoredPage.locator('[data-inspector-root] h1').innerText(), originalText));
     await restoredPage.screenshot({ path: path.join(evidence, 'restored.png') });
