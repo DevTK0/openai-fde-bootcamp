@@ -1,8 +1,10 @@
+import { recordQuerySchema } from "@/lib/record-query"
 import {
   getOperationsReport,
   getOperationsManifest,
   queryOperationsTable,
   readOperationsDownload,
+  exportOperationsCsv,
   sourceTable,
 } from "@/lib/operations-server"
 import { DatabaseBusyError } from "@/lib/database"
@@ -44,7 +46,8 @@ async function operationsResponse(request: Request) {
     )
   }
   const table = params.get("table") ?? "trips"
-  if (!sourceTable(table))
+  const source = sourceTable(table)
+  if (!source)
     return Response.json({ error: "Unknown source table" }, { status: 400 })
   if (view === "download") {
     const buffer = await readOperationsDownload(table)
@@ -55,22 +58,42 @@ async function operationsResponse(request: Request) {
       },
     })
   }
-  if (view !== "records")
+  if (view !== "records" && view !== "export")
     return Response.json({ error: "Unknown view" }, { status: 400 })
-  const rawPage = params.get("page") ?? "0",
-    page = Number(rawPage),
-    query = params.get("q") ?? ""
-  if (
-    !/^\d+$/.test(rawPage) ||
-    !Number.isSafeInteger(page) ||
-    page > 100000 ||
-    query.length > 120
-  )
+  const parsed = recordQuerySchema.safeParse(Object.fromEntries(params))
+  if (!parsed.success || !/^\d+$/.test(params.get("page") ?? "0"))
     return Response.json(
-      { error: "Invalid page or search (maximum 120 characters)" },
+      { error: "Invalid search or filter." },
       { status: 400 }
     )
+  const query = parsed.data
+  if (
+    [query.column, query.sort].some(
+      (column) => column && !source.columns.includes(column)
+    )
+  )
+    return Response.json(
+      { error: "Unknown filter or sort column." },
+      { status: 400 }
+    )
+  if (view === "export") {
+    return new Response(
+      await exportOperationsCsv(table, request.signal, query),
+      {
+        headers: {
+          "Content-Type": "text/csv;charset=utf-8",
+          "Content-Disposition": `attachment; filename="${table}.csv"`,
+        },
+      }
+    )
+  }
   return Response.json(
-    await queryOperationsTable(table, query, page, request.signal)
+    await queryOperationsTable(
+      table,
+      query.q,
+      query.page,
+      request.signal,
+      query
+    )
   )
 }

@@ -26,7 +26,7 @@ export function readMetadata<T>(
   )
 }
 
-function databasePath() {
+export function databasePath() {
   return (
     process.env.DASHBOARD_DATABASE_PATH ??
     resolve(process.cwd(), "../../data/operations/lionlink-network.sqlite")

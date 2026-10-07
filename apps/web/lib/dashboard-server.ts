@@ -20,6 +20,12 @@ export function readDashboardData(): DashboardData {
         const metadata: unknown = JSON.parse(table.metadata)
         return {
           ...z.record(z.string(), z.unknown()).parse(metadata),
+          recordIds: database
+            .prepare(
+              "SELECT position FROM handout_rows WHERE table_id = ? ORDER BY position"
+            )
+            .all(table.id)
+            .map((row) => z.number().parse(row.position)),
           rows: database
             .prepare(
               "SELECT data FROM handout_rows WHERE table_id = ? ORDER BY position"
@@ -47,14 +53,16 @@ export function readDashboardData(): DashboardData {
             "SELECT trips.* FROM passenger_links JOIN trips USING (trip_id) WHERE case_id = ? ORDER BY passenger_links.rowid"
           )
           .all(caseId)
-          .map((trip) => {
+          .flatMap((trip) => {
             const tripId = z.string().parse(trip.trip_id)
             const origin = database
               .prepare(
                 "SELECT * FROM stop_calls WHERE trip_id = ? AND stop_order = 1"
               )
               .get(tripId)
-            return passengerTripSchema.parse({ ...trip, origin })
+            return origin
+              ? [passengerTripSchema.parse({ ...trip, origin })]
+              : []
           })
         return { caseId, matches }
       })

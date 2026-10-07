@@ -1,3 +1,10 @@
+import {
+  emptyRecordQuery,
+  RECORD_PAGE_SIZE,
+  recordQuerySchema,
+  type RecordQuery,
+} from "./record-query"
+import { csvExport } from "./fleet"
 import type { DatabaseSync } from "node:sqlite"
 import { z } from "zod"
 import { withDatabase, readMetadata, queryDatabase } from "./database"
@@ -131,13 +138,13 @@ export async function getOperationsReport(
       signal
     )
   const trips = tripSchema.array().parse(tripRows)
-  for (const trip of trips) {
-    const key = `${trip.date}/${trip.service}`
+  function groupFor(date: string, service: string) {
+    const key = `${date}/${service}`
     let group = groups.get(key)
     if (!group) {
       group = {
-        date: trip.date,
-        service: trip.service,
+        date,
+        service,
         trips: 0,
         completed: 0,
         km: 0,
@@ -162,6 +169,10 @@ export async function getOperationsReport(
       }
       groups.set(key, group)
     }
+    return group
+  }
+  for (const trip of trips) {
+    const group = groupFor(trip.date, trip.service)
     group.trips++
     group.completed += Number(trip.state === "completed")
     group.km += trip.km
@@ -216,7 +227,7 @@ export async function getOperationsReport(
     .array()
     .parse(hotspotRows)
   for (const hotspot of hotspots) {
-    const group = groups.get(`${hotspot.date}/${hotspot.service}`)!
+    const group = groupFor(hotspot.date, hotspot.service)
     group.initialQueue += hotspot.initial
     group.arrivals += hotspot.arrivals
     group.remainingQueue += hotspot.remaining
@@ -235,25 +246,57 @@ export async function getOperationsReport(
   )
 }
 
+function recordSelection(id: string, query: RecordQuery) {
+  const table = sourceTable(id)
+  if (!table) throw new Error("Unknown table")
+  if (
+    [query.column, query.sort].some(
+      (column) => column && !table.columns.includes(column)
+    )
+  )
+    throw new Error("Unknown column")
+  const conditions: string[] = []
+  const parameters: string[] = []
+  if (query.q) {
+    conditions.push(
+      `(${table.columns.map((column) => `instr(search_text(${quote(column)}), ?) > 0`).join(" OR ")})`
+    )
+    parameters.push(...table.columns.map(() => query.q.toLowerCase()))
+  }
+  if (query.column) {
+    const column = `search_text(${quote(query.column)})`
+    if (query.match === "empty") conditions.push(`${column} = ''`)
+    else if (query.value) {
+      conditions.push(
+        query.match === "equals" ? `${column} = ?` : `instr(${column}, ?) > 0`
+      )
+      parameters.push(query.value.toLowerCase())
+    }
+  }
+  const where = conditions.length ? ` WHERE ${conditions.join(" AND ")}` : ""
+  const column = quote(query.sort)
+  const order = query.sort
+    ? `(${column} IS NULL OR ${column} = '') ASC, CASE WHEN typeof(${column}) = 'text' THEN search_text(${column}) ELSE ${column} END ${query.direction === "asc" ? "ASC" : "DESC"}, rowid`
+    : "rowid"
+  return { table, where, parameters, order }
+}
 export async function queryOperationsTable(
   id: string,
   query: string,
   page: number,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  options: Partial<RecordQuery> = {}
 ) {
-  const table = sourceTable(id)
-  if (!table) throw new Error("Unknown table")
-  const search = query.toLowerCase()
-  const where = search
-    ? ` WHERE ${table.columns.map((column) => `instr(search_text(${quote(column)}), ?) > 0`).join(" OR ")}`
-    : ""
-  const parameters = search ? table.columns.map(() => search) : []
+  const { table, where, parameters, order } = recordSelection(
+    id,
+    recordQuerySchema.parse({ ...options, q: query, page })
+  )
   const [counts, records] = await queryDatabase(
     [
       { sql: `SELECT count(*) AS count FROM ${quote(id)}${where}`, parameters },
       {
-        sql: `SELECT * FROM ${quote(id)}${where} ORDER BY rowid LIMIT 25 OFFSET ?`,
-        parameters: [...parameters, page * 25],
+        sql: `SELECT rowid AS __record_id, * FROM ${quote(id)}${where} ORDER BY ${order} LIMIT ${RECORD_PAGE_SIZE} OFFSET ?`,
+        parameters: [...parameters, page * RECORD_PAGE_SIZE],
       },
     ],
     signal
@@ -263,7 +306,8 @@ export async function queryOperationsTable(
   return {
     table: id,
     columns: table.columns,
-    rows: rows.map((row) =>
+    recordIds: rows.map((row) => z.number().parse(row.__record_id)),
+    rows: rows.map(({ __record_id: _id, ...row }) =>
       Object.fromEntries(
         Object.entries(row).map(([key, value]) => [
           key,
@@ -273,7 +317,7 @@ export async function queryOperationsTable(
     ),
     total,
     page,
-    pageSize: 25,
+    pageSize: RECORD_PAGE_SIZE,
   }
 }
 
@@ -286,4 +330,22 @@ export async function readOperationsDownload(id: string) {
       throw new Error("Unknown table")
     return Buffer.from(row.content)
   })
+}
+
+export async function exportOperationsCsv(
+  id: string,
+  signal?: AbortSignal,
+  query: RecordQuery = emptyRecordQuery
+) {
+  const { table, where, parameters, order } = recordSelection(id, query)
+  const [records] = await queryDatabase(
+    [
+      {
+        sql: `SELECT * FROM ${quote(id)}${where} ORDER BY ${order}`,
+        parameters,
+      },
+    ],
+    signal
+  )
+  return csvExport(table.columns, rowsSchema.parse(records))
 }
