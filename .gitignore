@@ -53,3 +53,6 @@ apps/slides/.editor-data/
 
 # Astro generated types
 .astro/
+
+# Fieldnotes runtime database
+.fieldnotes/

@@ -7,17 +7,13 @@ Fieldnotes listens to the current presentation and creates a real-time feature s
 
 Have the presentation ready before starting a Fieldnotes session.
 
-:::note[Implementation status]
-This tutorial documents the intended app workflow. The screenshots show the UI prototype. Live audio capture and specification generation are not implemented in this repository.
-:::
-
 ## 1. Start a presentation session
 
 1. Click **New chat** in the left chat list.
 2. Read the agent's message confirming that it is ready for the presentation.
 3. Click **Play** when the presenter begins.
 
-Chats use numbered names such as **Presentation 1** and **Presentation 2**. To rename one, click its pencil icon, enter a name, and click **Save**.
+Chats use numbered names such as **Presentation 1** and **Presentation 2**. To rename one, right-click its name, choose **Rename**, enter a name, and click **Save**.
 
 The player changes to **Stop**. The agent listens to the presentation and updates `product-spec.md` in the **Specification** panel as features are explained. No opening task prompt is needed.
 
@@ -39,9 +35,9 @@ Let the presentation supply the main description. Use chat to correct a detail, 
 
 > That feature is planned for a later release, not the first version.
 
-Type the clarification in the message box and send it. If a detail is unknown, tell the agent to leave it as an open question rather than assume an answer.
+Type the clarification in the message box and send it. If a detail is unknown, tell the agent to omit it rather than assume an answer.
 
-The agent uses these clarifications to refine the specification. Review the **Clarifications** section in the document preview.
+The agent uses these clarifications to refine the specification. Review the updated feature description in the document preview.
 
 ![The conversation records a scope instruction, with the clarification visible in the document preview.](/docs/fieldnotes/tutorial-assets/03-clarifications.png)
 
@@ -58,7 +54,7 @@ If the panel is hidden, click **Specification** in the top bar. Review unresolve
 
 Finish your clarifications and download the specification before ending the conversation.
 
-1. Click **Stop** on the player card.
+1. Click **Stop** to the left of the equalizer.
 2. Read the **End this conversation?** confirmation. Stopping ends the entire conversation, and you cannot resume it or send more messages.
 3. Click **End conversation** to confirm. To keep the conversation open, click **Cancel** instead.
 
