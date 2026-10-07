@@ -635,7 +635,6 @@ function Replay({ report }: { report: PlanningReport }) {
         date={selection.date}
         start={start}
         end={end}
-        context={`${selection.date} · Service ${selection.service} · ${selection.start}–${selection.end} SGT · Delay ≥${selection.delay} min · Queue ≥${selection.queue}`}
       >
         {(cursor) => {
           const replay = replayAt(detail, cursor)

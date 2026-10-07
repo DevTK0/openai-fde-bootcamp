@@ -20,7 +20,6 @@ export function ReplayPlayer({
   start,
   end,
   initialAt,
-  context,
   children,
 }: {
   detail: PlanningDetail
@@ -28,7 +27,6 @@ export function ReplayPlayer({
   start: number
   end: number
   initialAt?: number
-  context: ReactNode
   children?: (cursor: number) => ReactNode
 }) {
   const [cursor, setCursor] = useState(initialAt ?? start)
@@ -110,6 +108,7 @@ export function ReplayPlayer({
             </ButtonGroup>
             <PlanningTimePicker
               label="Inspect time"
+              hideLabel
               showSeconds
               min={clock(start)}
               max={clock(end)}
@@ -137,9 +136,6 @@ export function ReplayPlayer({
                 </Button>
               ))}
             </ButtonGroup>
-            <span className="ml-auto text-xs text-muted-foreground">
-              {context}
-            </span>
           </div>
         </CardContent>
       </Card>

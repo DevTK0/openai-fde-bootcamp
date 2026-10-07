@@ -15,8 +15,9 @@ import {
 export function PlanningTimePicker({
   label,
   showSeconds = false,
+  hideLabel = false,
   ...props
-}: TimePickerProps & { label: string }) {
+}: TimePickerProps & { label: string; hideLabel?: boolean }) {
   return (
     <TimePicker
       {...props}
@@ -24,7 +25,9 @@ export function PlanningTimePicker({
       showSeconds={showSeconds}
       className="space-y-1"
     >
-      <TimePickerLabel>{label}</TimePickerLabel>
+      <TimePickerLabel className={hideLabel ? "sr-only" : undefined}>
+        {label}
+      </TimePickerLabel>
       <TimePickerInputGroup className="h-9 w-auto min-w-36">
         <TimePickerInput segment="hour" aria-label={`${label} hours`} />
         <TimePickerSeparator />

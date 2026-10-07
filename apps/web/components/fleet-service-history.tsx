@@ -120,7 +120,6 @@ export function FleetServiceHistory() {
               start={start}
               end={end}
               initialAt={events[1] ?? start}
-              context={`${date} · All services · SGT`}
             />
           ) : (
             <p>No journeys were recorded on this date.</p>

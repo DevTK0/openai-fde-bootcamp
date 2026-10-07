@@ -243,7 +243,9 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     await screen.findByText("3 supported candidate windows for service 132")
   ).toBeInTheDocument()
   await user.click(screen.getByRole("tab", { name: "Timeline & replay" }))
-  expect(screen.getByText(/Queue ≥44/)).toBeInTheDocument()
+  expect(
+    screen.getByRole("spinbutton", { name: "Queue threshold" })
+  ).toHaveValue(44)
   const reportCard = (title: string) => {
     const card = screen.getByText(title).closest('[data-slot="card"]')
     if (!(card instanceof HTMLElement))
