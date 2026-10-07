@@ -15,9 +15,10 @@ const ServiceReplayMap = dynamic(
     import("./service-replay/map").then((module) => module.ServiceReplayMap),
   { ssr: false, loading: () => <p role="status">Loading service map…</p> }
 )
-import { Play, Pause, RefreshCw, RotateCcw } from "lucide-react"
+import { Play, Pause, RefreshCw, SkipBack, SkipForward } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
+import { ButtonGroup } from "@workspace/ui/components/button-group"
 import {
   Card,
   CardContent,
@@ -62,6 +63,7 @@ import {
   planningSelectionSchema,
   planningTime,
   replayAt,
+  replayEventTimes,
   type PlanningReport,
   type PlanningSelection,
   type ServiceWatch,
@@ -691,6 +693,17 @@ function Replay({ report }: { report: PlanningReport }) {
     return () => window.clearInterval(timer)
   }, [playing, ended, end, speed])
   const replay = useMemo(() => replayAt(detail, cursor), [detail, cursor])
+  const events = useMemo(
+    () => replayEventTimes(detail, start, end),
+    [detail, start, end]
+  )
+  const previous = events.filter((at) => at < cursor).at(-1) ?? start
+  const next = events.find((at) => at > cursor) ?? end
+  const seek = (at: number) => {
+    setPlaying(false)
+    setCursor(at)
+  }
+
   return (
     <div className="space-y-5">
       <Notice>
@@ -715,28 +728,40 @@ function Replay({ report }: { report: PlanningReport }) {
             }}
           />
           <div className="flex flex-wrap items-center gap-3">
-            <Button
-              size="icon"
-              aria-label={
-                playing && cursor < end ? "Pause replay" : "Play replay"
-              }
-              disabled={cursor >= end}
-              onClick={() => setPlaying((value) => !value)}
-            >
-              {playing && cursor < end ? <Pause /> : <Play />}
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Reset replay"
-              title="Reset replay"
-              onClick={() => {
-                setPlaying(false)
-                setCursor(start)
-              }}
-            >
-              <RotateCcw />
-            </Button>
+            <ButtonGroup aria-label="Replay controls">
+              <Button
+                size="icon"
+                variant="outline"
+                aria-label="Previous event"
+                title="Previous event"
+                disabled={cursor <= start}
+                onClick={() => seek(previous)}
+              >
+                <SkipBack />
+              </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                aria-label={playing && !ended ? "Pause replay" : "Play replay"}
+                title={playing && !ended ? "Pause replay" : "Play replay"}
+                onClick={() => {
+                  if (ended) setCursor(start)
+                  setPlaying((value) => ended || !value)
+                }}
+              >
+                {playing && !ended ? <Pause /> : <Play />}
+              </Button>
+              <Button
+                size="icon"
+                variant="outline"
+                aria-label="Next event"
+                title="Next event"
+                disabled={ended}
+                onClick={() => seek(next)}
+              >
+                <SkipForward />
+              </Button>
+            </ButtonGroup>
             <PlanningTimePicker
               label="Inspect time"
               showSeconds
@@ -753,15 +778,20 @@ function Replay({ report }: { report: PlanningReport }) {
                 setCursor(Math.max(start, Math.min(end, next)))
               }}
             />
-            <Pick
-              label="Playback speed"
-              value={String(speed)}
-              options={[1, 5, 15, 60].map((value) => ({
-                value: String(value),
-                label: `${value}×`,
-              }))}
-              onChange={(value) => setSpeed(Number(value))}
-            />
+            <ButtonGroup aria-label="Playback speed">
+              {[1, 5, 15, 60].map((value) => (
+                <Button
+                  key={value}
+                  size="sm"
+                  variant={speed === value ? "default" : "outline"}
+                  aria-label={`${value}× playback speed`}
+                  aria-pressed={speed === value}
+                  onClick={() => setSpeed(value)}
+                >
+                  {value}×
+                </Button>
+              ))}
+            </ButtonGroup>
             <span className="ml-auto text-xs text-muted-foreground">
               {selection.date} · Service {selection.service} · {selection.start}
               –{selection.end} SGT · Delay ≥{selection.delay} min · Queue ≥

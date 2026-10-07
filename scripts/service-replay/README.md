@@ -6,7 +6,7 @@ Boarded, alighted and remaining counts come from the same SQLite stop-call recor
 
 ## Behavior
 
-- A compact player bar below the map provides play/pause, reset, scrubbing, inspect time and a speed dropdown. Playback defaults to 5×, with 1×, 5×, 15× and 60× options.
+- A compact player bar below the map provides grouped previous-event, play/pause and next-event buttons, scrubbing, inspect time and grouped speed buttons. Playback defaults to 5×, with 1×, 5×, 15× and 60× options.
 - Buses dwell at recorded stops and follow LTA route geometry between calls. Position and heading between stops are estimates. Short terminal connectors preserve the original stop coordinates.
 - Boarding icons are mint, alighting icons cyan, and left-behind icons red.
 - Stops use circle markers. After departure, fading icon/count strips show boarded, alighted and left-behind passengers. Unknown is `?`; an observed zero is `0`. Strips hold for 30 replay seconds and expire after 180 seconds. They do not represent continuously measured queues.
@@ -44,3 +44,5 @@ The extractor iterates every LTA KML entry in the supplied registry, downloads m
 Run `pnpm check`. Focused tests cover passenger counts, departure/expiry boundaries, missing evidence, zero values, distinct directions, bends, endpoints and repeated route vertices. A database-wide test builds all 36 routes and 1,353 stop occurrences and checks that every current leg has a connected road path. Synthetic fixtures cover a new service ID, reversed multipart lines, loops, disconnected geometry and missing coordinates.
 
 In the running application, open the replay through Planning. Check a two-direction service, a loop and a multipart route such as 261, the dated passenger exchange, 1× and 5× playback, pause, Fit route, and road-aligned bus headings. At 06:03:36, vehicle NW-V009 dwells at Hougang; at 06:04 it travels toward Blk 302.
+
+The control groups adapt the shadcn.io Button Group Player Controls and Button Group Playback Speed examples. They use the shared shadcn ButtonGroup primitive and the application replay clock. Previous/next pause playback and seek recorded arrivals, departures or observation times within the selected window; the window boundaries are also seek targets. Play at the end restarts the window.

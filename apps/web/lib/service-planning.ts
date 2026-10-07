@@ -555,6 +555,27 @@ function candidateReviews(
     })
 }
 
+export function replayEventTimes(
+  detail: Pick<PlanningDetail, "calls" | "trips">,
+  start: number,
+  end: number
+) {
+  return [
+    ...new Set(
+      [
+        start,
+        end,
+        ...detail.calls.flatMap((call) => [
+          call.arrival,
+          call.observed,
+          call.departure,
+        ]),
+        ...detail.trips.flatMap((trip) => [trip.departure, trip.arrival]),
+      ].filter((at): at is number => at !== null && at >= start && at <= end)
+    ),
+  ].sort((a, b) => a - b)
+}
+
 export function replayAt(detail: PlanningDetail, at: number) {
   const queues = detail.positions
     .filter((p) => p.boarding === 1)
