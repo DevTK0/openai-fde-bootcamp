@@ -54,8 +54,6 @@ The agent uses these clarifications to refine the specification. Review the **Cl
 
 If the panel is hidden, click **Specification** in the top bar. Review unresolved decisions before requesting implementation.
 
-To use the existing [transcript workflow](/docs/evaluate-software-factory/), supply a separately captured transcript and a steering prompt that requests implementation. Include the downloaded specification as supporting context. Fieldnotes does not start that workflow automatically.
-
 ## 5. Stop and end the conversation
 
 Finish your clarifications and download the specification before ending the conversation.
