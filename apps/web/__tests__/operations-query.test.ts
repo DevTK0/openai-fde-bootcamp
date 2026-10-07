@@ -8,6 +8,7 @@ import {
   queryOperationsTable,
   getOperationsReport,
   getOperationsManifest,
+  sourceTable,
 } from "@/lib/operations-server"
 import { readDashboardData } from "@/lib/dashboard-server"
 import { GET } from "@/app/api/operations/route"
@@ -114,7 +115,7 @@ describe("SQLite dashboard queries", () => {
       expect(manifest.dates).toContain("2026-10-19")
       expect(manifest.coverage.trips).toBe(6901)
       expect(manifest.coverage.services).toBe(25)
-      expect(manifest.coverage.vehicles).toBe(before.coverage.vehicles + 1)
+      expect(manifest.coverage.vehicles).toBe(before.coverage.vehicles)
       const response = await GET(
         new Request(
           "http://localhost/api/operations?service=999&date=2026-10-19"
@@ -133,6 +134,27 @@ describe("SQLite dashboard queries", () => {
       expect(after.coverage.vehicles).toBe(before.coverage.vehicles)
     } finally {
       database.exec("DELETE FROM trips WHERE trip_id = 'SQLITE-NEW-TRIP'")
+      database.close()
+    }
+  })
+
+  it("counts roster vehicles even when they have no trips", () => {
+    const database = new DatabaseSync(path)
+    const before = getOperationsManifest().coverage.vehicles
+    try {
+      database.exec(
+        "CREATE TEMP TABLE extra_vehicle AS SELECT * FROM vehicles LIMIT 1; UPDATE extra_vehicle SET vehicle_id = 'SQLITE-IDLE-BUS'; INSERT INTO vehicles SELECT * FROM extra_vehicle;"
+      )
+      expect(getOperationsManifest().coverage.vehicles).toBe(before + 1)
+      const table = getOperationsManifest().tables.find(
+        (table) => table.id === "trips"
+      )!
+      expect(sourceTable("trips")).toEqual({
+        id: "trips",
+        columns: table.columns,
+      })
+    } finally {
+      database.exec("DELETE FROM vehicles WHERE vehicle_id = 'SQLITE-IDLE-BUS'")
       database.close()
     }
   })

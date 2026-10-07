@@ -37,20 +37,13 @@ export function readOperationsManifest(database: DatabaseSync) {
         .all()
     )
     .map((row) => row.service_date)
-  const vehicles = z
-    .object({ count: z.number() })
-    .parse(
-      database
-        .prepare("SELECT count(DISTINCT actual_vehicle_id) AS count FROM trips")
-        .get()
-    ).count
   return {
     ...manifest,
     tables,
     services,
     dates,
     coverage: {
-      vehicles,
+      vehicles: count("vehicles"),
       workshopVehicles: count("workshop_vehicles"),
       trips: count("trips"),
       stopCalls: count("stop_calls"),
@@ -64,11 +57,14 @@ export function getOperationsManifest() {
   return withDatabase(readOperationsManifest)
 }
 export function sourceTable(id: string) {
-  return withDatabase((database) =>
-    readMetadata(database, "operations", manifestSchema).tables.find(
-      (table) => table.id === id
-    )
-  )
+  return withDatabase((database) => {
+    const table = readMetadata(
+      database,
+      "operations",
+      manifestSchema
+    ).tables.find((table) => table.id === id)
+    return table && { id: table.id, columns: table.columns }
+  })
 }
 
 export async function getOperationsReport(
