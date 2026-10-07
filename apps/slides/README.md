@@ -99,7 +99,20 @@ retain the original evidence and editorial reference; generating evidence does n
 overwrite browser edits. Refresh report-based figures in the authored deck files
 when evidence changes. There is no separate custom editor or saved-edits API.
 
-## nginx deployment
+## Coolify read-only deployment
+
+The root `Dockerfile` builds the slides and the Next.js app, then serves the
+static slide export at `/slides/` through nginx on port 3000. Nginx proxies all
+other routes to Next.js on the container's loopback port 3002. Select the
+**Dockerfile** build pack in Coolify, keep the repository root as the base
+and `/Dockerfile` as the Dockerfile path, keep container port `3000` and any
+existing host-port mapping, and clear the old Railpack build/start overrides.
+`deploy/nginx/coolify.conf` handles the slide browser, assets, and deep links.
+This is a read-only presentation: edit authored JSX in Git and redeploy to
+publish changes. Browser edits and saves require the separate live authoring
+setup below and are **not** available in Coolify's static route.
+
+## Live nginx authoring deployment
 
 Nginx proxies `/slides/` to the loopback Open Slide server on port 3001, including
 its WebSocket connection. Open Slide's root-relative authoring APIs internally enter the `/slides/` location
