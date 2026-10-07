@@ -1,0 +1,6 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');
+require('./dist/replay-engine.js');require('./dist/decision-rules.js');
+const {latestQueue,busPosition}=globalThis.ReplayEngine;
+test('queues change at boarding cutoff and unknown stays distinct from zero',()=>{const events=[[100,12,'a'],[120,0,'b'],[120,4,'c']];assert.equal(latestQueue(events,99),null);assert.deepEqual(latestQueue(events,100),{time:100,people:12,trip:'a'});assert.equal(latestQueue(events,119).people,12);assert.equal(latestQueue(events,120).people,4);});
+test('bus dwells at actual stop and interpolates only between known calls',()=>{const stops=[{lat:1,lon:2},{lat:3,lon:6}],trip={calls:[[100,110,1],[130,140,2]]};assert.equal(busPosition(trip,stops,99),null);assert.equal(busPosition(trip,stops,105).dwelling,true);const p=busPosition(trip,stops,120);assert.equal(p.lat,2);assert.equal(p.lon,4);assert.equal(p.dwelling,false);assert.equal(busPosition(trip,stops,141),null);});
+test('critical set matches the shared rules and changes with planner thresholds',()=>{const s={service:'132',delays:[{minutes:7}],queue:40,held:[]};assert.equal(PlannerRules.critical({s},{delay:5,queue:30}).length,1);assert.equal(PlannerRules.critical({s},{delay:10,queue:30}).length,0);});

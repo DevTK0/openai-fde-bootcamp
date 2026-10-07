@@ -1,0 +1,4 @@
+# The static dashboard and generated exercise data are part of this deliverable.
+!dist/
+!dist/**
+.sites-runtime/

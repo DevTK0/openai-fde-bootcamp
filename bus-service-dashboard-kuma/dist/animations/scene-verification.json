@@ -1,0 +1,98 @@
+[
+  {
+    "service": "132",
+    "checks_passed": 783,
+    "samples": [
+      {
+        "seconds": 21600,
+        "visible_buses": 0,
+        "queues_checked": 108,
+        "unknown_queues": 108
+      },
+      {
+        "seconds": 22000,
+        "visible_buses": 2,
+        "queues_checked": 108,
+        "unknown_queues": 104
+      },
+      {
+        "seconds": 23401,
+        "visible_buses": 2,
+        "queues_checked": 108,
+        "unknown_queues": 73
+      },
+      {
+        "seconds": 26101,
+        "visible_buses": 6,
+        "queues_checked": 108,
+        "unknown_queues": 14
+      },
+      {
+        "seconds": 32401,
+        "visible_buses": 9,
+        "queues_checked": 108,
+        "unknown_queues": 0
+      },
+      {
+        "seconds": 39601,
+        "visible_buses": 4,
+        "queues_checked": 108,
+        "unknown_queues": 0
+      },
+      {
+        "seconds": 43200,
+        "visible_buses": 4,
+        "queues_checked": 108,
+        "unknown_queues": 0
+      }
+    ]
+  },
+  {
+    "service": "159",
+    "checks_passed": 578,
+    "samples": [
+      {
+        "seconds": 21600,
+        "visible_buses": 1,
+        "queues_checked": 79,
+        "unknown_queues": 79
+      },
+      {
+        "seconds": 22000,
+        "visible_buses": 2,
+        "queues_checked": 79,
+        "unknown_queues": 73
+      },
+      {
+        "seconds": 23401,
+        "visible_buses": 3,
+        "queues_checked": 79,
+        "unknown_queues": 40
+      },
+      {
+        "seconds": 26101,
+        "visible_buses": 4,
+        "queues_checked": 79,
+        "unknown_queues": 0
+      },
+      {
+        "seconds": 32401,
+        "visible_buses": 7,
+        "queues_checked": 79,
+        "unknown_queues": 0
+      },
+      {
+        "seconds": 39601,
+        "visible_buses": 5,
+        "queues_checked": 79,
+        "unknown_queues": 0
+      },
+      {
+        "seconds": 43200,
+        "visible_buses": 3,
+        "queues_checked": 79,
+        "unknown_queues": 0
+      }
+    ]
+  }
+]
