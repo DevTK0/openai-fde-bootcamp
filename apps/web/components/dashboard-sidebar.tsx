@@ -39,8 +39,12 @@ export function DashboardSidebar({
   const { setOpenMobile } = useSidebar()
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   useEffect(() => {
+    let activePage = dashboardPage(window.location.search).id
     const revealActiveWorkspace = () => {
-      const activeWorkspace = dashboardPage(window.location.search).workspace
+      const next = dashboardPage(window.location.search)
+      if (next.id === activePage) return
+      activePage = next.id
+      const activeWorkspace = next.workspace
       setExpanded((previous) =>
         previous[activeWorkspace]
           ? previous

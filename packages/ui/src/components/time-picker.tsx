@@ -355,7 +355,7 @@ function TimePicker(props: TimePickerProps) {
     openedViaFocus: false,
   }))
 
-  const propsRef = useAsRef({ onValueChange, onOpenChange })
+  const propsRef = useAsRef({ onValueChange, onOpenChange, valueProp })
 
   const store: Store = React.useMemo(() => {
     return {
@@ -368,7 +368,8 @@ function TimePicker(props: TimePickerProps) {
         if (Object.is(stateRef.current[key], value)) return
 
         if (key === "value" && typeof value === "string") {
-          stateRef.current.value = value
+          if (propsRef.current.valueProp === undefined)
+            stateRef.current.value = value
           propsRef.current.onValueChange?.(value)
         } else if (key === "open" && typeof value === "boolean") {
           stateRef.current.open = value
@@ -406,6 +407,14 @@ function TimePicker(props: TimePickerProps) {
       store.notify()
     }
   }, [open, stateRef, store])
+
+  React.useEffect(() => {
+    const form = inputGroup?.closest("form")
+    if (!form || valueProp !== undefined) return
+    const reset = () => store.setState("value", defaultValue ?? "")
+    form.addEventListener("reset", reset)
+    return () => form.removeEventListener("reset", reset)
+  }, [inputGroup, valueProp, defaultValue, store])
 
   const storeOpen = useStore((state) => state.open, store)
 
@@ -546,13 +555,14 @@ interface TimePickerLabelProps
 function TimePickerLabel(props: TimePickerLabelProps) {
   const { render, className, ...labelProps } = props
 
-  const { labelId } = useTimePickerContext(LABEL_NAME)
+  const { labelId, inputGroupRef } = useTimePickerContext(LABEL_NAME)
 
   return useRender({
     defaultTagName: "label",
     props: mergeProps<"label">(
       {
-        htmlFor: labelId,
+        id: labelId,
+        onClick: () => inputGroupRef.current?.querySelector("input")?.focus(),
         className: cn(
           "text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
           className
@@ -860,6 +870,7 @@ function TimePickerInput(props: TimePickerInputProps) {
     }
   }, [timeValue, segment, is12Hour, segmentPlaceholder])
 
+  const cancelBlurRef = React.useRef(false)
   const [editValue, setEditValue] = React.useState(getSegmentValue())
   const [isEditing, setIsEditing] = React.useState(false)
   const [pendingDigit, setPendingDigit] = React.useState<string | null>(null)
@@ -946,6 +957,12 @@ function TimePickerInput(props: TimePickerInputProps) {
       if (event.defaultPrevented) return
 
       setIsEditing(false)
+      if (cancelBlurRef.current) {
+        cancelBlurRef.current = false
+        setEditValue(getSegmentValue())
+        setPendingDigit(null)
+        return
+      }
 
       const placeholder = segment
         ? segmentPlaceholder[segment]
@@ -965,35 +982,6 @@ function TimePickerInput(props: TimePickerInputProps) {
         }
 
         updateTimeValue(valueToUpdate, true)
-
-        queueMicrotask(() => {
-          const currentTimeValue = parseTimeString(store.getState().value)
-          if (currentTimeValue) {
-            const now = new Date()
-            const newTime = { ...currentTimeValue }
-            let needsUpdate = false
-
-            if (newTime.hour === undefined) {
-              newTime.hour = now.getHours()
-              needsUpdate = true
-            }
-
-            if (newTime.minute === undefined) {
-              newTime.minute = now.getMinutes()
-              needsUpdate = true
-            }
-
-            if (showSeconds && newTime.second === undefined) {
-              newTime.second = now.getSeconds()
-              needsUpdate = true
-            }
-
-            if (needsUpdate) {
-              const newValue = formatTimeValue(newTime, showSeconds)
-              store.setState("value", newValue)
-            }
-          }
-        })
       }
 
       setEditValue(getSegmentValue())
@@ -1006,8 +994,6 @@ function TimePickerInput(props: TimePickerInputProps) {
       getSegmentValue,
       segment,
       segmentPlaceholder,
-      showSeconds,
-      store,
     ]
   )
 
@@ -1333,6 +1319,7 @@ function TimePickerInput(props: TimePickerInputProps) {
 
       if (event.key === "Escape") {
         event.preventDefault()
+        cancelBlurRef.current = true
         setEditValue(getSegmentValue())
         inputRef.current?.blur()
       }
@@ -1811,9 +1798,7 @@ function TimePickerColumnItem(props: TimePickerColumnItemProps) {
         nextItem?.ref.current?.focus()
         nextItem?.ref.current?.click()
       } else if (
-        (event.key === "Tab" ||
-          event.key === "ArrowLeft" ||
-          event.key === "ArrowRight") &&
+        (event.key === "ArrowLeft" || event.key === "ArrowRight") &&
         groupContext
       ) {
         event.preventDefault()
@@ -1829,8 +1814,7 @@ function TimePickerColumnItem(props: TimePickerColumnItemProps) {
 
           if (currentColumnIndex === -1) return
 
-          const goToPrevious =
-            event.key === "ArrowLeft" || (event.key === "Tab" && event.shiftKey)
+          const goToPrevious = event.key === "ArrowLeft"
 
           const nextColumnIndex = goToPrevious
             ? currentColumnIndex > 0

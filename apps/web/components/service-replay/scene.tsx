@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import * as THREE from "three"
 import { Button } from "@workspace/ui/components/button"
 import { Plus, Minus, LocateFixed } from "lucide-react"
@@ -49,7 +49,9 @@ export function Scene({
   showStops,
   markers,
   onPick,
+  fallback,
 }: {
+  fallback: ReactNode
   routes: Route[]
   selected: string
   showStops: boolean
@@ -72,11 +74,7 @@ export function Scene({
     try {
       renderer = new THREE.WebGLRenderer({ antialias: true })
     } catch {
-      queueMicrotask(() =>
-        setError(
-          "WebGL is unavailable. The recorded evidence remains available below."
-        )
-      )
+      queueMicrotask(() => setError("WebGL is unavailable."))
       return
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -494,9 +492,10 @@ export function Scene({
         <br />© OpenStreetMap contributors · OpenFreeMap
       </div>
       {error && (
-        <p role="alert" className="p-6">
-          {error}
-        </p>
+        <div className="space-y-3 p-6">
+          <p role="alert">{error}</p>
+          {fallback}
+        </div>
       )}
     </div>
   )

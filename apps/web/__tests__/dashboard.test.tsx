@@ -332,3 +332,69 @@ it("opens passenger queues with the linked service, date and planning assumption
     within(plot).queryByRole("button", { name: /NW-20261007-0108-01/ })
   ).not.toBeInTheDocument()
 })
+
+it("recovers from an invalid link without reopening a collapsed workspace", async () => {
+  window.history.replaceState(
+    null,
+    "",
+    "/dashboard?view=service-planning&queue=bad"
+  )
+  const user = userEvent.setup()
+  render(
+    <DashboardProvider data={readDashboardData()}>
+      <FleetDashboard />
+    </DashboardProvider>
+  )
+  await screen.findByRole("table", { name: "Service watchlist" })
+  await user.click(screen.getByRole("button", { name: "Planning" }))
+  expect(screen.getByRole("button", { name: "Planning" })).toHaveAttribute(
+    "aria-expanded",
+    "false"
+  )
+  await user.click(screen.getByRole("combobox", { name: "Planning date" }))
+  await user.click(await screen.findByRole("option", { name: "2026-10-08" }))
+  expect(
+    screen.getByRole("combobox", { name: "Planning date" })
+  ).toHaveTextContent("2026-10-08")
+  expect(screen.queryByText(/Invalid planning link/)).not.toBeInTheDocument()
+  expect(screen.getByRole("button", { name: "Planning" })).toHaveAttribute(
+    "aria-expanded",
+    "false"
+  )
+})
+
+it("retries failed planning loads without leaving a loading status", async () => {
+  const realFetch = globalThis.fetch
+  let failed = false
+  vi.stubGlobal("fetch", (input: string) => {
+    if (input.startsWith("/api/service-planning") && !failed) {
+      failed = true
+      return Promise.resolve(new Response("Busy", { status: 503 }))
+    }
+    return realFetch(input)
+  })
+  try {
+    window.history.replaceState(null, "", "/dashboard?view=service-planning")
+    const user = userEvent.setup()
+    render(
+      <DashboardProvider data={readDashboardData()}>
+        <FleetDashboard />
+      </DashboardProvider>
+    )
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "could not be loaded"
+    )
+    expect(
+      screen.queryByText("Loading planning evidence…")
+    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole("button", { name: "Retry" }))
+    expect(
+      await screen.findByRole("table", { name: "Service watchlist" })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Planning evidence could not be loaded/)
+    ).not.toBeInTheDocument()
+  } finally {
+    vi.stubGlobal("fetch", realFetch)
+  }
+})

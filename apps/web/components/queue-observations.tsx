@@ -152,6 +152,19 @@ export function QueueObservations({
               </div>
               {positions.map((p) => {
                 const records = calls.filter((c) => c.order === p.order)
+                // The chart's minimum time-axis width is 704px. Keep 28px targets apart.
+                const separation = ((end - start) * 28) / 704
+                const laneEnds: number[] = []
+                const lanes = records.map((c) => {
+                  const time = c.observed ?? start
+                  const available = laneEnds.findIndex(
+                    (last) => time - last >= separation
+                  )
+                  const lane = available === -1 ? laneEnds.length : available
+                  laneEnds[lane] = time
+                  return lane
+                })
+                const height = Math.max(40, laneEnds.length * 28 + 12)
                 return (
                   <div
                     key={p.order}
@@ -160,7 +173,8 @@ export function QueueObservations({
                     className="grid grid-cols-[14rem_1fr] border-b last:border-0"
                   >
                     <div
-                      className="sticky left-0 z-10 flex h-10 items-center gap-2 bg-card px-3 text-xs"
+                      className="sticky left-0 z-10 flex items-center gap-2 bg-card px-3 text-xs"
+                      style={{ height }}
                       title={`${p.order}. ${p.name} (${p.stop})`}
                     >
                       <span className="w-5 shrink-0 text-muted-foreground tabular-nums">
@@ -168,7 +182,7 @@ export function QueueObservations({
                       </span>
                       <span className="truncate">{p.name}</span>
                     </div>
-                    <div className="relative mx-4 h-10">
+                    <div className="relative mx-4" style={{ height }}>
                       {ticks.map((t) => (
                         <span
                           key={t}
@@ -181,7 +195,7 @@ export function QueueObservations({
                           No observation
                         </span>
                       )}
-                      {records.map((c) => {
+                      {records.map((c, index) => {
                         if (c.observed === null) return null
                         const label = `${p.name}, position ${p.order}, ${clock(c.observed)}, ${count(c.queue)} left behind${c.queue !== null && c.queue >= selection.queue ? ", threshold met" : ""}, ${c.id}`
                         const diameter =
@@ -198,8 +212,11 @@ export function QueueObservations({
                             aria-label={label}
                             title={label}
                             onClick={() => setSelectedId(c.id)}
-                            className="absolute top-1/2 size-7 -translate-x-1/2 -translate-y-1/2 rounded-full p-0 hover:bg-muted/60 focus-visible:z-10"
-                            style={{ left: left(c.observed) }}
+                            className="absolute size-7 -translate-x-1/2 -translate-y-1/2 rounded-full p-0 hover:bg-muted/60 focus-visible:z-10"
+                            style={{
+                              left: left(c.observed),
+                              top: 20 + (lanes[index] ?? 0) * 28,
+                            }}
                           >
                             <span
                               aria-hidden="true"

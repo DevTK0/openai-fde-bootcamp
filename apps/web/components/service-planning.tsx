@@ -41,9 +41,15 @@ function subscribe(listener: () => void) {
   window.addEventListener("popstate", listener)
   return () => window.removeEventListener("popstate", listener)
 }
-function updateLocation(values: Record<string, string>) {
+function updateLocation(
+  values: Record<string, string>,
+  selection?: PlanningSelection
+) {
   const url = new URL(window.location.href)
   url.searchParams.set("view", "service-planning")
+  if (selection)
+    for (const [key, value] of Object.entries(selection))
+      url.searchParams.set(key, String(value))
   for (const [key, value] of Object.entries(values))
     url.searchParams.set(key, value)
   window.history.replaceState(null, "", url)
@@ -81,11 +87,13 @@ export function ServicePlanning({
     ? parsed.data
     : planningSelectionSchema.parse(defaults)
   const query = queryFor(selection)
-  const [request, setRequest] = useState<{
-    query: string
-    report: PlanningReport
-  } | null>(null)
-  const [error, setError] = useState("")
+  const [attempt, setAttempt] = useState(0)
+  const requestKey = `${query}/${attempt}`
+  const [request, setRequest] = useState<
+    | { key: string; kind: "ready"; report: PlanningReport }
+    | { key: string; kind: "error"; message: string }
+    | null
+  >(null)
   useEffect(() => {
     const controller = new AbortController()
     fetch(`/api/service-planning?${query}`, { signal: controller.signal })
@@ -98,21 +106,25 @@ export function ServicePlanning({
       })
       .then((report) => {
         if (!controller.signal.aborted) {
-          setRequest({ query, report })
-          setError("")
+          setRequest({ key: requestKey, kind: "ready", report })
         }
       })
       .catch((reason: unknown) => {
         if (!controller.signal.aborted)
-          setError(
-            reason instanceof Error
-              ? reason.message
-              : "Could not load planning evidence"
-          )
+          setRequest({
+            key: requestKey,
+            kind: "error",
+            message:
+              reason instanceof Error
+                ? reason.message
+                : "Could not load planning evidence",
+          })
       })
     return () => controller.abort()
-  }, [query, dashboard])
-  const report = request?.query === query ? request.report : null
+  }, [query, requestKey, dashboard])
+  const current = request?.key === requestKey ? request : null
+  const report = current?.kind === "ready" ? current.report : null
+  const error = current?.kind === "error" ? current.message : ""
   const selected = report?.watchlist.find(
     (s) => s.service === selection.service
   )
@@ -128,17 +140,24 @@ export function ServicePlanning({
           label="Planning date"
           value={selection.date}
           options={manifest.dates.map((d) => ({ value: d, label: d }))}
-          onChange={(date) => updateLocation({ date })}
+          onChange={(date) => updateLocation({ date }, selection)}
         />
       </div>
       <Assumptions key={query} selection={selection} />
       {error && (
         <p role="alert" className="text-destructive">
           {error}
+          <Button
+            className="ml-2"
+            variant="outline"
+            onClick={() => setAttempt((a) => a + 1)}
+          >
+            Retry
+          </Button>
         </p>
       )}
       {!report ? (
-        <p role="status">Loading planning evidence…</p>
+        !error && <p role="status">Loading planning evidence…</p>
       ) : (
         <>
           <Card>
@@ -176,9 +195,12 @@ export function ServicePlanning({
                             variant="link"
                             aria-label={`Investigate service ${s.service}`}
                             onClick={() =>
-                              updateLocation({
-                                service: s.service,
-                              })
+                              updateLocation(
+                                {
+                                  service: s.service,
+                                },
+                                selection
+                              )
                             }
                           >
                             {s.service}
@@ -237,7 +259,7 @@ export function ServicePlanning({
                     value: s,
                     label: `Service ${s}`,
                   }))}
-                  onChange={(service) => updateLocation({ service })}
+                  onChange={(service) => updateLocation({ service }, selection)}
                 />
               </div>
               <Replay key={query} report={report} />

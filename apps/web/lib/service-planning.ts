@@ -507,7 +507,22 @@ function candidateReviews(
         const first = crewTasks
           .filter((t) => t.start <= now)
           .sort((a, b) => a.start - b.start)[0]
-        const dutyLimit = (first?.start ?? duty.start) + duty.maximum * 60
+        const completedBreaks = crewDuties.flatMap((d) =>
+          d.breakStart !== null &&
+          d.breakEnd !== null &&
+          d.breakEnd <= now &&
+          !crewTasks.some((t) =>
+            overlaps(t.start, t.end, d.breakStart ?? 0, d.breakEnd ?? 0)
+          )
+            ? [d.breakEnd]
+            : []
+        )
+        const dutyStart = Math.max(
+          duty.start,
+          first?.start ?? duty.start,
+          ...completedBreaks
+        )
+        const dutyLimit = dutyStart + duty.maximum * 60
         const nextVehicle = vehicleTasks
           .filter((t) => t.start >= horizon)
           .map((t) => t.start)

@@ -309,3 +309,27 @@ describe("service planning", () => {
     ).toBe(false)
   })
 })
+
+it("starts a fresh continuous duty segment after a completed protected break", () => {
+  const data = source()
+  data.duties = [
+    {
+      id: "D2",
+      crew: "C1",
+      service: "132",
+      issued: at("05:00"),
+      start: at("09:00"),
+      end: at("16:00"),
+      location: "A",
+      breakStart: at("11:05"),
+      breakEnd: at("11:35"),
+      maximum: 120,
+      takeover: 300,
+    },
+  ]
+  data.releases = data.releases.map((r) => ({ ...r, location: "A" }))
+  expect(buildPlanningReport(data, selection).candidates[0]).toMatchObject({
+    status: "candidate",
+    dutyLimit: at("13:35"),
+  })
+})

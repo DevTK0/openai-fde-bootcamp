@@ -15,6 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
+import { Button } from "@workspace/ui/components/button"
 import { Toggle } from "@workspace/ui/components/toggle"
 import { buildRoutes } from "./route-geometry"
 import { Scene, type Marker } from "./scene"
@@ -26,6 +27,21 @@ export function ServiceReplayMap({
   detail: ServiceMapDetail
   at: number
 }) {
+  function downloadRecords() {
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(detail, null, 2)], { type: "application/json" })
+    )
+    const link = document.createElement("a")
+    link.href = url
+    link.download = "journey-records.json"
+    link.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  const fallback = (
+    <Button variant="outline" onClick={downloadRecords}>
+      Download journey records
+    </Button>
+  )
   const scheduled = "plannedTrips" in detail
   const [selected, setSelected] = useState("")
   const routes = useMemo(() => buildRoutes(detail), [detail])
@@ -80,10 +96,12 @@ export function ServiceReplayMap({
   }, [detail, trips, at, routes, showPassengers])
   if (routes.every((route) => route.stops.length === 0))
     return (
-      <p className="text-sm text-muted-foreground">
-        No stop coordinates are available for this service. Recorded evidence
-        remains available below.
-      </p>
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground">
+          No stop coordinates are available for this service.
+        </p>
+        {fallback}
+      </div>
     )
   return (
     <section aria-label="Service replay map" className="space-y-4">
@@ -126,6 +144,7 @@ export function ServiceReplayMap({
       <div className="space-y-3">
         <div className="space-y-3">
           <Scene
+            fallback={fallback}
             showStops={showStops}
             routes={routes}
             selected={selected}
