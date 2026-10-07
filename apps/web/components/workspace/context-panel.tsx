@@ -127,7 +127,7 @@ export function ContextPanel({
                   <p className="mt-2 text-xs text-muted-foreground">
                     {item.type === "document"
                       ? item.scope
-                      : "Row observation within selected filters."}
+                      : "Source record within the effective evidence scope."}
                   </p>
                   {item.caveats.map((caveat) => (
                     <p
