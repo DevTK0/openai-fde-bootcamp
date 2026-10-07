@@ -174,14 +174,14 @@ it("moves a bus on an unseen service and holds it at its recorded stop", () => {
     ],
   })
   const routes = buildRoutes(detail, [])
-  const [dwell] = busPositions(detail, 100, true, routes)
+  const [dwell] = busPositions(detail, 100, routes)
   expect(dwell).toMatchObject({
     x: pa[0],
     z: pa[1],
     estimated: false,
     vehicle: "new-bus",
   })
-  const [moving] = busPositions(detail, 160, true, routes)
+  const [moving] = busPositions(detail, 160, routes)
   expect(moving?.x).toBeCloseTo(((pa[0] ?? 0) + (pb[0] ?? 0)) / 2)
   expect(moving?.heading).toBeCloseTo(Math.PI / 2)
   expect(moving?.estimated).toBe(true)

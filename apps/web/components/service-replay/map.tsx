@@ -1,7 +1,6 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Button } from "@workspace/ui/components/button"
 import { LogIn, LogOut, UserRoundX } from "lucide-react"
 import { replayAt, type PlanningReport } from "@/lib/service-planning"
 import { busPositions, point } from "./geometry"
@@ -22,16 +21,10 @@ export function ServiceReplayMap({
   at: number
 }) {
   const service = report.selection.service
-  const [cameraVersion, setCameraVersion] = useState(0)
-  const [roads, setRoads] = useState(true)
-  const [view, setView] = useState<"tilted" | "top">("tilted")
-  const [extent, setExtent] = useState<"service" | "island" | "neighborhood">(
-    "service"
-  )
   const [selected, setSelected] = useState("")
   const routes = useMemo(() => buildRoutes(report.detail), [report.detail])
   const state = useMemo(() => {
-    const buses = busPositions(report.detail, at, roads, routes)
+    const buses = busPositions(report.detail, at, routes)
     const queues = replayAt(report.detail, at).queues
     const exchanges = exchangesAt(
       report.detail.calls,
@@ -63,7 +56,7 @@ export function ServiceReplayMap({
         })
     }
     return { buses, queues, markers }
-  }, [report, at, roads, routes])
+  }, [report, at, routes])
   if (routes.every((route) => route.stops.length === 0))
     return (
       <p className="text-sm text-muted-foreground">
@@ -82,86 +75,12 @@ export function ServiceReplayMap({
           on the map.
         </p>
       )}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2">
-          <Button
-            size="sm"
-            variant={view === "tilted" ? "default" : "outline"}
-            onClick={() => {
-              setView("tilted")
-              setCameraVersion((v) => v + 1)
-            }}
-          >
-            Tilted 3D
-          </Button>
-          <Button
-            size="sm"
-            variant={view === "top" ? "default" : "outline"}
-            onClick={() => {
-              setView("top")
-              setCameraVersion((v) => v + 1)
-            }}
-          >
-            Top-down
-          </Button>
-          <Button
-            size="sm"
-            variant={extent === "service" ? "secondary" : "outline"}
-            onClick={() => {
-              setExtent("service")
-              setCameraVersion((v) => v + 1)
-            }}
-          >
-            Fit service
-          </Button>
-          <Button
-            size="sm"
-            variant={extent === "island" ? "secondary" : "outline"}
-            onClick={() => {
-              setExtent("island")
-              setCameraVersion((v) => v + 1)
-            }}
-          >
-            Singapore overview
-          </Button>
-          <Button
-            size="sm"
-            variant={extent === "neighborhood" ? "secondary" : "outline"}
-            onClick={() => {
-              setExtent("neighborhood")
-              setCameraVersion((v) => v + 1)
-            }}
-          >
-            Terminal close-up
-          </Button>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={roads ? "default" : "outline"}
-            onClick={() => setRoads(true)}
-          >
-            LTA road paths
-          </Button>
-          <Button
-            size="sm"
-            variant={!roads ? "default" : "outline"}
-            onClick={() => setRoads(false)}
-          >
-            Straight-line comparison
-          </Button>
-        </div>
-      </div>
       <div className="space-y-3">
         <div className="space-y-3">
           <Scene
             routes={routes}
             selected={selected}
-            cameraVersion={cameraVersion}
             service={service}
-            roads={roads}
-            view={view}
-            extent={extent}
             markers={state.markers}
             onPick={setSelected}
           />
@@ -190,8 +109,8 @@ export function ServiceReplayMap({
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger
-                  aria-label="Amber passengers were left behind"
-                  className="text-amber-400"
+                  aria-label="Red passengers were left behind"
+                  className="text-red-400"
                 >
                   <UserRoundX className="size-5" />
                 </TooltipTrigger>

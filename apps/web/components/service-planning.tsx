@@ -15,7 +15,7 @@ const ServiceReplayMap = dynamic(
     import("./service-replay/map").then((module) => module.ServiceReplayMap),
   { ssr: false, loading: () => <p role="status">Loading service map…</p> }
 )
-import { Play, Pause, RefreshCw } from "lucide-react"
+import { Play, Pause, RefreshCw, RotateCcw } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import {
@@ -699,60 +699,9 @@ function Replay({ report }: { report: PlanningReport }) {
         labeled stale under a proposed display rule. Between-stop positions are
         estimates along recorded route geometry, not live GPS.
       </Notice>
+      <ServiceReplayMap report={report} at={cursor} />
       <Card>
-        <CardHeader>
-          <CardTitle>Replay time</CardTitle>
-          <CardDescription>
-            {timestamp(cursor)} SGT · Service {selection.service} · Delay ≥
-            {selection.delay} min · Queue ≥{selection.queue}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap items-center gap-3">
-          <Button
-            variant="outline"
-            disabled={cursor >= end}
-            onClick={() => setPlaying((value) => !value)}
-          >
-            {playing && cursor < end ? <Pause /> : <Play />}
-            {playing && cursor < end ? "Pause replay" : "Play replay"}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setPlaying(false)
-              setCursor(start)
-            }}
-          >
-            Reset replay
-          </Button>
-          <PlanningTimePicker
-            label="Inspect time"
-            showSeconds
-            min={`${selection.start}:00`}
-            max={`${selection.end}:00`}
-            value={new Date(cursor * 1000 + 8 * 3600 * 1000)
-              .toISOString()
-              .slice(11, 19)}
-            onValueChange={(value) => {
-              if (!/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(value)) return
-              const next = Date.parse(`${selection.date}T${value}+08:00`) / 1000
-              setPlaying(false)
-              setCursor(Math.max(start, Math.min(end, next)))
-            }}
-          />
-          <div role="group" aria-label="Playback speed" className="flex gap-1">
-            {[1, 5, 15, 60].map((value) => (
-              <Button
-                key={value}
-                size="sm"
-                variant={speed === value ? "secondary" : "ghost"}
-                aria-pressed={speed === value}
-                onClick={() => setSpeed(value)}
-              >
-                {value}×
-              </Button>
-            ))}
-          </div>
+        <CardContent className="space-y-3 py-3">
           <Slider
             aria-label="Replay time"
             className="w-full"
@@ -765,9 +714,62 @@ function Replay({ report }: { report: PlanningReport }) {
               setCursor(Array.isArray(value) ? (value[0] ?? start) : value)
             }}
           />
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              size="icon"
+              aria-label={
+                playing && cursor < end ? "Pause replay" : "Play replay"
+              }
+              disabled={cursor >= end}
+              onClick={() => setPlaying((value) => !value)}
+            >
+              {playing && cursor < end ? <Pause /> : <Play />}
+            </Button>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="Reset replay"
+              title="Reset replay"
+              onClick={() => {
+                setPlaying(false)
+                setCursor(start)
+              }}
+            >
+              <RotateCcw />
+            </Button>
+            <PlanningTimePicker
+              label="Inspect time"
+              showSeconds
+              min={`${selection.start}:00`}
+              max={`${selection.end}:00`}
+              value={new Date(cursor * 1000 + 8 * 3600 * 1000)
+                .toISOString()
+                .slice(11, 19)}
+              onValueChange={(value) => {
+                if (!/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(value)) return
+                const next =
+                  Date.parse(`${selection.date}T${value}+08:00`) / 1000
+                setPlaying(false)
+                setCursor(Math.max(start, Math.min(end, next)))
+              }}
+            />
+            <Pick
+              label="Playback speed"
+              value={String(speed)}
+              options={[1, 5, 15, 60].map((value) => ({
+                value: String(value),
+                label: `${value}×`,
+              }))}
+              onChange={(value) => setSpeed(Number(value))}
+            />
+            <span className="ml-auto text-xs text-muted-foreground">
+              {selection.date} · Service {selection.service} · {selection.start}
+              –{selection.end} SGT · Delay ≥{selection.delay} min · Queue ≥
+              {selection.queue}
+            </span>
+          </div>
         </CardContent>
       </Card>
-      <ServiceReplayMap report={report} at={cursor} />
       <EvidenceTable
         title="Bus states at replay time"
         columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}

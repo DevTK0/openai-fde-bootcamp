@@ -22,7 +22,7 @@ const symbols = [
     person: false,
   },
   {
-    color: "#ffd166",
+    color: "#ff8585",
     paths: ["m16.5 16.5 5 5", "M2 21a8 8 0 0 1 11.531-7.18", "m21.5 16.5-5 5"],
     person: true,
   },

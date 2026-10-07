@@ -43,7 +43,6 @@ export function routeHeading(
 export function busPositions(
   detail: PlanningDetail,
   at: number,
-  roads: boolean,
   routes: Route[]
 ) {
   return detail.trips.flatMap((trip) => {
@@ -65,18 +64,7 @@ export function busPositions(
         ? [
             {
               ...point(stop.point),
-              heading: roads
-                ? routeHeading(route, stop.distance)
-                : headingBetween(
-                    point(
-                      route.stops.find((s) => s.order === stop.order - 1)
-                        ?.point ?? stop.point
-                    ),
-                    point(
-                      route.stops.find((s) => s.order === stop.order + 1)
-                        ?.point ?? stop.point
-                    )
-                  ),
+              heading: routeHeading(route, stop.distance),
               trip: trip.id,
               vehicle: trip.vehicle,
               state: `Recorded dwell · ${stop.name}`,
@@ -102,36 +90,11 @@ export function busPositions(
         end = route.stops.find((s) => s.order === b.order)
       if (!start || !end) return []
       const t = (at - a.departure) / (b.arrival - a.departure)
-      // Include short terminal connectors so a bus does not jump when dwell ends.
-      const startPath = along(route, start.distance),
-        endPath = along(route, end.distance)
-      const s = point(start.point),
-        e = point(end.point)
-      const lead = Math.hypot(s.x - startPath.x, s.z - startPath.z),
-        tail = Math.hypot(e.x - endPath.x, e.z - endPath.z)
-      const pathLength = end.distance - start.distance
-      const d = t * (lead + pathLength + tail)
-      const lerp = (a: Point, b: Point, t: number) => ({
-        x: a.x + (b.x - a.x) * t,
-        z: a.z + (b.z - a.z) * t,
-      })
-      const position = !roads
-        ? lerp(s, e, t)
-        : d < lead
-          ? lerp(s, startPath, d / lead)
-          : d <= lead + pathLength
-            ? along(route, start.distance + d - lead)
-            : lerp(endPath, e, (d - lead - pathLength) / tail)
+      const distance = start.distance + t * (end.distance - start.distance)
       return [
         {
-          ...position,
-          heading: !roads
-            ? headingBetween(s, e)
-            : d < lead
-              ? headingBetween(s, startPath)
-              : d <= lead + pathLength
-                ? routeHeading(route, start.distance + d - lead)
-                : headingBetween(endPath, e),
+          ...along(route, distance),
+          heading: routeHeading(route, distance),
           trip: trip.id,
           vehicle: trip.vehicle,
           state: `Estimated travel · ${start.name} → ${end.name}`,

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 import { Button } from "@workspace/ui/components/button"
-import { Plus, Minus } from "lucide-react"
+import { Plus, Minus, LocateFixed } from "lucide-react"
 import { passengerSymbols } from "./passenger-symbols"
 import type { Exchange } from "./passenger-exchange"
 import { addCity, loadCity } from "./city"
@@ -44,24 +44,17 @@ function dispose(object: THREE.Object3D) {
 export function Scene({
   routes,
   selected,
-  cameraVersion,
   service,
-  roads,
-  view,
-  extent,
   markers,
   onPick,
 }: {
   routes: Route[]
   selected: string
-  cameraVersion: number
   service: string
-  roads: boolean
-  view: "tilted" | "top"
-  extent: "service" | "island" | "neighborhood"
   markers: Marker[]
   onPick: (key: string) => void
 }) {
+  const [cameraVersion, setCameraVersion] = useState(0)
   const orbit = useRef<OrbitControls | null>(null)
   const host = useRef<HTMLDivElement>(null)
   const dynamic = useRef<THREE.Group | null>(null)
@@ -153,36 +146,14 @@ export function Scene({
         r.points.map((p) => new THREE.Vector3(point(p).x, 0, point(p).z))
       )
     )
-    const center =
-      extent === "island"
-        ? new THREE.Vector3(0, 0, 0)
-        : extent === "neighborhood"
-          ? new THREE.Vector3(
-              point(routes[0]?.stops[0]?.point ?? []).x,
-              0,
-              point(routes[0]?.stops[0]?.point ?? []).z
-            )
-          : bounds.getCenter(new THREE.Vector3())
+    const center = bounds.getCenter(new THREE.Vector3())
     const span =
-      extent === "island"
-        ? 1100
-        : extent === "neighborhood"
-          ? 95
-          : Math.max(
-              60,
-              bounds.max.x - bounds.min.x,
-              bounds.max.z - bounds.min.z
-            ) * 1.65
+      Math.max(60, bounds.max.x - bounds.min.x, bounds.max.z - bounds.min.z) *
+      1.65
     controls.target.copy(center)
     camera.position
       .copy(center)
-      .add(
-        new THREE.Vector3(
-          0,
-          span * (view === "top" ? 1.2 : 0.9),
-          view === "top" ? 0.01 : span * 0.65
-        )
-      )
+      .add(new THREE.Vector3(0, span * 0.9, span * 0.65))
     controls.update()
     for (const polygon of mapData.land) {
       const shape = new THREE.Shape(
@@ -238,17 +209,10 @@ export function Scene({
     }
     for (const route of routes) {
       const color = route.direction === 1 ? 0x35dec6 : 0x799bff
-      if (roads) {
-        for (const leg of route.legs)
-          line(
-            leg.points.map(point),
-            leg.kind === "road" ? color : 0xffb347,
-            3 + route.direction * 0.2
-          )
-      } else
+      for (const leg of route.legs)
         line(
-          route.stops.map((s) => point(s.point)),
-          color,
+          leg.points.map(point),
+          leg.kind === "road" ? color : 0xffb347,
           3 + route.direction * 0.2
         )
     }
@@ -366,7 +330,7 @@ export function Scene({
       renderer.dispose()
       renderer.domElement.remove()
     }
-  }, [routes, service, roads, view, extent, onPick, cameraVersion])
+  }, [routes, service, onPick, cameraVersion])
   useEffect(() => {
     const group = dynamic.current
     if (!group) return
@@ -417,7 +381,7 @@ export function Scene({
       mesh.userData.key = marker.key
       group.add(mesh)
     }
-  }, [routes, markers, selected, service, roads, view, extent, cameraVersion])
+  }, [routes, markers, selected, service, cameraVersion])
   function zoom(factor: number) {
     const controls = orbit.current
     if (!controls) return
@@ -439,7 +403,7 @@ export function Scene({
       <div
         className="absolute top-3 right-3 z-10 flex flex-col gap-1 rounded-lg border bg-background/95 p-1 shadow-sm"
         role="group"
-        aria-label="Map zoom"
+        aria-label="Map navigation"
       >
         <Button
           size="icon"
@@ -458,6 +422,15 @@ export function Scene({
           onClick={() => zoom(1.25)}
         >
           <Minus />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          aria-label="Fit route"
+          title="Fit route"
+          onClick={() => setCameraVersion((value) => value + 1)}
+        >
+          <LocateFixed />
         </Button>
       </div>
       <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded bg-background/85 px-3 py-2 text-xs text-foreground">
