@@ -230,11 +230,6 @@ export function ServicePlanning({
           Refresh evidence
         </Button>
       </div>
-      <Notice>
-        Synthetic exercise records · Retrospective review · All times Singapore
-        UTC+08. Missing records are unknown. This view does not issue dispatch
-        changes.
-      </Notice>
       {!parsed.success && (
         <p role="alert">
           Invalid planning link. Showing the default assumptions.
