@@ -733,6 +733,30 @@ function Replay({ report }: { report: PlanningReport }) {
           </span>
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Singapore 3D replay</CardTitle>
+          <CardDescription>
+            Explore roads, buildings, and passenger exchanges in the interactive
+            experimental map. Services 132 and 159 · 7 October 2026 ·
+            06:00–12:00 SGT. This example has its own time and service controls.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            nativeButton={false}
+            render={
+              <a
+                href="/prototypes/singapore-replay"
+                target="_blank"
+                rel="noreferrer"
+              />
+            }
+          >
+            Open interactive 3D replay
+          </Button>
+        </CardContent>
+      </Card>
       <BlenderReplayPreview service={selection.service} date={selection.date} />
       <EvidenceTable
         title="Bus states at replay time"
