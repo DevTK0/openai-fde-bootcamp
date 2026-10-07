@@ -7,8 +7,9 @@ Fleet records describe different parts of the same operation: the cost of keepin
 vehicles running, the journeys they provide, and the experiences passengers report.
 This guide explains how those records support a finding and where the evidence ends.
 
-The examples use fictional sample records. Each article states its coverage and
-includes graphs with the source values behind them.
+The findings articles use fictional sample records and explain the limits of
+their evidence. Their graphs include the source values behind them. The project
+proposals explain what LionLink could build and what would justify that work.
 
 ## Learn to read a comparison
 
@@ -34,5 +35,6 @@ recorded distance, and the difference between a total and a rate.
 
 ## Explore possible projects
 
-[Distinct problems and solution mechanisms](/docs/explanations/opportunities/)
-examines proposed projects, the data they need, and experiments that can reject them.
+[Twenty LionLink projects and the case for building them](/docs/explanations/opportunities/)
+explains the operational problems, how each proposed solution would work, and
+what a useful first implementation would require.

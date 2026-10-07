@@ -1,59 +1,44 @@
 ---
-title: Distinct problems and solution mechanisms
-description: Proposed LionLink projects distinguished by their decisions, inputs, and implementation mechanisms.
+title: Twenty LionLink projects and the case for building them
+description: Read the operational case, proposed workflow, implementation needs, and investment decision for twenty different LionLink projects.
 ---
 
-These 20 proposals extend the fictional LionLink exercise into possible projects.
-They are hypotheses to test, not validated customer needs or promised savings.
-The [evidence sources](/docs/applications/) describe the supplied records and their limits.
+Each article below makes the case for one possible LionLink project. It follows
+an operational problem through a proposed solution, explains how a first version
+would work, and identifies what the organization would need to make it useful.
+The aim is to support a decision about what to investigate or implement.
 
-Each article explains a concrete decision, a mechanism that produces an action,
-and a small experiment that can reject the idea. Sharing fleet data does not make
-solutions identical. Reusing the same mechanism with a different report title does.
-No proposal depends on a new graph or document-search interface as its main result.
+The articles use the repository's fictional transport records as a starting
+point. Those records can demonstrate a conflict or explain a design, but they
+cannot establish real customer demand or financial returns. Each proposal
+therefore distinguishes the available evidence from illustrative scenarios and
+information that LionLink would still need to collect.
 
-## Problems and mechanisms
+The first implementation differs by project. Some ideas can begin with a bounded
+working tool. Others require a survey, a data-quality study, or an agreed
+operating process before a substantial software investment makes sense. The
+articles explain those decisions alongside simpler alternatives, practical
+ownership, failure handling, and ways to judge whether the work is worthwhile.
 
-| Problem                                                                                                                    | Distinct mechanism                     | Decision or output                        |
-| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ----------------------------------------- |
-| [Workshop scheduling with service-cover constraints](/docs/explanations/opportunities/01-workshop-scheduling/)             | Constraint scheduling                  | Feasible bookings and cover assignments   |
-| [Headway control through bounded departure feedback](/docs/explanations/opportunities/02-headway-control/)                 | Feedback control                       | Bounded departure holds                   |
-| [Dispatch instructions with replayable command history](/docs/explanations/opportunities/03-dispatch-ledger/)              | Event sourcing and concurrency control | Authoritative accepted commands           |
-| [Crew-duty rules as executable assignment checks](/docs/explanations/opportunities/04-crew-duty-checking/)                 | Executable temporal rules              | Assignment violations or unknown coverage |
-| [Festival contingency plans through queue simulation](/docs/explanations/opportunities/05-festival-simulation/)            | Discrete-event simulation              | Contingency queue consequences            |
-| [Component risk estimates with incomplete failure histories](/docs/explanations/opportunities/06-component-survival/)      | Censored survival estimation           | Uncertain component risk                  |
-| [Mechanic questioning based on information gained](/docs/explanations/opportunities/07-diagnostic-questioning/)            | Sequential information gain            | Next diagnostic test                      |
-| [Spare-part replenishment under uncertain lead times](/docs/explanations/opportunities/08-spare-parts/)                    | Inventory control                      | Reorder thresholds and quantities         |
-| [Visual inspection assistance for a bounded component condition](/docs/explanations/opportunities/09-visual-inspection/)   | Image segmentation                     | Reviewed obstruction measurement          |
-| [Repair charges reconciled against orders and receipts](/docs/explanations/opportunities/10-invoice-reconciliation/)       | Document reconciliation                | Matched charges and exceptions            |
-| [Accessible journeys with verified transfer paths](/docs/explanations/opportunities/11-accessible-journeys/)               | Constraint-based graph search          | Verified journey or unresolved transfer   |
-| [A controlled experiment for additional preventive care](/docs/explanations/opportunities/12-preventive-care-experiment/)  | Randomized controlled experiment       | Evidence for expanding optional care      |
-| [Defect reports that survive a lost connection](/docs/explanations/opportunities/13-offline-defect-capture/)               | Durable offline synchronization        | Saved observations and explicit conflicts |
-| [Consistent disruption notices across languages](/docs/explanations/opportunities/14-disruption-notice-compiler/)          | Typed notice compilation               | Consistent approved passenger notices     |
-| [Incident rehearsal with branching decisions](/docs/explanations/opportunities/15-incident-rehearsal/)                     | Branching procedural rehearsal         | Decision replay and training debrief      |
-| [Synthetic case generation without copying passenger records](/docs/explanations/opportunities/16-synthetic-case-factory/) | Seeded case generation                 | Reproducible synthetic fixture pack       |
-| [Source contracts that quarantine incompatible refreshes](/docs/explanations/opportunities/17-source-contracts/)           | Versioned data contracts               | Accepted dataset or quarantined refresh   |
-| [Stop alerts that recognize progress on the device](/docs/explanations/opportunities/18-local-stop-alerts/)                | Local progress state estimation        | Destination alert with uncertainty        |
-| [A reverse auction for comparable workshop work](/docs/explanations/opportunities/19-supplier-auction/)                    | Qualified reverse auction              | Ranked compliant bids for review          |
-| [Verifiable Engineering release certificates](/docs/explanations/opportunities/20-signed-release-certificates/)            | Public-key signature verification      | Scoped release-authenticity receipt       |
-
-## What counts as a separate project
-
-Scheduling selects a feasible plan. Rule checking judges a proposed plan.
-Simulation estimates consequences under uncertain inputs. Inventory control sets
-repeated stock decisions. These can share constraints, but their inputs, outputs,
-and failure tests differ. The individual articles explain the closest boundaries.
-
-Several pairs share data but answer different questions. Forecasting estimates
-component risk, while randomized assignment tests whether extra care causes a
-change. Queue simulation estimates operational consequences, while rehearsal
-scores a learner against an authored procedure. Journey routing selects a path,
-while stop alerts recognize progress along a selected path.
-
-The dispatch ledger orders accepted commands. Offline capture preserves delayed
-writes and resolves conflicts. Signed certificates establish the issuer and
-integrity of a read-only statement. None supplies the other two guarantees.
-
-The current fixtures support some prototypes directly and only motivate others.
-Images, invoices, part ledgers, complete component histories, and live telemetry
-need new data. A proposal that needs those inputs says so explicitly.
+| Article                                                                                                                                   | Proposed first implementation                                          | Main dependency                                                  |
+| ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [Scheduling workshop repairs without cancelling protected services](/docs/explanations/opportunities/01-workshop-scheduling/)             | A repair schedule with workable bus and crew cover                     | Complete workshop bookings and service commitments               |
+| [Keeping buses evenly spaced when service starts to bunch](/docs/explanations/opportunities/02-headway-control/)                          | Supervised recommendations for short departure holds                   | Timely vehicle observations and agreed passenger-delay limits    |
+| [Preventing conflicting dispatch instructions for the same bus or driver](/docs/explanations/opportunities/03-dispatch-ledger/)           | One authoritative record of accepted dispatch instructions             | Agreed command authority and acknowledgement rules               |
+| [Checking whether a relief driver can complete the whole assignment](/docs/explanations/opportunities/04-crew-duty-checking/)             | Checks that explain why a proposed crew assignment is invalid          | Complete duties and explicitly agreed operating rules            |
+| [Testing whether festival shuttles can clear the crowd before closing](/docs/explanations/opportunities/05-festival-simulation/)          | A replay of festival arrivals, departures, and remaining queues        | Credible demand assumptions and boarding times                   |
+| [Deciding which components deserve an earlier inspection](/docs/explanations/opportunities/06-component-survival/)                        | A study of whether component history supports useful failure estimates | Reliable component lifetimes and failure records                 |
+| [Choosing the next useful test when a bus fault has several possible causes](/docs/explanations/opportunities/07-diagnostic-questioning/) | A guided choice of the next approved diagnostic test                   | Engineer-approved tests and defensible outcome assumptions       |
+| [Ordering spare parts before a repair has to wait for delivery](/docs/explanations/opportunities/08-spare-parts/)                         | Part-by-part replenishment recommendations                             | A trustworthy stock ledger and supplier lead times               |
+| [Making before-and-after condenser inspections comparable](/docs/explanations/opportunities/09-visual-inspection/)                        | Inspector-reviewed measurements of a visible component condition       | Representative photographs and agreed inspection labels          |
+| [Checking that repair invoices match approved and completed work](/docs/explanations/opportunities/10-invoice-reconciliation/)            | A review queue for charges that do not match authorized work           | Itemized invoices, orders, and receipt records                   |
+| [Helping passengers avoid inaccessible transfers](/docs/explanations/opportunities/11-accessible-journeys/)                               | A journey planner for surveyed accessible transfers                    | An owner who keeps physical access information current           |
+| [Finding out whether extra preventive maintenance is worth funding](/docs/explanations/opportunities/12-preventive-care-experiment/)      | A controlled trial of additional preventive care                       | An approved intervention and sufficient follow-up evidence       |
+| [Keeping defect reports when workshop devices lose their connection](/docs/explanations/opportunities/13-offline-defect-capture/)         | Defect reporting that preserves work through connection loss           | Device identity and ownership of conflicting reports             |
+| [Giving passengers consistent instructions during a disruption](/docs/explanations/opportunities/14-disruption-notice-compiler/)          | Consistent notices generated from approved incident facts              | Maintained language templates and publication authority          |
+| [Letting controllers practise difficult decisions before a live incident](/docs/explanations/opportunities/15-incident-rehearsal/)        | A rehearsal in which staff practice incident decisions                 | Reviewed scenarios and a defensible teaching rubric              |
+| [Testing unusual passenger reports without copying passenger stories](/docs/explanations/opportunities/16-synthetic-case-factory/)        | Repeatable fictional cases for testing software                        | An agreed test specification and independently authored examples |
+| [Stopping a data refresh from silently changing a report's meaning](/docs/explanations/opportunities/17-source-contracts/)                | A check that accepts or quarantines a new dataset version              | Named owners for data meaning, coverage, and change rules        |
+| [Warning passengers before they miss an unfamiliar stop](/docs/explanations/opportunities/18-local-stop-alerts/)                          | Stop reminders that recognize journey progress on a phone              | Usable location permissions and realistic journey trials         |
+| [Getting comparable workshop prices before choosing a supplier](/docs/explanations/opportunities/19-supplier-auction/)                    | A bidding trial for a tightly specified category of work               | Comparable scope and genuinely competing qualified suppliers     |
+| [Checking that an Engineering release record is genuine](/docs/explanations/opportunities/20-signed-release-certificates/)                | Local verification of a signed Engineering release record              | Managed signing keys and an acceptable revocation policy         |
