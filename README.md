@@ -90,7 +90,8 @@ Repository conventions and instructions for coding agents live in
 ## LionLink dashboards
 
 Visit `/dashboard` for fleet history, maintenance, October operations, workshop and
-festival planning, the incident baseline, passenger accounts, and quoted cost options.
+festival planning, the route-planning MVP, the incident baseline, passenger accounts,
+and quoted cost options.
 Relationships connects maintenance costs, component care, passenger evidence, and
 planning constraints. Dates are Singapore local time; money is SGD excluding tax.
 All operating observations are fictional exercise records.

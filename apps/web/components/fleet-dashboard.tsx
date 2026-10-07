@@ -11,6 +11,7 @@ import {
 import { operationsManifest } from "@/lib/operations"
 import operationsPassengers from "@/lib/operations-passengers.json"
 import { RelationshipsDashboard } from "@/components/relationships-dashboard"
+import { RoutePlanningDashboard } from "@/components/route-planning-dashboard"
 import {
   Activity,
   ArrowUpRight,
@@ -95,6 +96,13 @@ const sections = [
     icon: Activity,
     description:
       "172 operating vehicles · 24 services · detailed journeys, queues, and resources for 5–16 October 2026.",
+  },
+  {
+    id: "route-planning",
+    label: "Route planning MVP",
+    icon: BusFront,
+    description:
+      "Compare crowded and quieter services before a planner considers moving bus capacity.",
   },
   {
     id: "planning",
@@ -955,6 +963,7 @@ export function FleetDashboard() {
               </TabsContent>
             </Tabs>
           )}
+          {section === "route-planning" && <RoutePlanningDashboard />}
           {section === "planning" && <Planning />}
           {section === "passengers" && <Passengers />}
           {section === "costs" && <Costs />}
