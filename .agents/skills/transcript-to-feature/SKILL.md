@@ -1,6 +1,6 @@
 ---
 name: transcript-to-feature
-description: Turn an existing transcript and the user's steering prompt into an evidence-backed feature brief, then use pstack to carry out the requested work. Use for implementing, planning, or documenting features from meeting notes or transcripts. Not for recording audio or general meeting summaries.
+description: Turn an existing transcript and the user's steering prompt into an evidence-backed feature brief, then use pstack to carry out the requested work. Use for feature briefs, feature investigations, planning, documentation, or implementation from meeting notes or transcripts. Not for recording audio or general meeting summaries.
 ---
 
 # Transcript to feature
@@ -21,7 +21,10 @@ invent the missing discussion. If the prompt only says to use a transcript and
 does not establish an outcome, ask what the user wants from it.
 
 If the user names a domain skill, read it and apply it within the requested
-scope. Follow the repository's missing-skill procedure if it is unavailable.
+scope. If its path is stale, search the available skill catalog and repository
+skill directories for it. If it remains unavailable, state what is missing.
+Continue work that does not depend on it, but ask for its location or instructions
+when it is necessary to complete the task. Do not invent its conventions.
 The domain skill supplies project conventions; this skill handles intake and
 pstack handles delivery. Do not load every skill mentioned in the transcript.
 

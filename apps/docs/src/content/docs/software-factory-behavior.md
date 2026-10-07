@@ -18,7 +18,9 @@ The skill does not record audio, run a background listener, or require a magic p
 
 An absent source requires a source location or its contents. A transcript without
 a clear requested outcome requires clarification. An inaccessible named skill
-follows the repository's missing-skill procedure.
+requires a search of the available catalog and repository skills. If it remains
+unavailable and is necessary for the task, the agent asks for its location or
+instructions while continuing independent work.
 
 ## Evidence rules
 
