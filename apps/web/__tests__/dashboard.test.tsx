@@ -203,7 +203,7 @@ describe("SQLite dashboard interactions", () => {
   })
 })
 
-it("investigates SQLite service evidence, changes assumptions, and replays recorded zero versus unknown", async () => {
+it("investigates SQLite service evidence, changes assumptions, and replays recorded bus states", async () => {
   const user = userEvent.setup()
   render(
     <DashboardProvider data={readDashboardData()}>
@@ -252,8 +252,8 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
       throw new Error(`Missing report card: ${title}`)
     return card
   }
-  const queues = () => reportCard("Queues at replay time")
-  expect(within(queues()).getAllByText("No prior observation")).toHaveLength(25)
+  expect(screen.queryByText("Queues at replay time")).not.toBeInTheDocument()
+  expect(screen.getByText("Departure timeline")).toBeInTheDocument()
   fireEvent.change(
     screen.getByRole("textbox", { name: "Inspect time minutes" }),
     { target: { value: "03" } }
@@ -267,12 +267,6 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
   expect(
     within(busRow()).getByText("Recorded dwell at position 1")
   ).toBeInTheDocument()
-  expect(within(queues()).getByText("NW-20261007-0009-01")).toBeInTheDocument()
-  const observedRow = within(queues())
-    .getByText("NW-20261007-0009-01")
-    .closest("tr")!
-  expect(within(observedRow).getAllByText("0")).toHaveLength(2)
-  expect(within(queues()).getAllByText("No prior observation")).toHaveLength(24)
   fireEvent.change(
     screen.getByRole("textbox", { name: "Inspect time minutes" }),
     { target: { value: "04" } }

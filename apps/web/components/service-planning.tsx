@@ -625,10 +625,8 @@ function Replay({ report }: { report: PlanningReport }) {
   return (
     <div className="space-y-5">
       <Notice>
-        Replay of recorded events. Queues are last observed values, not
-        continuously measured demand. Observations older than 10 minutes are
-        labeled stale under a proposed display rule. Between-stop positions are
-        estimates along recorded route geometry, not live GPS.
+        Historical replay. Passenger counts show recorded departures; movement
+        between stops is estimated.
       </Notice>
       <ReplayPlayer
         detail={detail}
@@ -649,37 +647,6 @@ function Replay({ report }: { report: PlanningReport }) {
                   Route: b.route,
                   State: b.state,
                   Evidence: b.evidence,
-                }))}
-              />
-              <EvidenceTable
-                title="Queues at replay time"
-                columns={[
-                  "Route",
-                  "Position",
-                  "Stop",
-                  "Queue",
-                  "Observed at",
-                  "Age minutes",
-                  "Status",
-                  "Evidence",
-                ]}
-                rows={replay.queues.map((q) => ({
-                  Route: q.route,
-                  Position: q.order,
-                  Stop: `${q.stop} · ${q.name}`,
-                  Queue: q.observation?.queue ?? "Unknown",
-                  "Observed at": timestamp(q.observation?.observed ?? null),
-                  "Age minutes":
-                    q.age === null
-                      ? "Unknown"
-                      : Number((q.age / 60).toFixed(1)),
-                  Status:
-                    !q.observation || q.observation.queue === null
-                      ? "Unknown"
-                      : q.age !== null && q.age > 600
-                        ? "Stale observation"
-                        : "Observed",
-                  Evidence: q.observation?.id ?? "No prior observation",
                 }))}
               />
               <EvidenceTable
