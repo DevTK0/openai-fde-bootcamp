@@ -16,7 +16,10 @@ try {
     while (!shutdown.signal.aborted) {
       try {
         const config = readRunnerConfig()
-        await preflight(config)
+        await preflight(config, {
+          signal: shutdown.signal,
+          childChanged: (pid) => store.childChanged(pid),
+        })
         reason = null
         store.heartbeat(reason)
         while (!shutdown.signal.aborted) {
@@ -32,7 +35,10 @@ try {
         process.stderr.write(
           JSON.stringify({ event: "worker_blocked", reason }) + "\n"
         )
-        await setTimeout(5000)
+        if (!shutdown.signal.aborted)
+          await setTimeout(5000, undefined, { signal: shutdown.signal }).catch(
+            () => {}
+          )
       }
     }
   } finally {

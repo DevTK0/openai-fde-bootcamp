@@ -1,12 +1,20 @@
 import { afterEach, describe, expect, it } from "vitest"
 import { randomUUID } from "node:crypto"
-import { mkdtemp, writeFile, readFile, rm, chmod } from "node:fs/promises"
+import {
+  mkdtemp,
+  writeFile,
+  readFile,
+  rm,
+  chmod,
+  mkdir,
+  copyFile,
+} from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { DatabaseSync } from "node:sqlite"
 import { Store } from "../lib/store"
 import { MAGIC_PHRASE, commandSchema, snapshotSchema } from "../lib/contracts"
-import { execute, runOnce } from "../lib/runner"
+import { execute, preflight, runOnce } from "../lib/runner"
 import type { RunnerConfig } from "../lib/config"
 import { handle } from "../lib/http"
 
@@ -111,6 +119,56 @@ describe("durable factory", () => {
     ).toHaveLength(1)
     expect(submit(MAGIC_PHRASE.toUpperCase()).requests).toHaveLength(2)
   })
+  it("requires whole words at both ends of the trigger", async () => {
+    const { submit } = await setup()
+    expect(submit(MAGIC_PHRASE + "thing").requests).toHaveLength(0)
+    expect(submit("hi" + MAGIC_PHRASE).requests).toHaveLength(0)
+    expect(submit(MAGIC_PHRASE + ". Next task.").requests).toHaveLength(1)
+  })
+  it("decodes split UTF-8 characters independently on stdout and stderr", async () => {
+    const { directory } = await setup()
+    const result = await execute(
+      process.execPath,
+      [
+        "-e",
+        `
+      process.stdout.write(Buffer.from([0xc3]));
+      process.stderr.write(Buffer.from([0xe2]));
+      setTimeout(() => {
+        process.stdout.write(Buffer.from([0xa9]));
+        process.stderr.write(Buffer.from([0x82, 0xac]));
+      }, 50);
+    `,
+      ],
+      directory
+    )
+    expect(result.output).toContain("é")
+    expect(result.output).toContain("€")
+    expect(result.output).not.toContain("�")
+  })
+  it("tracks and terminates authentication during worker shutdown", async () => {
+    const { config } = await setup()
+    await writeFile(
+      config.codex,
+      `#!/usr/bin/env node
+setTimeout(() => process.exit(0), 20000);
+`
+    )
+    const abort = new AbortController()
+    const pids: Array<number | null> = []
+    const pending = preflight(config, {
+      signal: abort.signal,
+      childChanged: (pid) => {
+        pids.push(pid)
+        if (pid && pids.filter((value) => value !== null).length === 3)
+          abort.abort()
+      },
+    })
+    await expect(pending).rejects.toThrow("interrupted")
+    expect(pids.at(-1)).toBe(null)
+    for (const pid of pids)
+      if (pid) expect(() => process.kill(pid, 0)).toThrow()
+  }, 3000)
   it("runs a real isolated git worktree and exposes actual checked code with a controlled agent fixture", async () => {
     const { store, submit, config, repo } = await setup()
     submit("Add dispatch readiness. " + MAGIC_PHRASE)
@@ -141,14 +199,70 @@ describe("durable factory", () => {
         "+export const dispatchReady = true;"
       )
   })
-  it("terminates a timed-out agent and keeps its request failed", async () => {
-    const { store, submit, config } = await setup("slow")
+  it("terminates a timed-out process", async () => {
+    const { directory } = await setup()
+    const result = await execute(
+      process.execPath,
+      ["-e", "setTimeout(() => {}, 20000)"],
+      directory,
+      { timeoutMs: 150 }
+    )
+    expect(result.exitCode).toBe(-1)
+  })
+  it("runs checks from a user-managed toolchain without exposing adjacent files", async () => {
+    const { config, directory, submit, store } = await setup()
+    const bin = join(directory, "toolchain", "bin")
+    await mkdir(bin, { recursive: true })
+    await copyFile(process.execPath, join(bin, "node"))
+    const check = join(bin, "fixture-check")
+    await writeFile(
+      check,
+      "#!/usr/bin/env node\nprocess.exit(require('node:fs').existsSync(" +
+        JSON.stringify(join(directory, "private")) +
+        ") ? 9 : 0)\n",
+      { mode: 0o755 }
+    )
+    await writeFile(join(directory, "private"), "local dummy data")
+    process.env.PATH = bin + ":" + process.env.PATH
     submit(MAGIC_PHRASE)
-    await runOnce({ ...config, timeoutMs: 150 }, store)
-    expect(store.snapshot().requests[0]?.state).toEqual({
-      kind: "failed",
-      reason: "Codex exited with code -1. Inspect the attempt log.",
-    })
+    await runOnce(
+      { ...config, check: { command: "fixture-check", args: [] } },
+      store
+    )
+    expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
+  })
+  it("runs the installed pnpm check command in the validation sandbox", async () => {
+    const { config, repo, submit, store } = await setup()
+    await writeFile(
+      join(repo, "package.json"),
+      JSON.stringify({
+        name: "factory-check-fixture",
+        private: true,
+        scripts: { check: "node --check feature.js" },
+      })
+    )
+    await execute("git", ["add", "package.json"], repo)
+    await execute("git", ["commit", "-m", "Add fixture check"], repo)
+    const configured = {
+      ...config,
+      check: { command: "pnpm", args: ["check"] },
+    }
+    await preflight(configured)
+    submit(MAGIC_PHRASE)
+    await runOnce(configured, store)
+    expect(store.snapshot().requests[0]?.state.kind).toBe("ready")
+  })
+  it("blocks preflight when an installed sandbox cannot create namespaces", async () => {
+    const { config, directory } = await setup()
+    const bin = join(directory, "bin")
+    await mkdir(bin)
+    await writeFile(
+      join(bin, "bwrap"),
+      '#!/bin/sh\n[ "$1" = --version ] && exit 0\nexit 1\n',
+      { mode: 0o755 }
+    )
+    process.env.PATH = bin + ":" + process.env.PATH
+    await expect(preflight(config)).rejects.toThrow("sandbox is unavailable")
   })
   it("keeps host files and credentials outside generated-code validation", async () => {
     const { store, submit, config, directory } = await setup()
@@ -278,6 +392,28 @@ describe("durable factory", () => {
       authorization: "Bearer " + process.env.FACTORY_ACCESS_TOKEN,
       "content-type": "application/json",
     }
+    let cancelled = false
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        controller.enqueue(new Uint8Array(21000))
+      },
+      cancel() {
+        cancelled = true
+      },
+    })
+    const streamed = new Request(
+      "http://factory/api/factory",
+      Object.assign(
+        {
+          method: "POST",
+          headers,
+          body,
+        },
+        { duplex: "half" }
+      )
+    )
+    expect((await handle(streamed)).status).toBe(413)
+    expect(cancelled).toBe(true)
     const command = {
       kind: "create",
       id: randomUUID(),

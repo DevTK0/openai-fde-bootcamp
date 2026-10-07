@@ -42,9 +42,29 @@ export async function handle(request: Request): Promise<Response> {
     }
     if (Number(request.headers.get("content-length") || 0) > 20000)
       return Response.json({ error: "Request is too large." }, { status: 413 })
-    const text = await request.text()
-    if (Buffer.byteLength(text) > 20000)
-      return Response.json({ error: "Request is too large." }, { status: 413 })
+    const reader = request.body?.getReader()
+    const chunks: Uint8Array[] = []
+    let bytes = 0
+    if (reader) {
+      try {
+        while (true) {
+          const chunk = await reader.read()
+          if (chunk.done) break
+          bytes += chunk.value.byteLength
+          if (bytes > 20000) {
+            await reader.cancel()
+            return Response.json(
+              { error: "Request is too large." },
+              { status: 413 }
+            )
+          }
+          chunks.push(chunk.value)
+        }
+      } finally {
+        reader.releaseLock()
+      }
+    }
+    const text = Buffer.concat(chunks).toString("utf8")
     const command = commandSchema.parse(JSON.parse(text))
     return Response.json(store.apply(command), {
       headers: { "Cache-Control": "no-store" },

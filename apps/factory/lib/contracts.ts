@@ -81,6 +81,6 @@ export function completesTrigger(previous: string[], current: string) {
   const before = normalize(previous.join(" "))
   const combined = normalize([...previous, current].join(" "))
   const phrase = normalize(MAGIC_PHRASE)
-  const offset = combined.lastIndexOf(phrase)
+  const offset = ` ${combined} `.lastIndexOf(` ${phrase} `)
   return offset >= 0 && offset + phrase.length > before.length
 }

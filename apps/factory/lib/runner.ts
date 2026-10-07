@@ -5,6 +5,7 @@ import { z } from "zod"
 import type { RunnerConfig } from "./config"
 import type { Store } from "./store"
 import { agentPolicyArgs } from "./agent-policy"
+import { validationSandbox } from "./validation-sandbox"
 
 const agentResultSchema = z.discriminatedUnion("kind", [
   z.object({
@@ -66,13 +67,15 @@ export function execute(
     })
     let output = ""
     let truncated = false
-    const append = (data: Buffer) => {
-      const next = output + data.toString()
+    const append = (data: string) => {
+      const next = output + data
       truncated ||= next.length > OUTPUT_LIMIT
       output = next.slice(-OUTPUT_LIMIT)
     }
+    child.stdout.setEncoding("utf8")
+    child.stderr.setEncoding("utf8")
     child.stdout.on("data", append)
-    child.stderr.on("data", (data: Buffer) => {
+    child.stderr.on("data", (data: string) => {
       if (!options.stdoutOnly) append(data)
     })
     child.stdin.on("error", () => {})
@@ -108,20 +111,41 @@ export function execute(
     })
   })
 }
-export async function preflight(config: RunnerConfig) {
-  const git = await execute(
-    "git",
-    ["rev-parse", "--show-toplevel"],
-    config.repo
-  )
+export async function preflight(
+  config: RunnerConfig,
+  lifecycle: Pick<
+    NonNullable<Parameters<typeof execute>[3]>,
+    "signal" | "childChanged"
+  > = {}
+) {
+  const run = async (command: string, args: string[], credentials = false) => {
+    if (lifecycle.signal?.aborted)
+      throw new Error("Worker startup interrupted.")
+    const result = await execute(command, args, config.repo, {
+      ...lifecycle,
+      credentials,
+      timeoutMs: config.timeoutMs,
+    })
+    if (lifecycle.signal?.aborted)
+      throw new Error("Worker startup interrupted.")
+    return result
+  }
+  const git = await run("git", ["rev-parse", "--show-toplevel"])
   if (git.exitCode !== 0)
     throw new Error("FACTORY_REPO is not an accessible Git repository.")
-  const sandbox = await execute("bwrap", ["--version"], config.repo)
+  const probe = await validationSandbox(config.repo, config.check.command)
+  const sandbox = await run("bwrap", [
+    ...probe.prefix,
+    probe.node,
+    "-e",
+    "require('node:fs').accessSync(process.argv[1], require('node:fs').constants.X_OK)",
+    probe.binary,
+  ])
   if (sandbox.exitCode !== 0)
-    throw new Error("Install bubblewrap for isolated validation.")
-  const login = await execute(config.codex, ["login", "status"], config.repo, {
-    credentials: true,
-  })
+    throw new Error(
+      "Validation sandbox is unavailable. Check Bubblewrap namespace support and the configured toolchain."
+    )
+  const login = await run(config.codex, ["login", "status"], true)
   if (login.exitCode !== 0)
     throw new Error(
       "Codex authentication is unavailable. Run codex login in the worker environment."
@@ -228,49 +252,10 @@ export async function runOnce(
       store.finish(request.id, request.attempt, result)
       return true
     }
+    const validation = await validationSandbox(worktree, config.check.command)
     const checks = await run(
       "bwrap",
-      [
-        "--unshare-all",
-        "--die-with-parent",
-        "--new-session",
-        "--ro-bind",
-        "/usr",
-        "/usr",
-        "--ro-bind",
-        "/bin",
-        "/bin",
-        "--ro-bind",
-        "/lib",
-        "/lib",
-        "--ro-bind-try",
-        "/lib64",
-        "/lib64",
-        "--proc",
-        "/proc",
-        "--dev",
-        "/dev",
-        "--tmpfs",
-        "/tmp",
-        "--bind",
-        worktree,
-        "/workspace",
-        "--chdir",
-        "/workspace",
-        "--clearenv",
-        "--setenv",
-        "PATH",
-        "/usr/bin:/bin",
-        "--setenv",
-        "HOME",
-        "/tmp",
-        "--setenv",
-        "CI",
-        "1",
-        "--",
-        config.check.command,
-        ...config.check.args,
-      ],
+      [...validation.prefix, validation.binary, ...config.check.args],
       worktree
     )
     await writeFile(join(runDir, "checks.log"), checks.output)
