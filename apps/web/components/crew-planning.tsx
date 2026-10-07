@@ -244,7 +244,7 @@ function CrewTimeline({
                 </div>
               </div>
               {visible.map((row) => {
-                const height = 36 * row.lanes + 56
+                const height = 36 * row.lanes + 36
                 const incomplete = row.assignments.filter(
                   (a) => !timedTrip(a.trip)
                 )
@@ -285,7 +285,7 @@ function CrewTimeline({
                               <Button
                                 key={d.id}
                                 variant="ghost"
-                                className="absolute top-1 h-3 min-w-0 rounded-sm bg-muted p-0 hover:bg-muted-foreground/30"
+                                className="absolute top-1 h-5 min-w-0 rounded-sm bg-muted p-0 hover:bg-muted-foreground/30"
                                 style={position(d.start, d.end)}
                                 aria-label={`Duty ${d.id}, ${crewClock(d.start)} to ${crewClock(d.end)}`}
                                 title={`Duty ${d.id}`}
@@ -304,7 +304,7 @@ function CrewTimeline({
                                 className={`absolute h-8 min-w-0 flex-col items-start justify-center gap-0 overflow-hidden rounded-md px-1 text-[10px] leading-tight text-slate-950 ${a.conflicts.length ? "ring-2 ring-red-500 ring-offset-1 ring-offset-background" : ""}`}
                                 style={{
                                   ...position(a.trip.departure, a.trip.arrival),
-                                  top: 20 + 36 * a.lane,
+                                  top: 28 + 36 * a.lane,
                                   backgroundColor: serviceColor(a.trip.service),
                                   opacity:
                                     service === "all" ||
@@ -341,7 +341,7 @@ function CrewTimeline({
                               <Button
                                 key={`break:${d.id}`}
                                 variant="outline"
-                                className="absolute bottom-1 h-5 min-w-0 overflow-hidden rounded-sm border-muted-foreground/50 bg-[repeating-linear-gradient(135deg,transparent,transparent_4px,var(--border)_4px,var(--border)_7px)] p-0 text-[10px]"
+                                className="absolute top-1 h-5 min-w-0 overflow-hidden rounded-sm border-muted-foreground/50 bg-[repeating-linear-gradient(135deg,transparent,transparent_4px,var(--border)_4px,var(--border)_7px)] p-0 text-[10px]"
                                 style={position(d.breakStart, d.breakEnd)}
                                 aria-label={`Protected break ${d.id}, ${crewClock(d.breakStart)} to ${crewClock(d.breakEnd)}`}
                                 onClick={() =>
