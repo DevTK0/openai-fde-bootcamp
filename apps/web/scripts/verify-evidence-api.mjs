@@ -149,6 +149,51 @@ for (const question of [
   assert.equal(unresolved.status, "insufficient")
   assert.ok(unresolved.unresolvedScope.length)
 }
+const grammarBundle = structuredClone(fixture)
+grammarBundle.name = "Typed reference and quantity verification"
+grammarBundle.tables[1].rows.push({
+  id: "numeric-service",
+  values: {
+    ...grammarBundle.tables[1].rows[0].values,
+    service: "1",
+    boardings: 900,
+  },
+})
+grammarBundle.tables.push({
+  id: "faults",
+  title: "Faults",
+  sourceId: "demo",
+  kind: "evidence",
+  columns: ["issue"],
+  caveats: [],
+  rows: Array.from({ length: 9 }, (_, i) => ({
+    id: `fault-${i}`,
+    values: { issue: "fault" },
+  })),
+})
+const grammarRevision = (await request("/api/workspace", post(grammarBundle)))
+  .body.revision.id
+const grammarQuery = async (question) =>
+  (
+    await request(
+      `/api/workspace/${grammarRevision}?view=context&q=${encodeURIComponent(question)}`
+    )
+  ).body
+for (const question of [
+  "passenger boardings vehicle DEMO-1",
+  "passenger boardings route 1",
+]) {
+  const unresolved = await grammarQuery(question)
+  assert.deepEqual(unresolved.metrics, [])
+  assert.ok(unresolved.unresolvedScope.length)
+}
+const quantity = await grammarQuery("repair cost per 1,000 km")
+assert.equal(quantity.filters.service, "")
+assert.deepEqual(quantity.unresolvedScope, [])
+assert.equal(quantity.metrics.find((m) => m.id === "repair_cost").value, 500)
+const capped = await grammarQuery("fault")
+assert.equal(capped.evidence.filter((e) => e.type === "row").length, 8)
+assert.equal(capped.truncation.truncated, true)
 assert.ok(
   context.body.missingEvidence.includes(
     "Service-date operational aggregates cannot be allocated to an individual vehicle."
@@ -185,7 +230,7 @@ console.log(
       revision: id,
       newRevision: newer.body.revision.id,
       checks:
-        "import, idempotency, immutable isolation, metrics, filters, citations, insufficient evidence, malformed input, same-origin, short service scope, unknown scope, concurrent deduplication",
+        "import, idempotency, immutable isolation, metrics, filters, citations, insufficient evidence, malformed input, same-origin, short service scope, unknown scope, typed namespaces, unsupported routes, formatted quantities, candidate truncation, concurrent deduplication",
       corruptReimport: process.argv[4]
         ? "PASS"
         : "not run; pass the isolated server data directory as the third argument",
