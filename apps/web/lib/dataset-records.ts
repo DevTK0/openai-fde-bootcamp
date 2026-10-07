@@ -11,13 +11,11 @@ import {
 
 export class RecordValidationError extends Error {}
 const quote = (value: string) => `"${value.replaceAll('"', '""')}"`
-const metadataSchema = datasetSchema
-  .omit({ rows: true })
-  .extend({
-    fieldTypes: z
-      .record(z.string(), z.enum(["TEXT", "REAL", "INTEGER"]))
-      .optional(),
-  })
+const metadataSchema = datasetSchema.omit({ rows: true }).extend({
+  fieldTypes: z
+    .record(z.string(), z.enum(["TEXT", "REAL", "INTEGER"]))
+    .optional(),
+})
 function describe(database: DatabaseSync, id: string) {
   const stored = database
     .prepare("SELECT metadata FROM handout_tables WHERE id = ?")
@@ -221,6 +219,7 @@ export function mutateDataset(input: DatasetMutation) {
               .get(id)
           ).position
       : 0
+    const timestamp = database.prepare("SELECT unixepoch(?) AS value")
     const sample: z.infer<typeof rowSchema>[] = []
     for (const [index, valueRow] of values.entries()) {
       const row: z.infer<typeof rowSchema> = {}
@@ -257,7 +256,8 @@ export function mutateDataset(input: DatasetMutation) {
                 "proposed start",
                 "proposed end",
               ].includes(name)) &&
-            !Number.isFinite(Date.parse(value))
+            (!Number.isFinite(Date.parse(value)) ||
+              timestamp.get(value)?.value === null)
           )
             throw new RecordValidationError(
               `${prefix} must contain a valid date or timestamp.`

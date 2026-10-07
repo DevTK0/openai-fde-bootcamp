@@ -40,7 +40,8 @@ export async function POST(request: Request) {
     const { done, value } = await reader.read()
     if (done) break
     size += value.byteLength
-    if (size > 2_100_000) {
+    // JSON can encode each CSV byte as a six-byte Unicode escape.
+    if (size > 12_100_000) {
       await reader.cancel()
       return Response.json(
         { error: "The upload is too large. Maximum file size is 2 MB." },
@@ -64,6 +65,15 @@ export async function POST(request: Request) {
       { error: "Choose a dataset and supply valid record data." },
       { status: 400 }
     )
+  if (
+    parsed.data.action === "upload" &&
+    Buffer.byteLength(parsed.data.csv, "utf8") > 2_000_000
+  ) {
+    return Response.json(
+      { error: "The upload is too large. Maximum file size is 2 MB." },
+      { status: 413 }
+    )
+  }
   try {
     return Response.json(mutateDataset(parsed.data))
   } catch (error) {

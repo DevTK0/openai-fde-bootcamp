@@ -206,7 +206,10 @@ export function OperationsDashboard() {
                     Trips: r.trips,
                     Vehicles: r.vehicles,
                     "Departure >5m (%)": Number(
-                      ((r.lateDepartures / r.trips) * 100).toFixed(1)
+                      (r.trips
+                        ? (r.lateDepartures / r.trips) * 100
+                        : 0
+                      ).toFixed(1)
                     ),
                     "Early departures": r.earlyDepartures,
                     "Mean arrival (min)": Number(r.meanArrival.toFixed(1)),

@@ -100,6 +100,111 @@ describe("Operations CSV ingestion", () => {
     expect(report.metrics.trips).toBe(6901)
     expect(report.metrics.completed).toBe(6901)
   })
+  it("includes queue observations without matching trips in reports", async () => {
+    const database = new DatabaseSync(path)
+    const row = rowSchema.parse(
+      database.prepare("SELECT * FROM queue_windows LIMIT 1").get()
+    )
+    database.close()
+    mutateDataset({
+      action: "add",
+      table: "queue_windows",
+      row: {
+        ...row,
+        queue_window_id: "TEST-QUEUE-ONLY",
+        service_date: "2026-11-01",
+        initial_queue_people: 3,
+        total_arrivals_people: 7,
+        total_boarded_people: 4,
+        remaining_queue_people: 6,
+      },
+    })
+    const report = await getOperationsReport("all", "2026-11-01")
+    expect(report.metrics).toMatchObject({
+      trips: 0,
+      initialQueue: 3,
+      arrivals: 7,
+      remainingQueue: 6,
+    })
+    expect(report.hotspots).toHaveLength(1)
+    expect(report.hotspots[0]).toMatchObject({ boardings: 4, remaining: 6 })
+  })
+  it("accepts a CSV below 2 MB when JSON escaping exceeds the wire limit", async () => {
+    vi.stubEnv("RECORD_IMPORTS_ENABLED", "1")
+    const rows = Array.from({ length: 20 }, (_, i) => ({
+      vehicle_id: `TEST-QUOTED-${i}`,
+      assigned_service_no: "007",
+      vehicle_type: "DD",
+      capacity_people: 100,
+      wheelchair_spaces: 2,
+      capacity_basis: '"'.repeat(48000),
+    }))
+    const csv = csvExport(header.split(","), rows)
+    expect(Buffer.byteLength(csv)).toBeLessThan(2_000_000)
+    const body = JSON.stringify({
+      action: "upload",
+      table: "vehicles",
+      csv,
+      commit: false,
+    })
+    expect(Buffer.byteLength(body)).toBeGreaterThan(2_100_000)
+    const response = await POST(
+      new Request("http://localhost/api/datasets", {
+        method: "POST",
+        headers: { Origin: "http://localhost" },
+        body,
+      })
+    )
+    expect(response.status).toBe(200)
+    expect(count()).toBe(172)
+  })
+  it("enforces the CSV limit in UTF-8 bytes", async () => {
+    vi.stubEnv("RECORD_IMPORTS_ENABLED", "1")
+    const response = await POST(
+      new Request("http://localhost/api/datasets", {
+        method: "POST",
+        headers: { Origin: "http://localhost" },
+        body: JSON.stringify({
+          action: "upload",
+          table: "vehicles",
+          csv: "界".repeat(700000),
+          commit: false,
+        }),
+      })
+    )
+    expect(response.status).toBe(413)
+    expect(count()).toBe(172)
+  })
+  it.each([
+    ["trips", "trip_id", "actual_departure_at"],
+    ["terminal_movements", "movement_id", "actual_start_at"],
+  ])(
+    "rejects timestamps that SQLite cannot read in %s",
+    (table, key, timestamp) => {
+      const database = new DatabaseSync(path)
+      const row = rowSchema.parse(
+        database.prepare(`SELECT * FROM ${table} LIMIT 1`).get()
+      )
+      const before = database
+        .prepare(`SELECT count(*) AS count FROM ${table}`)
+        .get()?.count
+      expect(() =>
+        mutateDataset({
+          action: "add",
+          table,
+          row: {
+            ...row,
+            [key]: "TEST-UNSUPPORTED-DATE",
+            [timestamp]: "October 7, 2026",
+          },
+        })
+      ).toThrow("valid date or timestamp")
+      expect(
+        database.prepare(`SELECT count(*) AS count FROM ${table}`).get()?.count
+      ).toBe(before)
+      database.close()
+    }
+  )
   it("rejects more than 1,000 rows before writing", () => {
     const manyRows = Array.from(
       { length: 1001 },

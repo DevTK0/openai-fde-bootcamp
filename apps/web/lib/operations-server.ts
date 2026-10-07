@@ -138,13 +138,13 @@ export async function getOperationsReport(
       signal
     )
   const trips = tripSchema.array().parse(tripRows)
-  for (const trip of trips) {
-    const key = `${trip.date}/${trip.service}`
+  function groupFor(date: string, service: string) {
+    const key = `${date}/${service}`
     let group = groups.get(key)
     if (!group) {
       group = {
-        date: trip.date,
-        service: trip.service,
+        date,
+        service,
         trips: 0,
         completed: 0,
         km: 0,
@@ -169,6 +169,10 @@ export async function getOperationsReport(
       }
       groups.set(key, group)
     }
+    return group
+  }
+  for (const trip of trips) {
+    const group = groupFor(trip.date, trip.service)
     group.trips++
     group.completed += Number(trip.state === "completed")
     group.km += trip.km
@@ -223,7 +227,7 @@ export async function getOperationsReport(
     .array()
     .parse(hotspotRows)
   for (const hotspot of hotspots) {
-    const group = groups.get(`${hotspot.date}/${hotspot.service}`)!
+    const group = groupFor(hotspot.date, hotspot.service)
     group.initialQueue += hotspot.initial
     group.arrivals += hotspot.arrivals
     group.remainingQueue += hotspot.remaining
