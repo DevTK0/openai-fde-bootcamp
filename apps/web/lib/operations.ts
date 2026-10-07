@@ -1,6 +1,4 @@
-import sourceManifest from "../data/operations/manifest.json"
 import type { Row } from "./fleet"
-export const operationsManifest = sourceManifest
 export type OperationGroup = {
   date: string
   service: string

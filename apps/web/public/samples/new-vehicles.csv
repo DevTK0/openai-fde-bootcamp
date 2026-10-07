@@ -1,0 +1,3 @@
+vehicle_id,assigned_service_no,vehicle_type,capacity_people,wheelchair_spaces,capacity_basis
+DEMO-V181,235,SD,85,1,Fictional vehicle for the record upload prototype
+DEMO-V182,238,DD,120,1,Fictional vehicle for the record upload prototype

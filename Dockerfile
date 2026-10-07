@@ -1,11 +1,11 @@
-FROM node:22-bookworm-slim AS build
+FROM node:24.21.0-bookworm-slim AS build
 
 WORKDIR /app
 RUN npm install --global pnpm@12.9.1
 COPY . .
 RUN pnpm install --frozen-lockfile && pnpm build
 
-FROM node:22-bookworm-slim
+FROM node:24.21.0-bookworm-slim
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends nginx \
