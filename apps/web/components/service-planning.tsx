@@ -18,6 +18,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@workspace/ui/components/sheet"
 import { Input } from "@workspace/ui/components/input"
 
 import { Label } from "@workspace/ui/components/label"
@@ -96,6 +104,50 @@ function EvidenceTable({
         },
       }}
     />
+  )
+}
+
+function EvidenceDetails({
+  title,
+  rows,
+  columns,
+}: {
+  title: string
+  rows: Row[]
+  columns: string[]
+}) {
+  return (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" />}>
+        {title} ({rows.length})
+      </SheetTrigger>
+      <SheetContent className="overflow-y-auto sm:max-w-xl">
+        <SheetHeader>
+          <SheetTitle>{title}</SheetTitle>
+          <SheetDescription>Dated evidence · Singapore time</SheetDescription>
+        </SheetHeader>
+        <div className="space-y-4 px-4 pb-6">
+          {rows.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No matching records.
+            </p>
+          )}
+          {rows.map((row, index) => (
+            <dl
+              key={index}
+              className="grid grid-cols-[7rem_1fr] gap-3 rounded-lg border p-4 text-sm"
+            >
+              {columns.map((column) => (
+                <div key={column} className="contents">
+                  <dt className="text-muted-foreground">{column}</dt>
+                  <dd className="break-words">{row[column] ?? "Unknown"}</dd>
+                </div>
+              ))}
+            </dl>
+          ))}
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }
 
@@ -438,17 +490,6 @@ function Evidence({
   report: PlanningReport
   selected: ServiceWatch
 }) {
-  const start = planningTime(report.selection.date, report.selection.start),
-    end = planningTime(report.selection.date, report.selection.end)
-  const calls = report.detail.calls.filter(
-    (c) =>
-      c.observed !== null &&
-      c.observed >= start &&
-      c.observed <= end &&
-      report.detail.positions.some(
-        (p) => p.route === c.route && p.order === c.order && p.boarding === 1
-      )
-  )
   return (
     <div className="space-y-5">
       <div className="grid gap-4 md:grid-cols-3">
@@ -476,54 +517,53 @@ function Evidence({
           detail={`${selected.departuresTotal} departures scheduled in this window; actual departures are counted by observed time`}
         />
       </div>
-      <EvidenceTable
-        title="Flagged departures"
-        columns={[
-          "Trip",
-          "Vehicle",
-          "Scheduled departure",
-          "Actual departure",
-          "Delay minutes",
-        ]}
-        rows={selected.delays.map((d) => ({
-          Trip: d.trip,
-          Vehicle: d.vehicle,
-          "Scheduled departure": timestamp(d.scheduled),
-          "Actual departure": timestamp(d.departure),
-          "Delay minutes": Number(d.minutes.toFixed(2)),
-        }))}
-      />
-      <EvidenceTable
-        title="Queue observations"
-        columns={[
-          "Call",
-          "Trip",
-          "Route",
-          "Position",
-          "Observation time",
-          "Remaining queue",
-        ]}
-        rows={calls.map((c) => ({
-          Call: c.id,
-          Trip: c.trip,
-          Route: c.route,
-          Position: c.order,
-          "Observation time": timestamp(c.observed),
-          "Remaining queue": c.queue ?? "Unknown",
-        }))}
-      />
-      <EvidenceTable
-        title="Service-linked maintenance holds"
-        columns={["Record", "Vehicle", "Opened", "Confirmed release", "Source"]}
-        rows={selected.holds.map((h) => ({
-          Record: h.id,
-          Vehicle: h.vehicle,
-          Opened: timestamp(h.start),
-          "Confirmed release":
-            h.end === null ? "No confirmed release" : timestamp(h.end),
-          Source: h.source,
-        }))}
-      />
+      <div className="flex flex-wrap gap-2">
+        <EvidenceDetails
+          title="Flagged departures"
+          columns={[
+            "Trip",
+            "Vehicle",
+            "Scheduled departure",
+            "Actual departure",
+            "Delay minutes",
+          ]}
+          rows={selected.delays.map((d) => ({
+            Trip: d.trip,
+            Vehicle: d.vehicle,
+            "Scheduled departure": timestamp(d.scheduled),
+            "Actual departure": timestamp(d.departure),
+            "Delay minutes": Number(d.minutes.toFixed(2)),
+          }))}
+        />
+        <Button
+          variant="outline"
+          render={
+            <a
+              href={`/dashboard?view=crowding&${queryFor(report.selection)}`}
+            />
+          }
+        >
+          View passenger queues
+        </Button>
+        <EvidenceDetails
+          title="Service-linked maintenance holds"
+          columns={[
+            "Record",
+            "Vehicle",
+            "Opened",
+            "Confirmed release",
+            "Source",
+          ]}
+          rows={selected.holds.map((h) => ({
+            Record: h.id,
+            Vehicle: h.vehicle,
+            Opened: timestamp(h.start),
+            "Confirmed release":
+              h.end === null ? "No confirmed release" : timestamp(h.end),
+            Source: h.source,
+          }))}
+        />
+      </div>
       <Notice>
         Holds use recorded fleet service assignments and overlap with this
         window. Separate workshop vehicles without service assignments do not
@@ -592,7 +632,7 @@ function Candidates({ report }: { report: PlanningReport }) {
             "Full journey, positioning, later duties, completeness of operating evidence",
         }))}
       />
-      <EvidenceTable
+      <EvidenceDetails
         title="Other vehicle reviews"
         columns={["Vehicle", "Assigned service", "Result", "Explanation"]}
         rows={report.candidates.flatMap((c) =>
@@ -637,8 +677,8 @@ function Replay({ report }: { report: PlanningReport }) {
         {(cursor) => {
           const replay = replayAt(detail, cursor)
           return (
-            <>
-              <EvidenceTable
+            <div className="flex flex-wrap gap-2">
+              <EvidenceDetails
                 title="Bus states at replay time"
                 columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}
                 rows={replay.buses.map((b) => ({
@@ -649,7 +689,7 @@ function Replay({ report }: { report: PlanningReport }) {
                   Evidence: b.evidence,
                 }))}
               />
-              <EvidenceTable
+              <EvidenceDetails
                 title="Departure timeline"
                 columns={[
                   "Trip",
@@ -674,7 +714,7 @@ function Replay({ report }: { report: PlanningReport }) {
                     "Actual arrival": timestamp(t.arrival),
                   }))}
               />
-            </>
+            </div>
           )
         }}
       </ReplayPlayer>

@@ -12,6 +12,7 @@ import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
 import { Metric, Notice, Pick } from "@/components/report-ui"
 import { type OperationsReport } from "@/lib/operations"
+import { planningSelectionSchema } from "@/lib/service-planning"
 import { fmt } from "@/lib/fleet"
 
 function useReport<T>(url: string) {
@@ -68,13 +69,26 @@ function Pending({ error, retry }: { error?: string; retry: () => void }) {
 }
 export function OperationsDashboard({
   view,
+  initialQuery = "",
 }: {
+  initialQuery?: string
   view: "reliability" | "crowding"
 }) {
   const { operationsManifest: manifest } = useDashboard()
+  const parsed = planningSelectionSchema.safeParse(
+    Object.fromEntries(new URLSearchParams(initialQuery))
+  )
+  const linkedSelection =
+    parsed.success &&
+    manifest.dates.includes(parsed.data.date) &&
+    manifest.services.includes(parsed.data.service)
+      ? parsed.data
+      : undefined
   const [service, setService] = useState("all"),
     [date, setDate] = useState(
-      view === "crowding" ? (manifest.dates.at(-1) ?? "") : "all"
+      view === "crowding"
+        ? (linkedSelection?.date ?? manifest.dates.at(-1) ?? "")
+        : "all"
     )
   const request = useReport<OperationsReport>(
     `/api/operations?service=${encodeURIComponent(service)}&date=${encodeURIComponent(date)}`
@@ -246,7 +260,12 @@ export function OperationsDashboard({
           )}
         </>
       )}
-      {view === "crowding" && <PassengerQueueObservations date={date} />}
+      {view === "crowding" && (
+        <PassengerQueueObservations
+          date={date}
+          initialSelection={linkedSelection}
+        />
+      )}
     </div>
   )
 }

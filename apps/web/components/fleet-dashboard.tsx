@@ -371,7 +371,13 @@ function DashboardReport({
       )
     case "reliability":
     case "crowding":
-      return <OperationsDashboard key={view} view={view} />
+      return (
+        <OperationsDashboard
+          key={view}
+          view={view}
+          initialQuery={initialQuery}
+        />
+      )
     case "usage":
       return <SelectedOperations />
     case "maintenance":

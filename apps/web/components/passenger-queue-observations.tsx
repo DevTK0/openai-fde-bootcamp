@@ -8,13 +8,20 @@ import {
   planningDetailSchema,
   planningTime,
   type PlanningDetail,
+  type PlanningSelection,
 } from "@/lib/service-planning"
 
 type Result =
   | { key: string; kind: "ready"; detail: PlanningDetail }
   | { key: string; kind: "error" }
 
-export function PassengerQueueObservations({ date }: { date: string }) {
+export function PassengerQueueObservations({
+  date,
+  initialSelection,
+}: {
+  date: string
+  initialSelection?: PlanningSelection
+}) {
   const dashboard = useDashboard()
   const [result, setResult] = useState<Result | null>(null)
   const [attempt, setAttempt] = useState(0)
@@ -86,11 +93,18 @@ export function PassengerQueueObservations({ date }: { date: string }) {
     <QueueObservations
       key={date}
       detail={current.detail}
+      initialService={initialSelection?.service}
       selection={{
         date,
-        start: hour(firstHour),
-        end: hour(lastHour),
-        queue: 30,
+        start:
+          initialSelection?.date === date
+            ? initialSelection.start
+            : hour(firstHour),
+        end:
+          initialSelection?.date === date
+            ? initialSelection.end
+            : hour(lastHour),
+        queue: initialSelection?.queue ?? 30,
       }}
     />
   )

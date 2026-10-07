@@ -136,7 +136,9 @@ describe("SQLite dashboard interactions", () => {
         expect(link).toHaveAttribute("aria-current", "page")
         expect(screen.getAllByRole("link", { current: "page" })).toHaveLength(1)
         if (group.workspace === "Data" || name === "Service reliability") {
-          expect(await screen.findAllByRole("table")).toHaveLength(1)
+          expect(
+            await screen.findAllByRole("table", {}, { timeout: 5000 })
+          ).toHaveLength(1)
           expect(
             screen.getByRole("textbox", { name: "Search records" })
           ).toBeInTheDocument()
@@ -265,7 +267,14 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
   const watchlist = await screen.findByRole("table", {
     name: "Service watchlist",
   })
-  expect(await screen.findByText("Queue observations")).toBeInTheDocument()
+  expect(
+    await screen.findByRole("link", { name: "View passenger queues" })
+  ).toHaveAttribute("href", expect.stringContaining("view=crowding"))
+  expect(screen.queryByText("Queue observations")).not.toBeInTheDocument()
+  expect(screen.getAllByRole("table")).toHaveLength(1)
+  await user.click(screen.getByRole("button", { name: /Flagged departures/ }))
+  expect(screen.getByRole("dialog")).toHaveTextContent("Actual departure")
+  await user.keyboard("{Escape}")
   expect(
     screen.queryByRole("region", {
       name: "Queue observations by route position and time",
@@ -302,14 +311,11 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
   expect(
     screen.getByRole("spinbutton", { name: "Queue threshold" })
   ).toHaveValue(44)
-  const reportCard = (title: string) => {
-    const card = screen.getByText(title).closest('[data-slot="card"]')
-    if (!(card instanceof HTMLElement))
-      throw new Error(`Missing report card: ${title}`)
-    return card
-  }
   expect(screen.queryByText("Queues at replay time")).not.toBeInTheDocument()
-  expect(screen.getByText("Departure timeline")).toBeInTheDocument()
+  expect(screen.getAllByRole("table")).toHaveLength(1)
+  expect(
+    screen.getByRole("button", { name: /Departure timeline/ })
+  ).toBeInTheDocument()
   fireEvent.change(
     screen.getByRole("textbox", { name: "Inspect time minutes" }),
     { target: { value: "03" } }
@@ -318,11 +324,15 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     screen.getByRole("textbox", { name: "Inspect time seconds" }),
     { target: { value: "36" } }
   )
-  const busStates = () => reportCard("Bus states at replay time")
-  const busRow = () => within(busStates()).getByText("NW-V009").closest("tr")!
+  await user.click(
+    screen.getByRole("button", { name: /Bus states at replay time/ })
+  )
+  const busRow = () =>
+    within(screen.getByRole("dialog")).getByText("NW-V009").closest("dl")!
   expect(
     within(busRow()).getByText("Recorded dwell at position 1")
   ).toBeInTheDocument()
+  await user.keyboard("{Escape}")
   fireEvent.change(
     screen.getByRole("textbox", { name: "Inspect time minutes" }),
     { target: { value: "04" } }
@@ -331,8 +341,41 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     screen.getByRole("textbox", { name: "Inspect time seconds" }),
     { target: { value: "00" } }
   )
+  await user.click(
+    screen.getByRole("button", { name: /Bus states at replay time/ })
+  )
   expect(
     within(busRow()).getByText("Estimated between positions 1 and 2")
   ).toBeInTheDocument()
   window.history.replaceState(null, "", "/")
+}, 15000)
+
+it("opens passenger queues with the linked service, date and planning assumptions", async () => {
+  window.history.replaceState(
+    null,
+    "",
+    "/dashboard?view=crowding&date=2026-10-07&service=132&start=06:00&end=07:00&queue=44"
+  )
+  render(
+    <DashboardProvider data={readDashboardData()}>
+      <FleetDashboard />
+    </DashboardProvider>
+  )
+  expect(
+    await screen.findByRole("combobox", { name: "Queue service" })
+  ).toHaveTextContent("Service 132")
+  expect(
+    screen.getByRole("combobox", { name: "Operating date" })
+  ).toHaveTextContent("2026-10-07")
+  expect(screen.getByText(/≥44 left behind/)).toBeInTheDocument()
+  const plot = screen.getByRole("region", {
+    name: "Queue observations by route position and time",
+  })
+  expect(within(plot).getByText("07:00")).toBeInTheDocument()
+  expect(
+    within(plot).getByRole("button", { name: /NW-20261007-0009-01/ })
+  ).toBeInTheDocument()
+  expect(
+    within(plot).queryByRole("button", { name: /NW-20261007-0108-01/ })
+  ).not.toBeInTheDocument()
 })

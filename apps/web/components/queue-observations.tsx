@@ -36,11 +36,15 @@ const count = (value: number | null | undefined) =>
 export function QueueObservations({
   detail,
   selection,
+  initialService,
 }: {
+  initialService?: string
   detail: PlanningDetail
   selection: Pick<PlanningSelection, "date" | "start" | "end" | "queue">
 }) {
-  const [serviceId, setServiceId] = useState(detail.routes[0]?.service ?? "")
+  const [serviceId, setServiceId] = useState(
+    initialService ?? detail.routes[0]?.service ?? ""
+  )
   const services = [...new Set(detail.routes.map((r) => r.service))]
   const service = services.includes(serviceId) ? serviceId : services[0]
   const routes = detail.routes.filter((r) => r.service === service)
