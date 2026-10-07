@@ -68,7 +68,9 @@ export class BusFleet extends THREE.Group {
 
   pick(raycaster: THREE.Raycaster) {
     const hit = raycaster.intersectObjects(this.children)[0]
-    return hit?.instanceId === undefined ? undefined : this.keys[hit.instanceId]
+    if (hit?.instanceId === undefined) return undefined
+    const key = this.keys[hit.instanceId]
+    return key === undefined ? undefined : { key, distance: hit.distance }
   }
 
   dispose() {

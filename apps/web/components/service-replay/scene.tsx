@@ -296,11 +296,9 @@ export function Scene({
         .find(
           (h) => h.object.visible && typeof h.object.userData.key === "string"
         )
-      if (hit) onPick(String(hit.object.userData.key))
-      else {
-        const key = fleet.current?.pick(raycaster)
-        if (key) onPick(key)
-      }
+      const busHit = fleet.current?.pick(raycaster)
+      if (busHit && (!hit || busHit.distance < hit.distance)) onPick(busHit.key)
+      else if (hit) onPick(String(hit.object.userData.key))
     }
     renderer.domElement.addEventListener("pointerdown", pointerDown)
     renderer.domElement.addEventListener("pointerup", pick)

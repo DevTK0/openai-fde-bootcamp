@@ -55,15 +55,18 @@ describe("LionLink buses on the route map", () => {
       )
     buses.update([{ key: "first", x: 0, z: 0 }])
     buses.updateMatrixWorld(true)
-    expect(buses.pick(ray(0, 0))).toBe("first")
+    expect(buses.pick(ray(0, 0))?.key).toBe("first")
+    const hit = buses.pick(ray(0, 0))
+    expect(hit?.distance).toBeGreaterThan(14)
+    expect(hit?.distance).toBeLessThan(15)
     buses.update([
       { key: "moved", x: 10, z: 20 },
       { key: "added", x: 30, z: 40 },
     ])
     buses.updateMatrixWorld(true)
     expect(buses.pick(ray(0, 0))).toBeUndefined()
-    expect(buses.pick(ray(10, 20))).toBe("moved")
-    expect(buses.pick(ray(30, 40))).toBe("added")
+    expect(buses.pick(ray(10, 20))?.key).toBe("moved")
+    expect(buses.pick(ray(30, 40))?.key).toBe("added")
     buses.update([])
     expect(buses.pick(ray(10, 20))).toBeUndefined()
     buses.dispose()
