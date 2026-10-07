@@ -48,7 +48,12 @@ export default defineConfig({
         },
         {
           label: "Explanation",
-          items: [],
+          items: [
+            {
+              label: "Operations planning with AI",
+              slug: "operations-planning",
+            },
+          ],
         },
       ],
     }),
