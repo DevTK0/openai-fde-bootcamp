@@ -1,7 +1,7 @@
 import { z } from "zod"
 import { loadBundle } from "@/lib/evidence/store"
 import { seedBundle, seedId } from "@/lib/evidence/seed"
-import { analyse, inspectTable } from "@/lib/evidence/analysis"
+import { analyse, inspectTable, inspectRow } from "@/lib/evidence/analysis"
 import { retrieveContext } from "@/lib/evidence/context"
 import { filterSchema, revisionIdSchema } from "@/lib/evidence/schema"
 import { HttpError, respond } from "@/lib/evidence/http"
@@ -23,7 +23,7 @@ export async function GET(
       )
     )
     const view = z
-      .enum(["analysis", "table", "context"])
+      .enum(["analysis", "table", "context", "row"])
       .parse(params.get("view") ?? "analysis")
     const q = z
       .string()
@@ -32,6 +32,13 @@ export async function GET(
     const bundle = revision === seedId ? seedBundle : await loadBundle(revision)
     if (view === "analysis") return analyse(bundle, revision, filters)
     if (view === "context") return retrieveContext(bundle, revision, q, filters)
+    if (view === "row") {
+      const row = z.string().min(1).max(100).parse(params.get("row"))
+      const table = z.string().min(1).max(100).parse(params.get("table"))
+      const result = inspectRow(bundle, revision, table, row, filters)
+      if (!result) throw new HttpError(404, "Row not found in this scope")
+      return result
+    }
     const page = z.coerce
       .number()
       .int()

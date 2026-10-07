@@ -10,8 +10,10 @@ export class HttpError extends Error {
 }
 export async function readImport(request: Request) {
   const origin = request.headers.get("origin")
+  const requestOrigin = new URL(request.url)
+  requestOrigin.host = request.headers.get("host") || requestOrigin.host
   const expectedOrigin =
-    process.env.EVIDENCE_PUBLIC_ORIGIN || new URL(request.url).origin
+    process.env.EVIDENCE_PUBLIC_ORIGIN || requestOrigin.origin
   if (!origin || origin !== expectedOrigin)
     throw new HttpError(403, "Import requires the configured same origin")
   if (!request.headers.get("content-type")?.startsWith("application/json"))

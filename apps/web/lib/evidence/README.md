@@ -8,7 +8,7 @@ A mutable database and a generic SQL agent were considered. That design would re
 
 ## Import contract
 
-Download `/evidence/example-bundle.json` for a complete example. POST its JSON to `/api/workspace` with `Content-Type: application/json` and an `Origin` matching the application origin. `EVIDENCE_PUBLIC_ORIGIN` configures that origin behind a trusted proxy. Imports are at most 5 MiB and 20,000 rows. This local exercise workspace has no user accounts; deploy behind an authenticated access boundary before accepting sensitive data.
+Download `/evidence/example-bundle.json` for a complete example. POST its JSON to `/api/workspace` with `Content-Type: application/json` and an `Origin` matching the application origin. `EVIDENCE_PUBLIC_ORIGIN` configures that origin behind a trusted proxy. Imports are at most 5 MiB and 20,000 rows. This local exercise workspace has no user accounts. Origin validation prevents cross-origin browser imports, but does not authenticate users. Both read and import endpoints must sit behind an authenticated access boundary before accepting sensitive data.
 
 A bundle contains `schemaVersion: 1`, `name`, `description`, `sources` and `tables`. Sources have unique IDs, titles, evidence kind, original reference, caveats and text. Evidence kind is `observed`, `reported`, `planned` or `synthetic`. Tables have unique IDs, title, sourceId, kind, columns, rows and caveats. Rows contain a unique stable ID and a `values` object with declared column names and string, finite number or null values. Put coverage, units and effective dates in source caveats. Unknown fields are rejected.
 
@@ -18,18 +18,21 @@ Maintenance rows have grain `month` in YYYY-MM and `vehicle_id`. Required numeri
 
 ## API reference
 
-- GET `/api/workspace` returns `{ revisions }`, including the built-in seed.
-- POST `/api/workspace` returns `{ revision, created }` after validation and durable file publication.
-- GET `/api/workspace/{revision}` returns analysis, metric definitions, numerator, denominator, citation list, series, source metadata and available filters.
+- GET `/api/workspace` returns `{ revisions, unavailableRevisions }`, including the built-in seed.
+- POST `/api/workspace` returns `{ revision, created }` after validation and atomic file publication.
+- GET `/api/workspace/{revision}` returns analysis, metric definitions, numerator, denominator, a sample of up to 25 citations, `rowCount`, `citationsTruncated`, series, source metadata and available filters.
 - GET `/api/workspace/{revision}?view=table&table={tableId}&page=0&q={text}` returns up to 25 rows and exact revision/source/table/row citations.
+- GET `/api/workspace/{revision}?view=row&table={tableId}&row={rowId}` returns the full row, its source and citation, or 404 if absent from the filtered scope.
 - GET `/api/workspace/{revision}?view=context&q={question}` returns a maximum of eight row excerpts and four document excerpts, relevant deterministic metrics, missing evidence and retrieval limits.
 
 All revision queries accept `vehicle`, `service`, `from` and `to`. Date filters include complete months only for monthly ledgers. A vehicle filter excludes service-only aggregates and a service filter excludes vehicle-only maintenance. Unknown scope yields unavailable metrics. Partially missing numeric fields also yield unavailable values rather than biased partial totals.
 
-Retrieval uses exact identifier matches, lexical terms and structured scope. Document excerpts are background guidance, not filtered measurements. This is the retrieval and context-management part of a RAG system. It does not generate an answer with a language model, claim causality or execute imported instructions. A model synthesis adapter requires a separately verified provider and citation contract.
+Retrieval uses exact identifier matches, lexical terms and structured scope. A single recognized vehicle, service or date in a question supplies missing filters for both rows and metrics. Ambiguous or conflicting identifiers suppress numeric context. The response states requested and effective filters. Context JSON is capped at 32,000 characters, including caveats and metric metadata, with explicit truncation metadata. Document excerpts are background guidance, not filtered measurements. This is the retrieval and context-management part of a RAG system. It does not generate an answer with a language model, claim causality or execute imported instructions. A model synthesis adapter requires a separately verified provider and citation contract.
 
 ## Storage and verification
 
 `EVIDENCE_DATA_DIR` selects the persistent directory. The default is `apps/web/data/evidence` when the web app runs from its workspace. Keep this directory across restarts. It is ignored by Git. Immutable imports have no deletion or merge endpoint.
 
-Run `node apps/web/scripts/generate-evidence-seed.mjs` from any directory to regenerate the checked-in seed from current source artifacts. Run `EVIDENCE_URL=http://localhost:3011 node apps/web/scripts/verify-evidence-api.mjs` against the app. Restart the app with the same data directory and repeat the driver to prove persistence. Set `EVIDENCE_ORIGIN` when the server has a configured proxy origin. The driver changes the server only by importing the documented synthetic examples.
+Run `node apps/web/scripts/generate-evidence-seed.mjs` from any directory to regenerate the checked-in seed from current source artifacts. Run `node apps/web/scripts/verify-evidence-api.mjs http://localhost:3011` against the app. Restart the app with the same data directory and repeat the driver to prove persistence. Pass the expected origin as a second argument when the server has a configured proxy origin. The driver changes the server only by importing the documented synthetic examples.
+
+Catalog summaries are cached in-process for unchanged file metadata, with a 1,000-entry cap. A cold process validates each revision once. Damaged revisions appear in `unavailableRevisions` while healthy revisions remain accessible. Reads of individual revisions always validate content integrity.

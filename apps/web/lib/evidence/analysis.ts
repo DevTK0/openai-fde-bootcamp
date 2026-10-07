@@ -1,3 +1,4 @@
+import { dateBounds } from "./schema"
 import type {
   DatasetBundle,
   EvidenceFilters,
@@ -106,19 +107,17 @@ export function selectedRows(
       values.date ??
       values["Service date"] ??
       values["Observed on"] ??
-      values["Reported at"]
+      values["Reported at"] ??
+      values["Month"] ??
+      values["Opened at"] ??
+      values["Inspected at"] ??
+      values["Week start"] ??
+      values["Period"]
     if (filters.from || filters.to) {
       if (typeof date !== "string") return false
-      // Monthly totals cannot be sliced into partial months.
-      const start = date.length === 7 ? `${date}-01` : date.slice(0, 10)
-      const end =
-        date.length === 7
-          ? new Date(
-              Date.UTC(Number(date.slice(0, 4)), Number(date.slice(5, 7)), 0)
-            )
-              .toISOString()
-              .slice(0, 10)
-          : start
+      const bounds = dateBounds(date)
+      if (!bounds) return false
+      const { start, end } = bounds
       if (
         (filters.from && start < filters.from) ||
         (filters.to && end > filters.to)
@@ -150,13 +149,26 @@ export function analyse(
   revision: string,
   filters: EvidenceFilters
 ) {
-  const metrics = metricDefinitions.map((def) => {
-    const table = bundle.tables.find((t) => t.kind === def.kind)
-    const source = bundle.sources.find((s) => s.id === table?.sourceId)
+  const indexed = bundle.tables.map((table) => {
+    const source = bundle.sources.find((s) => s.id === table.sourceId)
     const rows =
-      table && (source?.kind === "observed" || source?.kind === "synthetic")
+      source?.kind === "observed" || source?.kind === "synthetic"
         ? selectedRows(table, filters)
         : []
+    const periods = new Map<string, EvidenceRow[]>()
+    for (const row of rows) {
+      const period = String(row.values.month ?? row.values.date)
+      const group = periods.get(period) ?? []
+      group.push(row)
+      periods.set(period, group)
+    }
+    return { table, source, rows, periods }
+  })
+  const metrics = metricDefinitions.map((def) => {
+    const entry = indexed.find((item) => item.table.kind === def.kind)
+    const table = entry?.table,
+      source = entry?.source,
+      rows = entry?.rows ?? []
     const numerator = total(rows, def.numerator),
       denominator = def.denominator ? total(rows, def.denominator) : null
     const available =
@@ -180,17 +192,15 @@ export function analyse(
       sourceId: source?.id ?? null,
       evidenceKind: source?.kind ?? null,
       tableId: table?.id ?? null,
-      citations: table ? rows.map((row) => citation(revision, table, row)) : [],
+      citations: table
+        ? rows.slice(0, 25).map((row) => citation(revision, table, row))
+        : [],
+      citationsTruncated: rows.length > 25,
       caveats: [...(source?.caveats ?? []), ...(table?.caveats ?? [])],
-      series: [
-        ...new Set(rows.map((r) => String(r.values.month ?? r.values.date))),
-      ]
-        .sort()
-        .map((period) => {
-          const group = rows.filter(
-              (r) => (r.values.month ?? r.values.date) === period
-            ),
-            n = total(group, def.numerator),
+      series: [...(entry?.periods.entries() ?? [])]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([period, group]) => {
+          const n = total(group, def.numerator),
             d = def.denominator ? total(group, def.denominator) : null
           return {
             period,
@@ -277,3 +287,26 @@ export function inspectTable(
   }
 }
 export type EvidenceTablePage = NonNullable<ReturnType<typeof inspectTable>>
+
+export function inspectRow(
+  bundle: DatasetBundle,
+  revision: string,
+  tableId: string,
+  rowId: string,
+  filters: EvidenceFilters
+) {
+  const table = bundle.tables.find((t) => t.id === tableId)
+  if (!table) return null
+  const row = selectedRows(table, filters).find((r) => r.id === rowId)
+  if (!row) return null
+  return {
+    revision,
+    tableId,
+    title: table.title,
+    columns: table.columns,
+    source: bundle.sources.find((s) => s.id === table.sourceId) ?? null,
+    caveats: table.caveats,
+    row: { ...row, citation: citation(revision, table, row) },
+  }
+}
+export type EvidenceRowDetail = NonNullable<ReturnType<typeof inspectRow>>

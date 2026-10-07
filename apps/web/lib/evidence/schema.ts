@@ -52,6 +52,21 @@ function validDate(value: string) {
     new Date(value).toISOString().slice(0, 10) === value
   )
 }
+export function dateBounds(value: string) {
+  if (/^\d{4}-\d{2}$/.test(value) && validDate(`${value}-01`)) {
+    const last = new Date(`${value}-01T00:00:00.000Z`)
+    last.setUTCMonth(last.getUTCMonth() + 1, 0)
+    return { start: `${value}-01`, end: last.toISOString().slice(0, 10) }
+  }
+  const day = value.slice(0, 10)
+  if (
+    /^\d{4}-\d{2}-\d{2}(?:$|[T ])/.test(value) &&
+    validDate(day) &&
+    !Number.isNaN(Date.parse(value))
+  )
+    return { start: day, end: day }
+  return null
+}
 export const bundleSchema = z
   .object({
     schemaVersion: z.literal(1),

@@ -20,7 +20,7 @@ function canonical(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`
   if (value !== null && typeof value === "object")
     return `{${Object.entries(value)
-      .sort(([a], [b]) => a.localeCompare(b))
+      .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
       .map(([k, v]) => `${JSON.stringify(k)}:${canonical(v)}`)
       .join(",")}}`
   return JSON.stringify(value)
@@ -73,19 +73,39 @@ export async function loadBundle(id: string, directory = dataDirectory()) {
     throw new Error("Revision integrity check failed")
   return bundle
 }
+const summaryCache = new Map<
+  string,
+  { fingerprint: string; value: ReturnType<typeof summary> }
+>()
 export async function listBundles(directory = dataDirectory()) {
   await mkdir(directory, { recursive: true })
-  const files = await readdir(directory)
-  return Promise.all(
-    files
-      .filter((f) => /^[a-f0-9]{64}\.json$/.test(f))
-      .map(async (file) => {
-        const id = file.slice(0, -5),
-          bundle = await loadBundle(id, directory),
-          info = await stat(join(directory, file))
-        return summary(id, bundle, info.mtime.toISOString())
-      })
-  ).then((items) =>
-    items.sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+  const files = (await readdir(directory)).filter((f) =>
+    /^[a-f0-9]{64}\.json$/.test(f)
   )
+  const revisions: ReturnType<typeof summary>[] = []
+  const unavailableRevisions: string[] = []
+  for (const file of files) {
+    const id = file.slice(0, -5),
+      path = join(directory, file)
+    try {
+      const info = await stat(path)
+      const fingerprint = `${info.ino}:${info.size}:${info.mtimeMs}:${info.ctimeMs}`
+      const cached = summaryCache.get(path)
+      if (cached?.fingerprint === fingerprint) revisions.push(cached.value)
+      else {
+        const bundle = await loadBundle(id, directory)
+        const value = summary(id, bundle, info.mtime.toISOString())
+        if (summaryCache.size >= 1000) summaryCache.clear()
+        summaryCache.set(path, { fingerprint, value })
+        revisions.push(value)
+      }
+    } catch {
+      summaryCache.delete(path)
+      unavailableRevisions.push(id)
+    }
+  }
+  return {
+    revisions: revisions.sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    unavailableRevisions,
+  }
 }

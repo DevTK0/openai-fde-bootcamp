@@ -1,5 +1,10 @@
 import { analyse, citation, selectedRows } from "./analysis"
-import type { DatasetBundle, EvidenceFilters } from "./schema"
+import {
+  filterSchema,
+  dateBounds,
+  type DatasetBundle,
+  type EvidenceFilters,
+} from "./schema"
 
 const stopWords = new Set([
   "what",
@@ -26,12 +31,76 @@ export function retrieveContext(
   question: string,
   filters: EvidenceFilters
 ) {
+  let truncated = false
+  const clip = (text: string, length: number) => {
+    if (text.length <= length) return text
+    truncated = true
+    return text.slice(0, length - 14) + " … [truncated]"
+  }
+  const caveats = (values: string[]) => {
+    const unique = [...new Set(values)]
+    if (unique.length > 3) truncated = true
+    return unique.slice(0, 3).map((value) => clip(value, 240))
+  }
   const terms = [
     ...new Set(question.toLowerCase().match(/[a-z0-9][a-z0-9_-]{2,}/g) ?? []),
   ]
     .filter((t) => !stopWords.has(t))
     .slice(0, 20)
-  const identifiers = terms.filter((t) => /\d/.test(t) && /[-_]/.test(t))
+  const dates = terms.filter((t) => /^\d{4}-\d{2}(?:-\d{2})?$/.test(t))
+  const identifiers = terms.filter(
+    (t) => /\d/.test(t) && /[-_]/.test(t) && !dates.includes(t)
+  )
+  const vehicles = [
+    ...new Set(
+      bundle.tables.flatMap((t) =>
+        t.kind === "maintenance"
+          ? t.rows.map((r) => String(r.values.vehicle_id))
+          : []
+      )
+    ),
+  ].filter((v) => terms.includes(v.toLowerCase()))
+  const services = [
+    ...new Set(
+      bundle.tables.flatMap((t) =>
+        t.kind === "operations"
+          ? t.rows.map((r) => String(r.values.service))
+          : []
+      )
+    ),
+  ].filter((v) => terms.includes(v.toLowerCase()))
+  const effectiveFilters = { ...filters }
+  if (!filters.vehicle && vehicles.length === 1)
+    effectiveFilters.vehicle = vehicles[0] ?? ""
+  if (!filters.service && services.length === 1)
+    effectiveFilters.service = services[0] ?? ""
+  const date = dates[0]
+  if (dates.length === 1 && date) {
+    const bounds = dateBounds(date)
+    if (bounds) {
+      if (!filters.from) effectiveFilters.from = bounds.start
+      if (!filters.to) effectiveFilters.to = bounds.end
+    }
+  }
+  const inferredScopeValid = filterSchema.safeParse(effectiveFilters).success
+  const ambiguousScope =
+    !inferredScopeValid ||
+    dates.some((value) => !dateBounds(value)) ||
+    vehicles.length > 1 ||
+    services.length > 1 ||
+    dates.length > 1 ||
+    identifiers.some(
+      (id) => ![...vehicles, ...services].some((v) => v.toLowerCase() === id)
+    )
+  const conflictingScope =
+    vehicles.some((v) => filters.vehicle && v !== filters.vehicle) ||
+    services.some((v) => filters.service && v !== filters.service) ||
+    Boolean(
+      date &&
+      ((filters.from && date < filters.from.slice(0, date.length)) ||
+        (filters.to && date > filters.to.slice(0, date.length)))
+    )
+
   const score = (text: string) => {
     const words = new Set(
       text.toLowerCase().match(/[a-z0-9][a-z0-9_-]*/g) ?? []
@@ -40,7 +109,7 @@ export function retrieveContext(
   }
   const rows = bundle.tables
     .flatMap((table) =>
-      selectedRows(table, filters).flatMap((row) => {
+      selectedRows(table, effectiveFilters).flatMap((row) => {
         const text = JSON.stringify(row.values)
         const values = Object.values(row.values).map((v) =>
           String(v).toLowerCase()
@@ -56,13 +125,17 @@ export function retrieveContext(
               {
                 type: "row" as const,
                 score: relevance,
-                text: text.slice(0, 1600),
+                text: clip(text, 1600),
                 citation: citation(revision, table, row),
                 title: table.title,
                 kind:
                   bundle.sources.find((s) => s.id === table.sourceId)?.kind ??
                   "reported",
-                caveats: table.caveats,
+                caveats: caveats([
+                  ...table.caveats,
+                  ...(bundle.sources.find((s) => s.id === table.sourceId)
+                    ?.caveats ?? []),
+                ]),
               },
             ]
           : []
@@ -90,26 +163,38 @@ export function retrieveContext(
         kind: source.kind,
         reference: source.reference,
         citation: { revision, sourceId: source.id, paragraph: p.index + 1 },
-        text: p.text.slice(0, 1400),
-        caveats: source.caveats,
+        text: clip(p.text, 1400),
+        caveats: caveats(source.caveats),
         scope: "Background guidance; not a filtered numeric observation.",
       }))
     })
     .sort((a, b) => b.score - a.score)
     .slice(0, 4)
-  const analysis = analyse(bundle, revision, filters)
+  const analysis = analyse(bundle, revision, effectiveFilters)
   const metrics = analysis.metrics
-    .filter((m) => score(`${m.label} ${m.definition}`) > 0)
+    .filter(
+      (m) =>
+        !ambiguousScope &&
+        !conflictingScope &&
+        score(`${m.label} ${m.definition}`) > 0
+    )
     .map(({ citations, series, ...metric }) => ({
       ...metric,
-      citations: citations.slice(0, 5),
-      series: series.slice(-24),
+      caveats: caveats(metric.caveats),
+      citations: citations.slice(0, 3),
+      series: series.slice(-12),
     }))
-  const insufficient = rows.length === 0
-  return {
+  const insufficient =
+    rows.length === 0 && !metrics.some((m) => m.status === "available")
+  const result = {
     revision,
     question,
-    filters,
+    filters: effectiveFilters,
+    requestedFilters: filters,
+    scopeNote:
+      ambiguousScope || conflictingScope
+        ? "Numeric context omitted because question identifiers need an unambiguous matching scope. Set explicit filters."
+        : "Explicit filters take precedence. A single recognized vehicle, service or date in the question supplies missing filters.",
     status: insufficient
       ? ("insufficient" as const)
       : ("evidence-found" as const),
@@ -131,13 +216,33 @@ export function retrieveContext(
           ]
         : []),
     ],
+    truncation: {
+      truncated,
+      omittedEntriesForBudget: 0,
+      note: "Excerpts and citation lists are bounded. Inspect the full revision for complete records and caveats.",
+    },
     limits: {
       maxRows: 8,
       maxDocuments: 4,
       maxRowCharacters: 1600,
       maxDocumentCharacters: 1400,
       maxQueryTerms: 20,
+      maxSerializedCharacters: 32000,
+      maxMetricCitations: 3,
+      maxMetricPeriods: 12,
+      maxCaveatsPerEntry: 3,
+      maxCaveatCharacters: 240,
     },
   }
+  while (
+    JSON.stringify(result).length > result.limits.maxSerializedCharacters
+  ) {
+    result.truncation.truncated = true
+    result.truncation.omittedEntriesForBudget++
+    if (result.evidence.length > 1) result.evidence.pop()
+    else if (result.metrics.length) result.metrics.pop()
+    else break
+  }
+  return result
 }
 export type EvidenceContext = ReturnType<typeof retrieveContext>
