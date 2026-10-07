@@ -1,5 +1,9 @@
 # Live conversation design
 
+This document records the throwaway prototype. It is not a production design or
+release acceptance record. The [feature proposal](../../docs/src/content/docs/software-factory.md)
+and its linked requirements define the current documentation-first work.
+
 The browser owns microphone permission, connection lifetime and partial text. The server owns durable finalized segments and request transitions. `startTranscription` accepts a cancellation signal and callbacks. It returns a stop operation which flushes speech before closing the connection. Committed item order determines transcript order, even when final events arrive out of order.
 
 We compared browser SpeechRecognition with OpenAI WebRTC transcription. Browser recognition needs less server code, but browser support and provider behavior vary. WebRTC gives this app an explicit provider protocol and keeps the project key on the server. Typed conversation remains available without an audio provider.

@@ -16,6 +16,17 @@ export default defineConfig({
       sidebar: [
         { label: "Overview", slug: "" },
         {
+          label: "Software factory proposal",
+          items: [
+            { label: "From feedback to a change", slug: "software-factory" },
+            { label: "Proposed behavior", slug: "software-factory-behavior" },
+            {
+              label: "Evaluate the proposal",
+              slug: "evaluate-software-factory",
+            },
+          ],
+        },
+        {
           label: "Tutorials",
           items: [
             { label: "Read a maintenance comparison", slug: "getting-started" },

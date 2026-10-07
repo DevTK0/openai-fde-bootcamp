@@ -1,5 +1,9 @@
 # Factory intake and implementation
 
+This document records the throwaway prototype. It is not a production design or
+release acceptance record. The [feature proposal](../../docs/src/content/docs/software-factory.md)
+and its linked requirements define the current documentation-first work.
+
 ## Existing system
 
 The root workspace discovers `apps/*`. Turbo runs each package's checks. `apps/web` is a Next app, and `packages/ui` owns UI components. There is no conversation storage or job runner to reuse. The factory is a separate Next app and an explicit local worker process. It leaves fleet data and web routes alone.

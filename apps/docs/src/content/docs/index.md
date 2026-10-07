@@ -10,6 +10,12 @@ This guide explains how those records support a finding and where the evidence e
 The examples use fictional sample records. Each article states its coverage and
 includes graphs with the source values behind them.
 
+## Explore the software factory proposal
+
+[From employee feedback to a proposed change](/docs/software-factory/) explains
+the proposed conversation-to-implementation workflow. The feature is in
+documentation-first design. Its current code is a throwaway prototype.
+
 ## Learn to read a comparison
 
 [Read a maintenance comparison](/docs/getting-started/) introduces costs,

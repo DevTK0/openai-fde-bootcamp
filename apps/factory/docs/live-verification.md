@@ -1,5 +1,9 @@
 # Live UI verification
 
+This document records the throwaway prototype. It is not a production design or
+release acceptance record. The [feature proposal](../../docs/src/content/docs/software-factory.md)
+and its linked requirements define the current documentation-first work.
+
 ## Owner evidence
 
 The owner checked code revision `17a39d7c30c6a6f7f7fb9588ce4050990c3d3f44` on October 7, 2026.

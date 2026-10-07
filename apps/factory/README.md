@@ -1,5 +1,12 @@
 # LionLink software factory
 
+This application is a throwaway prototype. It is not a production implementation
+or a supported interface. Feature design starts with the
+[software factory proposal](../docs/src/content/docs/software-factory.md),
+[proposed behavior](../docs/src/content/docs/software-factory-behavior.md), and
+[evaluation procedure](../docs/src/content/docs/evaluate-software-factory.md).
+The instructions below describe the prototype for local experiments only.
+
 The factory runs separately from `apps/web` on port 3002. It stores conversations and queued requests in SQLite, then runs an explicit worker to implement triggered requests in isolated git worktrees. The worker never automatically merges or deploys changes.
 
 ## Run locally
