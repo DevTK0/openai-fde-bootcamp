@@ -2,23 +2,15 @@
 
 import {
   useEffect,
-  useMemo,
   useState,
   useSyncExternalStore,
   type FormEvent,
 } from "react"
-import dynamic from "next/dynamic"
-import { Slider } from "@workspace/ui/components/slider"
-
-const ServiceReplayMap = dynamic(
-  () =>
-    import("./service-replay/map").then((module) => module.ServiceReplayMap),
-  { ssr: false, loading: () => <p role="status">Loading service map…</p> }
-)
-import { Play, Pause, RefreshCw, SkipBack, SkipForward } from "lucide-react"
+import { RefreshCw } from "lucide-react"
+import { PlanningTimePicker } from "./planning-time-picker"
+import { ReplayPlayer } from "./service-replay/player"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
-import { ButtonGroup } from "@workspace/ui/components/button-group"
 import {
   Card,
   CardContent,
@@ -27,19 +19,7 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
-import {
-  TimePicker,
-  TimePickerLabel,
-  TimePickerInputGroup,
-  TimePickerInput,
-  TimePickerSeparator,
-  TimePickerTrigger,
-  TimePickerContent,
-  TimePickerHour,
-  TimePickerMinute,
-  TimePickerSecond,
-  type TimePickerProps,
-} from "@workspace/ui/components/time-picker"
+
 import { Label } from "@workspace/ui/components/label"
 import {
   Tabs,
@@ -63,7 +43,6 @@ import {
   planningSelectionSchema,
   planningTime,
   replayAt,
-  replayEventTimes,
   type PlanningReport,
   type PlanningSelection,
   type ServiceWatch,
@@ -358,40 +337,6 @@ export function ServicePlanning({
   )
 }
 
-function PlanningTimePicker({
-  label,
-  showSeconds = false,
-  ...props
-}: TimePickerProps & { label: string }) {
-  return (
-    <TimePicker
-      {...props}
-      locale="en-GB"
-      showSeconds={showSeconds}
-      className="space-y-1"
-    >
-      <TimePickerLabel>{label}</TimePickerLabel>
-      <TimePickerInputGroup className="h-9 w-auto min-w-36">
-        <TimePickerInput segment="hour" aria-label={`${label} hours`} />
-        <TimePickerSeparator />
-        <TimePickerInput segment="minute" aria-label={`${label} minutes`} />
-        {showSeconds && (
-          <>
-            <TimePickerSeparator />
-            <TimePickerInput segment="second" aria-label={`${label} seconds`} />
-          </>
-        )}
-        <TimePickerTrigger aria-label={`Choose ${label.toLowerCase()}`} />
-      </TimePickerInputGroup>
-      <TimePickerContent aria-label={`${label} picker`}>
-        <TimePickerHour format="2-digit" aria-label="Hours" />
-        <TimePickerMinute aria-label="Minutes" />
-        {showSeconds && <TimePickerSecond aria-label="Seconds" />}
-      </TimePickerContent>
-    </TimePicker>
-  )
-}
-
 function Assumptions({ selection }: { selection: PlanningSelection }) {
   const [error, setError] = useState("")
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -677,33 +622,6 @@ function Replay({ report }: { report: PlanningReport }) {
   const { selection, detail } = report
   const start = planningTime(selection.date, selection.start),
     end = planningTime(selection.date, selection.end)
-  const [cursor, setCursor] = useState(start)
-  const [playing, setPlaying] = useState(false)
-  const [speed, setSpeed] = useState(5)
-  const ended = cursor >= end
-  useEffect(() => {
-    if (!playing || ended) return
-    let previous = performance.now()
-    const timer = window.setInterval(() => {
-      const now = performance.now()
-      const elapsed = Math.min(1, (now - previous) / 1000)
-      previous = now
-      setCursor((value) => Math.min(end, value + elapsed * speed))
-    }, 250)
-    return () => window.clearInterval(timer)
-  }, [playing, ended, end, speed])
-  const replay = useMemo(() => replayAt(detail, cursor), [detail, cursor])
-  const events = useMemo(
-    () => replayEventTimes(detail, start, end),
-    [detail, start, end]
-  )
-  const previous = events.filter((at) => at < cursor).at(-1) ?? start
-  const next = events.find((at) => at > cursor) ?? end
-  const seek = (at: number) => {
-    setPlaying(false)
-    setCursor(at)
-  }
-
   return (
     <div className="space-y-5">
       <Notice>
@@ -712,157 +630,88 @@ function Replay({ report }: { report: PlanningReport }) {
         labeled stale under a proposed display rule. Between-stop positions are
         estimates along recorded route geometry, not live GPS.
       </Notice>
-      <ServiceReplayMap report={report} at={cursor} />
-      <Card>
-        <CardContent className="space-y-3 py-3">
-          <Slider
-            aria-label="Replay time"
-            className="w-full"
-            min={start}
-            max={end}
-            step={1}
-            value={[cursor]}
-            onValueChange={(value) => {
-              setPlaying(false)
-              setCursor(Array.isArray(value) ? (value[0] ?? start) : value)
-            }}
-          />
-          <div className="flex flex-wrap items-center gap-3">
-            <ButtonGroup aria-label="Replay controls">
-              <Button
-                size="icon"
-                variant="outline"
-                aria-label="Previous event"
-                title="Previous event"
-                disabled={cursor <= start}
-                onClick={() => seek(previous)}
-              >
-                <SkipBack />
-              </Button>
-              <Button
-                size="icon"
-                variant="outline"
-                aria-label={playing && !ended ? "Pause replay" : "Play replay"}
-                title={playing && !ended ? "Pause replay" : "Play replay"}
-                onClick={() => {
-                  if (ended) setCursor(start)
-                  setPlaying((value) => ended || !value)
-                }}
-              >
-                {playing && !ended ? <Pause /> : <Play />}
-              </Button>
-              <Button
-                size="icon"
-                variant="outline"
-                aria-label="Next event"
-                title="Next event"
-                disabled={ended}
-                onClick={() => seek(next)}
-              >
-                <SkipForward />
-              </Button>
-            </ButtonGroup>
-            <PlanningTimePicker
-              label="Inspect time"
-              showSeconds
-              min={`${selection.start}:00`}
-              max={`${selection.end}:00`}
-              value={new Date(cursor * 1000 + 8 * 3600 * 1000)
-                .toISOString()
-                .slice(11, 19)}
-              onValueChange={(value) => {
-                if (!/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(value)) return
-                const next =
-                  Date.parse(`${selection.date}T${value}+08:00`) / 1000
-                setPlaying(false)
-                setCursor(Math.max(start, Math.min(end, next)))
-              }}
-            />
-            <ButtonGroup aria-label="Playback speed">
-              {[1, 5, 15, 60].map((value) => (
-                <Button
-                  key={value}
-                  size="sm"
-                  variant={speed === value ? "default" : "outline"}
-                  aria-label={`${value}× playback speed`}
-                  aria-pressed={speed === value}
-                  onClick={() => setSpeed(value)}
-                >
-                  {value}×
-                </Button>
-              ))}
-            </ButtonGroup>
-            <span className="ml-auto text-xs text-muted-foreground">
-              {selection.date} · Service {selection.service} · {selection.start}
-              –{selection.end} SGT · Delay ≥{selection.delay} min · Queue ≥
-              {selection.queue}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-      <EvidenceTable
-        title="Bus states at replay time"
-        columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}
-        rows={replay.buses.map((b) => ({
-          Vehicle: b.vehicle,
-          Trip: b.trip,
-          Route: b.route,
-          State: b.state,
-          Evidence: b.evidence,
-        }))}
-      />
-      <EvidenceTable
-        title="Queues at replay time"
-        columns={[
-          "Route",
-          "Position",
-          "Stop",
-          "Queue",
-          "Observed at",
-          "Age minutes",
-          "Status",
-          "Evidence",
-        ]}
-        rows={replay.queues.map((q) => ({
-          Route: q.route,
-          Position: q.order,
-          Stop: `${q.stop} · ${q.name}`,
-          Queue: q.observation?.queue ?? "Unknown",
-          "Observed at": timestamp(q.observation?.observed ?? null),
-          "Age minutes":
-            q.age === null ? "Unknown" : Number((q.age / 60).toFixed(1)),
-          Status:
-            !q.observation || q.observation.queue === null
-              ? "Unknown"
-              : q.age !== null && q.age > 600
-                ? "Stale observation"
-                : "Observed",
-          Evidence: q.observation?.id ?? "No prior observation",
-        }))}
-      />
-      <EvidenceTable
-        title="Departure timeline"
-        columns={[
-          "Trip",
-          "Vehicle",
-          "Scheduled",
-          "Actual departure",
-          "Actual arrival",
-        ]}
-        rows={detail.trips
-          .filter(
-            (t) =>
-              t.departure !== null && t.departure >= start && t.departure <= end
+      <ReplayPlayer
+        detail={detail}
+        date={selection.date}
+        start={start}
+        end={end}
+        context={`${selection.date} · Service ${selection.service} · ${selection.start}–${selection.end} SGT · Delay ≥${selection.delay} min · Queue ≥${selection.queue}`}
+      >
+        {(cursor) => {
+          const replay = replayAt(detail, cursor)
+          return (
+            <>
+              <EvidenceTable
+                title="Bus states at replay time"
+                columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}
+                rows={replay.buses.map((b) => ({
+                  Vehicle: b.vehicle,
+                  Trip: b.trip,
+                  Route: b.route,
+                  State: b.state,
+                  Evidence: b.evidence,
+                }))}
+              />
+              <EvidenceTable
+                title="Queues at replay time"
+                columns={[
+                  "Route",
+                  "Position",
+                  "Stop",
+                  "Queue",
+                  "Observed at",
+                  "Age minutes",
+                  "Status",
+                  "Evidence",
+                ]}
+                rows={replay.queues.map((q) => ({
+                  Route: q.route,
+                  Position: q.order,
+                  Stop: `${q.stop} · ${q.name}`,
+                  Queue: q.observation?.queue ?? "Unknown",
+                  "Observed at": timestamp(q.observation?.observed ?? null),
+                  "Age minutes":
+                    q.age === null
+                      ? "Unknown"
+                      : Number((q.age / 60).toFixed(1)),
+                  Status:
+                    !q.observation || q.observation.queue === null
+                      ? "Unknown"
+                      : q.age !== null && q.age > 600
+                        ? "Stale observation"
+                        : "Observed",
+                  Evidence: q.observation?.id ?? "No prior observation",
+                }))}
+              />
+              <EvidenceTable
+                title="Departure timeline"
+                columns={[
+                  "Trip",
+                  "Vehicle",
+                  "Scheduled",
+                  "Actual departure",
+                  "Actual arrival",
+                ]}
+                rows={detail.trips
+                  .filter(
+                    (t) =>
+                      t.departure !== null &&
+                      t.departure >= start &&
+                      t.departure <= end
+                  )
+                  .sort((a, b) => (a.departure ?? 0) - (b.departure ?? 0))
+                  .map((t) => ({
+                    Trip: t.id,
+                    Vehicle: t.vehicle,
+                    Scheduled: timestamp(t.scheduled),
+                    "Actual departure": timestamp(t.departure),
+                    "Actual arrival": timestamp(t.arrival),
+                  }))}
+              />
+            </>
           )
-          .sort((a, b) => (a.departure ?? 0) - (b.departure ?? 0))
-          .map((t) => ({
-            Trip: t.id,
-            Vehicle: t.vehicle,
-            Scheduled: timestamp(t.scheduled),
-            "Actual departure": timestamp(t.departure),
-            "Actual arrival": timestamp(t.arrival),
-          }))}
-      />
+        }}
+      </ReplayPlayer>
     </div>
   )
 }

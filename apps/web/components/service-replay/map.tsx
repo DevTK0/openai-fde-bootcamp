@@ -2,33 +2,38 @@
 
 import { useMemo, useState } from "react"
 import { LogIn, LogOut, UserRoundX } from "lucide-react"
-import { replayAt, type PlanningReport } from "@/lib/service-planning"
-import { busPositions, point } from "./geometry"
+import type { PlanningDetail } from "@/lib/service-planning"
+import { busPositions, prepareBusTrips, point } from "./geometry"
 import { exchangesAt } from "./passenger-exchange"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@workspace/ui/components/tooltip"
+import { Badge } from "@workspace/ui/components/badge"
+import { serviceColor } from "./service-color"
 import { buildRoutes } from "./route-geometry"
 import { Scene, type Marker } from "./scene"
 
 export function ServiceReplayMap({
-  report,
+  detail,
   at,
 }: {
-  report: PlanningReport
+  detail: PlanningDetail
   at: number
 }) {
-  const service = report.selection.service
   const [selected, setSelected] = useState("")
-  const routes = useMemo(() => buildRoutes(report.detail), [report.detail])
+  const routes = useMemo(() => buildRoutes(detail), [detail])
+  const services = [
+    ...new Set(detail.routes.map((route) => route.service)),
+  ].sort((a, b) => a.localeCompare(b, "en", { numeric: true }))
+  const network = services.length > 1
+  const trips = useMemo(() => prepareBusTrips(detail, routes), [detail, routes])
   const state = useMemo(() => {
-    const buses = busPositions(report.detail, at, routes)
-    const queues = replayAt(report.detail, at).queues
+    const buses = busPositions(trips, at)
     const exchanges = exchangesAt(
-      report.detail.calls,
-      report.detail.calls.map((call) => ({
+      detail.calls,
+      detail.calls.map((call) => ({
         id: call.id,
         boarded: call.boarded ?? null,
         alighted: call.alighted ?? null,
@@ -42,7 +47,7 @@ export function ServiceReplayMap({
       kind: "bus",
       count: null,
     }))
-    for (const queue of queues) {
+    for (const queue of detail.positions) {
       const stop = routes
         .find((r) => r.id === queue.route)
         ?.stops.find((s) => s.order === queue.order)
@@ -51,12 +56,12 @@ export function ServiceReplayMap({
           ...point(stop.point),
           key: `stop:${queue.route}/${queue.order}`,
           kind: "queue",
-          count: queue.observation?.queue ?? null,
+          count: null,
           exchange: exchanges.get(`${queue.route}/${queue.order}`),
         })
     }
-    return { buses, queues, markers }
-  }, [report, at, routes])
+    return { buses, markers }
+  }, [detail, trips, at, routes])
   if (routes.every((route) => route.stops.length === 0))
     return (
       <p className="text-sm text-muted-foreground">
@@ -66,6 +71,13 @@ export function ServiceReplayMap({
     )
   return (
     <section aria-label="Service replay map" className="space-y-4">
+      {network && (
+        <p className="text-sm text-muted-foreground">
+          {services.length} services · {state.buses.length}{" "}
+          {state.buses.length === 1 ? "bus" : "buses"} shown at this time ·
+          Route colors match the service labels on buses.
+        </p>
+      )}
       {routes.some(
         (r) => r.legs.some((leg) => leg.kind === "direct") || r.missingStops > 0
       ) && (
@@ -80,7 +92,6 @@ export function ServiceReplayMap({
           <Scene
             routes={routes}
             selected={selected}
-            service={service}
             markers={state.markers}
             onPick={setSelected}
           />
@@ -120,16 +131,29 @@ export function ServiceReplayMap({
           </div>
         </div>
       </div>
-      <div className="grid gap-3 md:grid-cols-2">
-        {routes.map((r) => (
-          <div key={r.id} className="text-sm">
-            <span className="font-medium">Direction {r.direction}</span>
-            <span className="ml-2 text-muted-foreground">
-              {r.origin} → {r.destination} · {r.stops.length} stops
-            </span>
-          </div>
-        ))}
-      </div>
+      {network ? (
+        <div aria-label="Service legend" className="flex flex-wrap gap-2">
+          {services.map((service) => (
+            <Badge variant="outline" key={service}>
+              <svg aria-hidden="true" className="size-3" viewBox="0 0 12 12">
+                <circle cx="6" cy="6" r="5" fill={serviceColor(service)} />
+              </svg>
+              {service}
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2">
+          {routes.map((r) => (
+            <div key={r.id} className="text-sm">
+              <span className="font-medium">Direction {r.direction}</span>
+              <span className="ml-2 text-muted-foreground">
+                {r.origin} → {r.destination} · {r.stops.length} stops
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
       <details className="text-xs text-muted-foreground">
         <summary className="cursor-pointer">Map sources and limits</summary>
         <p className="mt-2 max-w-4xl leading-relaxed">

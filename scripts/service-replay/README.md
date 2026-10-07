@@ -46,3 +46,9 @@ Run `pnpm check`. Focused tests cover passenger counts, departure/expiry boundar
 In the running application, open the replay through Planning. Check a two-direction service, a loop and a multipart route such as 261, the dated passenger exchange, 1× and 5× playback, pause, Fit route, and road-aligned bus headings. At 06:03:36, vehicle NW-V009 dwells at Hougang; at 06:04 it travels toward Blk 302.
 
 The control groups adapt the shadcn.io Button Group Player Controls and Button Group Playback Speed examples. They use the shared shadcn ButtonGroup primitive and the application replay clock. Previous/next pause playback and seek recorded arrivals, departures or observation times within the selected window; the window boundaries are also seek targets. Play at the end restarts the window.
+
+## Fleet service history
+
+Fleet overview includes a Service history map for all services on a selected operating date. Its date is independent of the maintenance vehicle and period filters. The read-only `/api/service-history?date=YYYY-MM-DD` endpoint reads routes, ordered stops, trips and stop calls from SQLite. The map uses the same player and road geometry as Planning, with service-colored paths, bus service labels and a legend. It initially seeks the first event and allows inspection across the full Singapore calendar day.
+
+Verify Fleet overview at 07:30 on 16 October 2026, change the operating date, and exercise play/pause, event seeking and the time scrubber. Check that all 24 services remain in the legend and that changing maintenance filters does not filter the service map. These are historical exercise records, and movement between observations remains estimated.

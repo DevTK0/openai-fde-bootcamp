@@ -101,3 +101,57 @@ it("withholds candidates when crew evidence is missing from the database", async
     status: "unknown",
   })
 })
+
+it("replays every service for one operating date without losing missing or zero counts", async () => {
+  const { GET: history } = await import("@/app/api/service-history/route")
+  const { planningDetailSchema, planningTime } =
+    await import("@/lib/service-planning")
+  const database = new DatabaseSync(path)
+  try {
+    database
+      .prepare(
+        "UPDATE stop_calls SET boarded_people = 0, alighted_people = NULL WHERE call_id = ?"
+      )
+      .run("NW-20261007-0108-03")
+  } finally {
+    database.close()
+  }
+  const details = []
+  for (const date of ["2026-10-07", "2026-10-08"]) {
+    const response = await history(
+      new Request(`http://localhost/api/service-history?date=${date}`)
+    )
+    expect(response.status).toBe(200)
+    const detail = planningDetailSchema.parse(await response.json())
+    expect(new Set(detail.routes.map((route) => route.service)).size).toBe(24)
+    expect(detail.routes).toHaveLength(36)
+    expect(new Set(detail.trips.map((trip) => trip.service)).size).toBe(24)
+    const start = planningTime(date, "00:00")
+    expect(
+      detail.trips.every(
+        (trip) =>
+          trip.scheduled !== null &&
+          trip.scheduled >= start &&
+          trip.scheduled < start + 86400
+      )
+    ).toBe(true)
+    const trips = new Set(detail.trips.map((trip) => trip.id))
+    expect(detail.calls.every((call) => trips.has(call.trip))).toBe(true)
+    details.push(detail)
+  }
+  const first = details[0]!
+  expect(
+    first.calls.some((call) => call.boarded === 0 && call.alighted === null)
+  ).toBe(true)
+  const firstIds = new Set(first.trips.map((trip) => trip.id))
+  expect(details[1]!.trips.every((trip) => !firstIds.has(trip.id))).toBe(true)
+  for (const query of ["", "date=no", "date=2020-01-01"]) {
+    expect(
+      (
+        await history(
+          new Request(`http://localhost/api/service-history?${query}`)
+        )
+      ).status
+    ).toBe(400)
+  }
+})

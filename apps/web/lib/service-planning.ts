@@ -166,7 +166,7 @@ const candidateSchema = z.discriminatedUnion("status", [
     reasons: z.array(z.string()),
   }),
 ])
-const detailSchema = planningSourcesSchema.pick({
+export const planningDetailSchema = planningSourcesSchema.pick({
   routes: true,
   positions: true,
   calls: true,
@@ -176,11 +176,11 @@ export const planningReportSchema = z.object({
   selection: planningSelectionSchema,
   watchlist: z.array(serviceWatchSchema),
   candidates: z.array(candidateSchema),
-  detail: detailSchema,
+  detail: planningDetailSchema,
 })
 export type ServiceWatch = z.infer<typeof serviceWatchSchema>
 export type CandidateReview = z.infer<typeof candidateSchema>
-export type PlanningDetail = z.infer<typeof detailSchema>
+export type PlanningDetail = z.infer<typeof planningDetailSchema>
 export type PlanningReport = z.infer<typeof planningReportSchema>
 export function planningTime(date: string, clock: string) {
   return Date.parse(`${date}T${clock}:00+08:00`) / 1000

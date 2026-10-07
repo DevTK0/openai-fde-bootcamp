@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import * as THREE from "three"
 import { Button } from "@workspace/ui/components/button"
 import { Plus, Minus, LocateFixed } from "lucide-react"
+import { serviceColor } from "./service-color"
 import { passengerSymbols } from "./passenger-symbols"
 import type { Exchange } from "./passenger-exchange"
 import { addCity, loadCity } from "./city"
@@ -18,6 +19,7 @@ export type Marker = Point & {
   exchange?: Exchange
   estimated?: boolean
   heading?: number
+  service?: string
 }
 
 function dispose(object: THREE.Object3D) {
@@ -44,16 +46,15 @@ function dispose(object: THREE.Object3D) {
 export function Scene({
   routes,
   selected,
-  service,
   markers,
   onPick,
 }: {
   routes: Route[]
   selected: string
-  service: string
   markers: Marker[]
   onPick: (key: string) => void
 }) {
+  const network = new Set(routes.map((route) => route.service)).size > 1
   const [cameraVersion, setCameraVersion] = useState(0)
   const orbit = useRef<OrbitControls | null>(null)
   const host = useRef<HTMLDivElement>(null)
@@ -208,7 +209,11 @@ export function Scene({
       scene.add(mesh)
     }
     for (const route of routes) {
-      const color = route.direction === 1 ? 0x35dec6 : 0x799bff
+      const color = network
+        ? new THREE.Color(serviceColor(route.service)).getHex()
+        : route.direction === 1
+          ? 0x35dec6
+          : 0x799bff
       for (const leg of route.legs)
         line(
           leg.points.map(point),
@@ -287,6 +292,18 @@ export function Scene({
         anchor.quaternion.copy(camera.quaternion)
         anchor.scale.setScalar(unit * (anchor.userData.selected ? 7 : 4))
       }
+      for (const label of group.children.filter(
+        (child) => child.userData.busLabel === true
+      )) {
+        const depth = -label.position
+          .clone()
+          .applyMatrix4(camera.matrixWorldInverse).z
+        const unit =
+          (2 * depth * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) /
+          element.clientHeight
+        label.scale.set(unit * 32, unit * 16, 1)
+        label.visible = depth > 0
+      }
       const occupied: { x: number; y: number; w: number; h: number }[] = []
       const events = group.children
         .filter((child) => child.userData.exchange === true)
@@ -330,7 +347,7 @@ export function Scene({
       renderer.dispose()
       renderer.domElement.remove()
     }
-  }, [routes, service, onPick, cameraVersion])
+  }, [routes, network, onPick, cameraVersion])
   useEffect(() => {
     const group = dynamic.current
     if (!group) return
@@ -366,7 +383,12 @@ export function Scene({
       const mesh = new THREE.Mesh(
         new THREE.BoxGeometry(1.5, 1, 3),
         new THREE.MeshStandardMaterial({
-          color: marker.estimated ? 0xffd269 : 0xffffff,
+          color:
+            network && marker.service
+              ? serviceColor(marker.service)
+              : marker.estimated
+                ? 0xffd269
+                : 0xffffff,
         })
       )
       mesh.position.set(marker.x, 5.5, marker.z)
@@ -380,8 +402,39 @@ export function Scene({
       mesh.add(windscreen)
       mesh.userData.key = marker.key
       group.add(mesh)
+      if (network && marker.service) {
+        const canvas = document.createElement("canvas")
+        canvas.width = 120
+        canvas.height = 60
+        const context = canvas.getContext("2d")
+        if (context) {
+          context.fillStyle = "#07111f"
+          context.fillRect(0, 0, 120, 60)
+          context.strokeStyle = serviceColor(marker.service)
+          context.lineWidth = 5
+          context.strokeRect(3, 3, 114, 54)
+          context.fillStyle = "#ffffff"
+          context.font = "bold 36px sans-serif"
+          context.textAlign = "center"
+          context.textBaseline = "middle"
+          context.fillText(marker.service, 60, 31)
+          const texture = new THREE.CanvasTexture(canvas)
+          texture.colorSpace = THREE.SRGBColorSpace
+          const label = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: texture,
+              depthTest: false,
+              toneMapped: false,
+            })
+          )
+          label.position.set(marker.x, 9, marker.z)
+          label.userData = { busLabel: true, key: marker.key }
+          label.renderOrder = 106
+          group.add(label)
+        }
+      }
     }
-  }, [routes, markers, selected, service, cameraVersion])
+  }, [routes, network, markers, selected, cameraVersion])
   function zoom(factor: number) {
     const controls = orbit.current
     if (!controls) return

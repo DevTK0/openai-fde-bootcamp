@@ -1,6 +1,9 @@
 // @vitest-environment node
 import { expect, it } from "vitest"
-import { busPositions } from "@/components/service-replay/geometry"
+import {
+  busPositions,
+  prepareBusTrips,
+} from "@/components/service-replay/geometry"
 import { DatabaseSync } from "node:sqlite"
 import { resolve } from "node:path"
 import {
@@ -174,14 +177,14 @@ it("moves a bus on an unseen service and holds it at its recorded stop", () => {
     ],
   })
   const routes = buildRoutes(detail, [])
-  const [dwell] = busPositions(detail, 100, routes)
+  const [dwell] = busPositions(prepareBusTrips(detail, routes), 100)
   expect(dwell).toMatchObject({
     x: pa[0],
     z: pa[1],
     estimated: false,
     vehicle: "new-bus",
   })
-  const [moving] = busPositions(detail, 160, routes)
+  const [moving] = busPositions(prepareBusTrips(detail, routes), 160)
   expect(moving?.x).toBeCloseTo(((pa[0] ?? 0) + (pb[0] ?? 0)) / 2)
   expect(moving?.heading).toBeCloseTo(Math.PI / 2)
   expect(moving?.estimated).toBe(true)

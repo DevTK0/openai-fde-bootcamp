@@ -1,5 +1,6 @@
 "use client"
 
+import { FleetServiceHistory } from "./fleet-service-history"
 import { ServicePlanning } from "./service-planning"
 import { DatasetPicker } from "@/components/dataset-picker"
 import { useDashboard } from "@/components/dashboard-provider"
@@ -167,6 +168,7 @@ function Overview({ vehicle, period }: { vehicle: string; period: string }) {
           ]}
         />
       </div>
+      <FleetServiceHistory />
       <SourcePicker
         tables={data.tables.filter(
           (t) =>

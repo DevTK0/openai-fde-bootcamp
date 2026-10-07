@@ -2,6 +2,7 @@ import { queryDatabase } from "./database"
 import {
   buildPlanningReport,
   planningSourcesSchema,
+  planningDetailSchema,
   type PlanningSelection,
 } from "./service-planning"
 
@@ -12,37 +13,18 @@ export async function getPlanningReport(
   const [
     routes,
     positions,
-    vehicles,
     trips,
     calls,
+    vehicles,
     releases,
     duties,
     movements,
     holds,
   ] = await queryDatabase(
     [
-      {
-        sql: `SELECT route_id AS id, service_no AS service, direction, service_name AS name, origin_stop_id AS origin FROM routes ORDER BY route_id`,
-      },
-      {
-        sql: `SELECT p.route_id AS route, p.stop_order AS "order", p.stop_id AS stop, COALESCE(s.description, p.stop_id) AS name,
-      p.stop_order < (SELECT max(last.stop_order) FROM route_stops last WHERE last.route_id = p.route_id) AS boarding, s.latitude, s.longitude
-      FROM route_stops p LEFT JOIN stops s USING(stop_id) ORDER BY p.route_id, p.stop_order`,
-      },
+      ...replayQueries(selection.date),
       {
         sql: `SELECT vehicle_id AS id, assigned_service_no AS service FROM vehicles ORDER BY vehicle_id`,
-      },
-      {
-        sql: `SELECT trip_id AS id, service_no AS service, route_id AS route, actual_vehicle_id AS vehicle, actual_crew_id AS crew,
-      origin_stop_id AS origin, destination_stop_id AS destination, unixepoch(scheduled_departure_at) AS scheduled,
-      unixepoch(actual_departure_at) AS departure, unixepoch(actual_arrival_at) AS arrival FROM trips WHERE service_date = ?`,
-        parameters: [selection.date],
-      },
-      {
-        sql: `SELECT call_id AS id, trip_id AS trip, route_id AS route, stop_order AS "order", actual_vehicle_id AS vehicle,
-      unixepoch(actual_arrival_at) AS arrival, unixepoch(actual_departure_at) AS departure,
-      unixepoch(boarding_cutoff_at) AS observed, queue_after_people AS queue, boarded_people AS boarded, alighted_people AS alighted FROM stop_calls WHERE service_date = ?`,
-        parameters: [selection.date],
       },
       {
         sql: `SELECT readiness_id AS id, vehicle_id AS vehicle, unixepoch(issued_at) AS issued, unixepoch(available_from) AS start,
@@ -92,4 +74,37 @@ export async function getPlanningReport(
     }),
     selection
   )
+}
+
+function replayQueries(date: string) {
+  return [
+    {
+      sql: `SELECT route_id AS id, service_no AS service, direction, service_name AS name, origin_stop_id AS origin FROM routes ORDER BY route_id`,
+    },
+    {
+      sql: `SELECT p.route_id AS route, p.stop_order AS "order", p.stop_id AS stop, COALESCE(s.description, p.stop_id) AS name,
+      p.stop_order < (SELECT max(last.stop_order) FROM route_stops last WHERE last.route_id = p.route_id) AS boarding, s.latitude, s.longitude
+      FROM route_stops p LEFT JOIN stops s USING(stop_id) ORDER BY p.route_id, p.stop_order`,
+    },
+    {
+      sql: `SELECT trip_id AS id, service_no AS service, route_id AS route, actual_vehicle_id AS vehicle, actual_crew_id AS crew,
+      origin_stop_id AS origin, destination_stop_id AS destination, unixepoch(scheduled_departure_at) AS scheduled,
+      unixepoch(actual_departure_at) AS departure, unixepoch(actual_arrival_at) AS arrival FROM trips WHERE service_date = ?`,
+      parameters: [date],
+    },
+    {
+      sql: `SELECT call_id AS id, trip_id AS trip, route_id AS route, stop_order AS "order", actual_vehicle_id AS vehicle,
+      unixepoch(actual_arrival_at) AS arrival, unixepoch(actual_departure_at) AS departure,
+      unixepoch(boarding_cutoff_at) AS observed, queue_after_people AS queue, boarded_people AS boarded, alighted_people AS alighted FROM stop_calls WHERE service_date = ?`,
+      parameters: [date],
+    },
+  ]
+}
+
+export async function getServiceHistory(date: string, signal?: AbortSignal) {
+  const [routes, positions, trips, calls] = await queryDatabase(
+    replayQueries(date),
+    signal
+  )
+  return planningDetailSchema.parse({ routes, positions, trips, calls })
 }

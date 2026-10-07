@@ -40,17 +40,25 @@ export function routeHeading(
     along(route, Math.min(length, distance + 0.25))
   )
 }
-export function busPositions(
-  detail: PlanningDetail,
-  at: number,
-  routes: Route[]
-) {
+export function prepareBusTrips(detail: PlanningDetail, routes: Route[]) {
+  const byTrip = new Map<string, PlanningDetail["calls"]>()
+  for (const call of detail.calls) {
+    const calls = byTrip.get(call.trip) ?? []
+    calls.push(call)
+    byTrip.set(call.trip, calls)
+  }
+  for (const calls of byTrip.values()) calls.sort((a, b) => a.order - b.order)
+  const byRoute = new Map(routes.map((route) => [route.id, route]))
   return detail.trips.flatMap((trip) => {
-    const route = routes.find((r) => r.id === trip.route)
-    if (!route) return []
-    const calls = detail.calls
-      .filter((c) => c.trip === trip.id)
-      .sort((a, b) => a.order - b.order)
+    const route = byRoute.get(trip.route)
+    return route ? [{ trip, route, calls: byTrip.get(trip.id) ?? [] }] : []
+  })
+}
+export function busPositions(
+  trips: ReturnType<typeof prepareBusTrips>,
+  at: number
+) {
+  return trips.flatMap(({ trip, route, calls }) => {
     const dwell = calls.find(
       (c) =>
         c.arrival !== null &&
@@ -65,6 +73,7 @@ export function busPositions(
             {
               ...point(stop.point),
               heading: routeHeading(route, stop.distance),
+              service: trip.service,
               trip: trip.id,
               vehicle: trip.vehicle,
               state: `Recorded dwell · ${stop.name}`,
@@ -95,6 +104,7 @@ export function busPositions(
         {
           ...along(route, distance),
           heading: routeHeading(route, distance),
+          service: trip.service,
           trip: trip.id,
           vehicle: trip.vehicle,
           state: `Estimated travel · ${start.name} → ${end.name}`,
