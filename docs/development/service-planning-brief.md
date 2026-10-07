@@ -52,7 +52,7 @@ Blender videos are deferred. They support demonstrations but are not necessary f
 
 ## Policy decisions
 
-The comparison with main is complete. The planner enters through Operations, then Service planning. The integration reference records the source records, existing capabilities, and remaining limits.
+The comparison with main is complete. The planner enters through Planning, then Service planning. The integration reference records the source records, existing capabilities, and remaining limits.
 
 Outstanding product decisions include priority policy, observation windows, stale-data treatment, and the required feasibility horizon for reassignment. Prototype defaults are assumptions rather than approved operating policy.
 

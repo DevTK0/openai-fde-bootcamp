@@ -68,7 +68,7 @@ const sections = [
   },
   {
     id: "planning",
-    label: "Workshop & planning",
+    label: "Planning",
     icon: CalendarDays,
   },
   {
@@ -330,9 +330,61 @@ function SelectedOperations() {
     </div>
   )
 }
-function Planning() {
+function Workshop() {
   const { data, dataset } = useDashboard()
   const requests = dataset("Maintenance planning", "Requested maintenance").rows
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
+        <Metric
+          title="Requested jobs"
+          value={String(requests.length)}
+          detail="19 October 2026 · tentative requests"
+        />
+        <Metric
+          title="Available bays"
+          value={String(
+            dataset("Maintenance planning", "Bay and staffing capacity")
+              .rows[0]?.["Available bays"] ?? "Not supplied"
+          )}
+          detail="09:00–17:00 · Hougang staging"
+        />
+        <Metric
+          title="Available technicians"
+          value={String(
+            dataset("Maintenance planning", "Bay and staffing capacity")
+              .rows[0]?.["Available technicians"] ?? "Not supplied"
+          )}
+          detail="Technicians per shift"
+        />
+      </div>
+      <Plot
+        title="Requested workshop resources"
+        description="Bays and technicians"
+        rows={requests.map((r) => ({
+          name: r["Vehicle ID"]!,
+          bays: r["Required bays"]!,
+          technicians: r["Required technicians"]!,
+        }))}
+        series={[
+          { key: "bays", label: "Requested bays" },
+          { key: "technicians", label: "Requested technicians" },
+        ]}
+      />
+      <SourcePicker
+        tables={data.tables.filter((t) => t.sheet === "Maintenance planning")}
+        operations={[
+          "workshop_work_orders",
+          "workshop_vehicles",
+          "planning_constraints",
+        ]}
+      />
+    </div>
+  )
+}
+
+function Planning({ initialQuery }: { initialQuery: string }) {
+  const { data, dataset } = useDashboard()
   const allocations = dataset(
     "Festival allocation",
     "Proposed fleet allocations"
@@ -342,57 +394,14 @@ function Planning() {
     "Relief queue planning arrivals"
   ).rows
   return (
-    <Tabs defaultValue="workshop" className="gap-6">
+    <Tabs defaultValue="service-planning" className="gap-6">
       <TabsList>
-        <TabsTrigger value="workshop">Workshop</TabsTrigger>
+        <TabsTrigger value="service-planning">Service planning</TabsTrigger>
         <TabsTrigger value="festival">Festival</TabsTrigger>
         <TabsTrigger value="incident">Incident</TabsTrigger>
       </TabsList>
-      <TabsContent value="workshop" className="space-y-6">
-        <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
-          <Metric
-            title="Requested jobs"
-            value={String(requests.length)}
-            detail="19 October 2026 · tentative requests"
-          />
-          <Metric
-            title="Available bays"
-            value={String(
-              dataset("Maintenance planning", "Bay and staffing capacity")
-                .rows[0]?.["Available bays"] ?? "Not supplied"
-            )}
-            detail="09:00–17:00 · Hougang staging"
-          />
-          <Metric
-            title="Available technicians"
-            value={String(
-              dataset("Maintenance planning", "Bay and staffing capacity")
-                .rows[0]?.["Available technicians"] ?? "Not supplied"
-            )}
-            detail="Technicians per shift"
-          />
-        </div>
-        <Plot
-          title="Requested workshop resources"
-          description="Bays and technicians"
-          rows={requests.map((r) => ({
-            name: r["Vehicle ID"]!,
-            bays: r["Required bays"]!,
-            technicians: r["Required technicians"]!,
-          }))}
-          series={[
-            { key: "bays", label: "Requested bays" },
-            { key: "technicians", label: "Requested technicians" },
-          ]}
-        />
-        <SourcePicker
-          tables={data.tables.filter((t) => t.sheet === "Maintenance planning")}
-          operations={[
-            "workshop_work_orders",
-            "workshop_vehicles",
-            "planning_constraints",
-          ]}
-        />
+      <TabsContent value="service-planning">
+        <ServicePlanning initialQuery={initialQuery} />
       </TabsContent>
       <TabsContent value="festival" className="space-y-6">
         <Plot
@@ -516,7 +525,7 @@ export function FleetDashboard({
   const { vehicles } = useDashboard()
   const [section, setSection] = useState<string>(
     new URLSearchParams(initialPlanningQuery).get("view") === "service-planning"
-      ? "operations"
+      ? "planning"
       : "overview"
   )
   const [vehicle, setVehicle] = useState("all")
@@ -634,37 +643,36 @@ export function FleetDashboard({
             <Overview vehicle={vehicle} period={period} />
           )}
           {section === "maintenance" && (
-            <Maintenance vehicle={vehicle} period={period} />
+            <Tabs defaultValue="history" className="gap-6">
+              <TabsList>
+                <TabsTrigger value="history">Maintenance history</TabsTrigger>
+                <TabsTrigger value="workshop">Workshop</TabsTrigger>
+              </TabsList>
+              <TabsContent value="history">
+                <Maintenance vehicle={vehicle} period={period} />
+              </TabsContent>
+              <TabsContent value="workshop">
+                <Workshop />
+              </TabsContent>
+            </Tabs>
           )}
           {section === "operations" && (
-            <Tabs
-              defaultValue={
-                new URLSearchParams(initialPlanningQuery).get("view") ===
-                "service-planning"
-                  ? "service-planning"
-                  : "network"
-              }
-              className="gap-6"
-            >
+            <Tabs defaultValue="network" className="gap-6">
               <TabsList>
                 <TabsTrigger value="network">Network</TabsTrigger>
                 <TabsTrigger value="selected">Usage & service</TabsTrigger>
-                <TabsTrigger value="service-planning">
-                  Service planning
-                </TabsTrigger>
               </TabsList>
               <TabsContent value="network">
                 <OperationsDashboard />
-              </TabsContent>
-              <TabsContent value="service-planning">
-                <ServicePlanning initialQuery={initialPlanningQuery} />
               </TabsContent>
               <TabsContent value="selected">
                 <SelectedOperations />
               </TabsContent>
             </Tabs>
           )}
-          {section === "planning" && <Planning />}
+          {section === "planning" && (
+            <Planning initialQuery={initialPlanningQuery} />
+          )}
           {section === "passengers" && <Passengers />}
           {section === "costs" && <Costs />}
         </main>

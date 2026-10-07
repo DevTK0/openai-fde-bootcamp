@@ -18,6 +18,19 @@ import {
   CardTitle,
 } from "@workspace/ui/components/card"
 import { Input } from "@workspace/ui/components/input"
+import {
+  TimePicker,
+  TimePickerLabel,
+  TimePickerInputGroup,
+  TimePickerInput,
+  TimePickerSeparator,
+  TimePickerTrigger,
+  TimePickerContent,
+  TimePickerHour,
+  TimePickerMinute,
+  TimePickerSecond,
+  type TimePickerProps,
+} from "@workspace/ui/components/time-picker"
 import { Label } from "@workspace/ui/components/label"
 import {
   Tabs,
@@ -335,6 +348,40 @@ export function ServicePlanning({
   )
 }
 
+function PlanningTimePicker({
+  label,
+  showSeconds = false,
+  ...props
+}: TimePickerProps & { label: string }) {
+  return (
+    <TimePicker
+      {...props}
+      locale="en-GB"
+      showSeconds={showSeconds}
+      className="space-y-1"
+    >
+      <TimePickerLabel>{label}</TimePickerLabel>
+      <TimePickerInputGroup className="h-9 w-auto min-w-36">
+        <TimePickerInput segment="hour" aria-label={`${label} hours`} />
+        <TimePickerSeparator />
+        <TimePickerInput segment="minute" aria-label={`${label} minutes`} />
+        {showSeconds && (
+          <>
+            <TimePickerSeparator />
+            <TimePickerInput segment="second" aria-label={`${label} seconds`} />
+          </>
+        )}
+        <TimePickerTrigger aria-label={`Choose ${label.toLowerCase()}`} />
+      </TimePickerInputGroup>
+      <TimePickerContent aria-label={`${label} picker`}>
+        <TimePickerHour format="2-digit" aria-label="Hours" />
+        <TimePickerMinute aria-label="Minutes" />
+        {showSeconds && <TimePickerSecond aria-label="Seconds" />}
+      </TimePickerContent>
+    </TimePicker>
+  )
+}
+
 function Assumptions({ selection }: { selection: PlanningSelection }) {
   const [error, setError] = useState("")
   function submit(event: FormEvent<HTMLFormElement>) {
@@ -368,26 +415,18 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
       </CardHeader>
       <CardContent>
         <form onSubmit={submit} className="flex flex-wrap items-end gap-4">
-          <div className="space-y-1">
-            <Label htmlFor="planning-start">Window start</Label>
-            <Input
-              id="planning-start"
-              name="start"
-              type="time"
-              defaultValue={selection.start}
-              required
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="planning-end">Window end / decision time</Label>
-            <Input
-              id="planning-end"
-              name="end"
-              type="time"
-              defaultValue={selection.end}
-              required
-            />
-          </div>
+          <PlanningTimePicker
+            label="Window start"
+            name="start"
+            defaultValue={selection.start}
+            required
+          />
+          <PlanningTimePicker
+            label="Window end / decision time"
+            name="end"
+            defaultValue={selection.end}
+            required
+          />
           <div className="w-36 space-y-1">
             <Label htmlFor="planning-delay">Delay threshold (min)</Label>
             <Input
@@ -673,23 +712,17 @@ function Replay({ report }: { report: PlanningReport }) {
           >
             Reset replay
           </Button>
-          <Label htmlFor="replay-time">Inspect time</Label>
-          <Input
-            id="replay-time"
-            className="w-40"
-            type="time"
-            step={1}
-            min={selection.start}
-            max={selection.end}
+          <PlanningTimePicker
+            label="Inspect time"
+            showSeconds
+            min={`${selection.start}:00`}
+            max={`${selection.end}:00`}
             value={new Date(cursor * 1000 + 8 * 3600 * 1000)
               .toISOString()
               .slice(11, 19)}
-            onChange={(event) => {
-              if (!/^\d{2}:\d{2}(:\d{2})?$/.test(event.target.value)) return
-              const next =
-                Date.parse(
-                  `${selection.date}T${event.target.value.length === 5 ? `${event.target.value}:00` : event.target.value}+08:00`
-                ) / 1000
+            onValueChange={(value) => {
+              if (!/^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(value)) return
+              const next = Date.parse(`${selection.date}T${value}+08:00`) / 1000
               setPlaying(false)
               setCursor(Math.max(start, Math.min(end, next)))
             }}

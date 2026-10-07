@@ -72,12 +72,21 @@ describe("SQLite dashboard interactions", () => {
     for (const name of [
       "Maintenance",
       "Operations",
-      "Workshop & planning",
+      "Planning",
       "Passenger reports",
       "Cost options",
     ]) {
       await user.click(screen.getByRole("button", { name }))
       expect(screen.getByRole("heading", { name })).toBeInTheDocument()
+      if (name === "Planning") {
+        expect(
+          screen.getByRole("tab", { name: "Service planning" })
+        ).toHaveAttribute("aria-selected", "true")
+        expect(
+          screen.queryByRole("tab", { name: "Workshop" })
+        ).not.toBeInTheDocument()
+        await user.click(screen.getByRole("tab", { name: "Festival" }))
+      }
       expect(
         screen.queryByText("Source notes & coverage")
       ).not.toBeInTheDocument()
@@ -110,6 +119,13 @@ describe("SQLite dashboard interactions", () => {
           screen.getByText("2 records · Page 1 of 1 · 25 per page")
         ).toBeInTheDocument()
       }
+      if (name === "Maintenance") {
+        await user.click(screen.getByRole("tab", { name: "Workshop" }))
+        expect(await screen.findAllByRole("table")).toHaveLength(1)
+        expect(
+          screen.queryByRole("tab", { name: "Service planning" })
+        ).not.toBeInTheDocument()
+      }
       if (name === "Operations") {
         expect(
           await screen.findByText("6,900 completed · 172 actual vehicles")
@@ -123,8 +139,8 @@ describe("SQLite dashboard interactions", () => {
           )
         }
       }
-      if (name === "Workshop & planning") {
-        for (const tab of ["Festival", "Incident", "Workshop"]) {
+      if (name === "Planning") {
+        for (const tab of ["Festival", "Incident"]) {
           await user.click(screen.getByRole("tab", { name: tab }))
           expect(await screen.findAllByRole("table")).toHaveLength(1)
           expect(screen.getByRole("tab", { name: tab })).toHaveAttribute(
@@ -144,7 +160,10 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
       <FleetDashboard />
     </DashboardProvider>
   )
-  await user.click(screen.getByRole("button", { name: "Operations" }))
+  await user.click(screen.getByRole("button", { name: "Planning" }))
+  expect(
+    screen.getByRole("tab", { name: "Service planning" })
+  ).toBeInTheDocument()
   await user.click(screen.getByRole("tab", { name: "Service planning" }))
   const watchlist = await screen.findByRole("table", {
     name: "Service watchlist",
@@ -186,9 +205,14 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
   }
   const queues = () => reportCard("Queues at replay time")
   expect(within(queues()).getAllByText("No prior observation")).toHaveLength(25)
-  fireEvent.change(screen.getByLabelText("Inspect time"), {
-    target: { value: "06:03:36" },
-  })
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Inspect time minutes" }),
+    { target: { value: "03" } }
+  )
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Inspect time seconds" }),
+    { target: { value: "36" } }
+  )
   const busStates = () => reportCard("Bus states at replay time")
   const busRow = () => within(busStates()).getByText("NW-V009").closest("tr")!
   expect(
@@ -200,9 +224,14 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     .closest("tr")!
   expect(within(observedRow).getAllByText("0")).toHaveLength(2)
   expect(within(queues()).getAllByText("No prior observation")).toHaveLength(24)
-  fireEvent.change(screen.getByLabelText("Inspect time"), {
-    target: { value: "06:04:00" },
-  })
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Inspect time minutes" }),
+    { target: { value: "04" } }
+  )
+  fireEvent.change(
+    screen.getByRole("textbox", { name: "Inspect time seconds" }),
+    { target: { value: "00" } }
+  )
   expect(
     within(busRow()).getByText("Estimated between positions 1 and 2")
   ).toBeInTheDocument()
