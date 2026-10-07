@@ -192,7 +192,9 @@ describe("SQLite dashboard interactions", () => {
           expect(screen.getByText("No matching records.")).toBeInTheDocument()
           await user.click(screen.getByRole("button", { name: "Reset" }))
           await user.click(screen.getByRole("combobox", { name: "Filter by" }))
-          await user.click(screen.getByRole("option", { name: "Channel" }))
+          await user.click(
+            await screen.findByRole("option", { name: "Channel" })
+          )
           await user.type(
             screen.getByRole("textbox", { name: "Filter value" }),
             "call"

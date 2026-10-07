@@ -34,6 +34,7 @@ const base: VehiclePlanningData = {
     },
   ],
   holds: [],
+  workOrders: [],
 }
 it("detects overlapping assignments across services and open holds", () => {
   const rows = vehicleRows(
@@ -65,6 +66,9 @@ it("detects overlapping assignments across services and open holds", () => {
     "Maintenance hold hold (workshop)",
   ])
   expect(rows[0]?.lanes).toBe(2)
+  expect(rows[0]?.assignments[0]?.maintenanceHolds).toEqual([
+    { id: "hold", vehicle: "bus", start: 180, end: null, source: "workshop" },
+  ])
 })
 it("honors confirmed-release boundaries and does not infer release from missing evidence", () => {
   const holds = [
@@ -80,6 +84,7 @@ it("honors confirmed-release boundaries and does not infer release from missing 
     1000
   )
   expect(rows[0]?.assignments.map((a) => a.conflicts)).toEqual([[], []])
+  expect(rows[0]?.assignments.map((a) => a.maintenanceHolds)).toEqual([[], []])
   expect(rows[0]?.lanes).toBe(1)
   expect(
     vehicleRows({ ...base, readiness: [] }, 0, 1000)[0]?.assignments[0]
@@ -136,6 +141,26 @@ it("loads planned trips and keeps the separate workshop cohort and open holds vi
     vehicle: "NW-W001",
     end: null,
   })
+  expect(data.workOrders.find((o) => o.id === "NW-WO0001")).toMatchObject({
+    vehicle: "NW-W001",
+    fault: "Door mechanism inspection",
+    status: "In repair",
+    releaseStatus: "held",
+    released: null,
+    expected: Date.parse("2026-10-06T12:00:00+08:00") / 1000,
+    updated: Date.parse("2026-10-02T16:00:00+08:00") / 1000,
+    facility: "NW-WS01",
+  })
+  expect(data.workOrders.find((o) => o.id === "NW-MWO002")).toMatchObject({
+    vehicle: "NW-V020",
+    source: "01_maintenance_and_repairs/Repairs/8",
+    fault: "Warm passenger saloon reported after morning duty",
+    finding:
+      "Filter and condenser surfaces dirty; static cooling performance low",
+    action: "Cleaned filter and condenser; output checked after cleaning",
+    updated: null,
+    released: Date.parse("2026-10-05T19:10:00+08:00") / 1000,
+  })
   const day = Date.parse("2026-10-07T00:00:00+08:00") / 1000
   expect(
     vehicleRows(data, day, day + 86400)
@@ -145,6 +170,15 @@ it("loads planned trips and keeps the separate workshop cohort and open holds vi
   expect(data.readiness.find((r) => r.vehicle === "NW-V001")?.state).toBe(
     "released"
   )
+  expect(
+    vehicleRows(data, day, day + 86400)
+      .find((r) => r.vehicle === "NW-V020")
+      ?.workOrders.map((o) => o.id)
+  ).toEqual(["NW-MWO002", "NW-MWO001"])
+  expect(
+    vehicleRows(data, day, day + 86400).find((r) => r.vehicle === "NW-V001")
+      ?.workOrders
+  ).toEqual([])
   for (const query of ["", "date=bad", "date=2027-01-01"])
     expect(
       (await GET(new Request(`http://localhost/api/vehicle-planning?${query}`)))
