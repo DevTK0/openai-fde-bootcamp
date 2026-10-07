@@ -128,6 +128,13 @@ export function DashboardSidebar({
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
+                    {group.id === "planning" && (
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton href="/ops-planning">
+                          <span>Operations planner</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    )}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </Collapsible>
