@@ -1,6 +1,6 @@
 "use client"
 
-import { DatasetTabs } from "./dataset-tabs"
+import { DatasetPicker } from "./dataset-picker"
 import { DatasetTable } from "./dataset-table"
 import { useDashboard } from "@/components/dashboard-provider"
 
@@ -9,12 +9,6 @@ import { Plot } from "@workspace/ui/components/report-chart"
 import { useEffect, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs"
 import { Metric, Notice, Pick } from "@/components/report-ui"
 import { type OperationsReport } from "@/lib/operations"
 import { fmt } from "@/lib/fleet"
@@ -71,11 +65,14 @@ function Pending({ error, retry }: { error?: string; retry: () => void }) {
     </div>
   )
 }
-export function OperationsDashboard() {
+export function OperationsDashboard({
+  view,
+}: {
+  view: "reliability" | "crowding" | "resources"
+}) {
   const { operationsManifest: manifest } = useDashboard()
   const [service, setService] = useState("all"),
-    [date, setDate] = useState("all"),
-    [tab, setTab] = useState("reliability")
+    [date, setDate] = useState("all")
   const request = useReport<OperationsReport>(
     `/api/operations?service=${encodeURIComponent(service)}&date=${encodeURIComponent(date)}`
   )
@@ -83,53 +80,40 @@ export function OperationsDashboard() {
     m = report?.metrics
   return (
     <div className="space-y-6">
-      <Tabs
-        value={tab}
-        onValueChange={(value) => setTab(String(value))}
-        className="gap-5"
-      >
-        <TabsList className="h-auto! flex-wrap">
-          <TabsTrigger value="reliability">Reliability</TabsTrigger>
-          <TabsTrigger value="crowding">Crowding</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
-          <TabsTrigger value="records">Records</TabsTrigger>
-        </TabsList>
-        {(tab === "reliability" || tab === "crowding") && (
-          <div className="flex flex-wrap gap-3">
-            <Pick
-              label="Operating service"
-              value={service}
-              onChange={setService}
-              options={[
-                {
-                  value: "all",
-                  label: `All ${manifest.services.length} services`,
-                },
-                ...manifest.services.map((s) => ({
-                  value: s,
-                  label: `Service ${s}`,
-                })),
-              ]}
-            />
-            <Pick
-              label="Operating date"
-              value={date}
-              onChange={setDate}
-              options={[
-                { value: "all", label: `All ${manifest.dates.length} dates` },
-                ...manifest.dates.map((d) => ({ value: d, label: d })),
-              ]}
-            />
-          </div>
-        )}
-        <TabsContent value="records">
-          <OperationsSources />
-        </TabsContent>
-        {tab === "records" ? null : !report || !m ? (
-          <Pending error={request.error} retry={request.retry} />
-        ) : (
-          <>
-            <TabsContent value="reliability" className="space-y-6">
+      {(view === "reliability" || view === "crowding") && (
+        <div className="flex flex-wrap gap-3">
+          <Pick
+            label="Operating service"
+            value={service}
+            onChange={setService}
+            options={[
+              {
+                value: "all",
+                label: `All ${manifest.services.length} services`,
+              },
+              ...manifest.services.map((s) => ({
+                value: s,
+                label: `Service ${s}`,
+              })),
+            ]}
+          />
+          <Pick
+            label="Operating date"
+            value={date}
+            onChange={setDate}
+            options={[
+              { value: "all", label: `All ${manifest.dates.length} dates` },
+              ...manifest.dates.map((d) => ({ value: d, label: d })),
+            ]}
+          />
+        </div>
+      )}
+      {!report || !m ? (
+        <Pending error={request.error} retry={request.retry} />
+      ) : (
+        <>
+          {view === "reliability" && (
+            <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Supplied trips"
@@ -218,8 +202,10 @@ export function OperationsDashboard() {
                   })),
                 }}
               />
-            </TabsContent>
-            <TabsContent value="crowding" className="space-y-6">
+            </div>
+          )}
+          {view === "crowding" && (
+            <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Recorded boardings"
@@ -281,8 +267,10 @@ export function OperationsDashboard() {
                   })),
                 }}
               />
-            </TabsContent>
-            <TabsContent value="resources" className="space-y-6">
+            </div>
+          )}
+          {view === "resources" && (
+            <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Operating vehicles"
@@ -311,13 +299,20 @@ export function OperationsDashboard() {
                 />
               </div>
               <OperationsSources
-                initialTable="workshop_work_orders"
-                allowedTables={["workshop_work_orders"]}
+                initialTable="crew_duties"
+                allowedTables={[
+                  "crew_duties",
+                  "resource_updates",
+                  "terminal_movements",
+                  "planning_constraints",
+                  "origin_arrivals",
+                  "queue_windows",
+                ]}
               />
-            </TabsContent>
-          </>
-        )}
-      </Tabs>
+            </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
@@ -368,5 +363,5 @@ export function OperationsSources({
     ]
   })
   if (items.length === 1) return items[0]?.content
-  return <DatasetTabs items={items} defaultValue={initialTable} />
+  return <DatasetPicker items={items} defaultValue={initialTable} />
 }

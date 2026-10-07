@@ -1,27 +1,20 @@
 "use client"
 
 import { ServicePlanning } from "./service-planning"
-import { DatasetTabs } from "@/components/dataset-tabs"
+import { DatasetPicker } from "@/components/dataset-picker"
 import { useDashboard } from "@/components/dashboard-provider"
 
 import { Plot } from "@workspace/ui/components/report-chart"
 
-import { useState } from "react"
+import { useState, useSyncExternalStore } from "react"
+import { DashboardSidebar } from "@/components/dashboard-sidebar"
+import { dashboardPage, type DashboardView } from "@/lib/dashboard-navigation"
 import { Pick, Metric, Records } from "@/components/report-ui"
 import {
   OperationsDashboard,
   OperationsSources,
 } from "@/components/operations-dashboard"
-import {
-  Activity,
-  BusFront,
-  CalendarDays,
-  ChartNoAxesCombined,
-  ChevronRight,
-  LayoutDashboard,
-  MessageSquareText,
-  Wrench,
-} from "lucide-react"
+import { CalendarDays, ChevronRight } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
 import {
   Card,
@@ -37,51 +30,13 @@ import {
   TabsContent,
 } from "@workspace/ui/components/tabs"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
   SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
 } from "@workspace/ui/components/sidebar"
 import { Separator } from "@workspace/ui/components/separator"
 import { fmt, money, num, sum, groupSum, type Dataset } from "@/lib/fleet"
 
-const sections = [
-  {
-    id: "overview",
-    label: "Fleet overview",
-    icon: LayoutDashboard,
-  },
-  {
-    id: "maintenance",
-    label: "Maintenance",
-    icon: Wrench,
-  },
-  {
-    id: "operations",
-    label: "Operations",
-    icon: Activity,
-  },
-  {
-    id: "planning",
-    label: "Planning",
-    icon: CalendarDays,
-  },
-  {
-    id: "passengers",
-    label: "Passenger reports",
-    icon: MessageSquareText,
-  },
-  {
-    id: "costs",
-    label: "Cost options",
-    icon: ChartNoAxesCombined,
-  },
-] as const
 function SourcePicker({
   tables,
   operations = [],
@@ -90,7 +45,7 @@ function SourcePicker({
   operations?: string[]
 }) {
   return (
-    <DatasetTabs
+    <DatasetPicker
       items={[
         ...tables.map((table) => ({
           id: table.id,
@@ -383,86 +338,80 @@ function Workshop() {
   )
 }
 
-function Planning({ initialQuery }: { initialQuery: string }) {
+function Festival() {
   const { data, dataset } = useDashboard()
   const allocations = dataset(
     "Festival allocation",
     "Proposed fleet allocations"
   ).rows
+  return (
+    <div className="space-y-6">
+      <Plot
+        title="Proposed departure capacity by route"
+        description="Passenger capacity by route"
+        rows={groupSum(
+          allocations
+            .filter((r) => r["Route ID"])
+            .map((r) => ({
+              route: r["Route ID"]!,
+              capacity:
+                num(r, "Planning limit per departure") *
+                String(r["Proposed departure times local"]).split("|").length,
+            })),
+          "route",
+          ["capacity"]
+        )}
+        series={[{ key: "capacity", label: "Proposed passenger places" }]}
+      />
+      <SourcePicker
+        tables={data.tables.filter((t) => t.sheet === "Festival allocation")}
+      />
+    </div>
+  )
+}
+function Incident() {
+  const { data, dataset } = useDashboard()
   const arrivals = dataset(
     "Incident baseline",
     "Relief queue planning arrivals"
   ).rows
   return (
-    <Tabs defaultValue="service-planning" className="gap-6">
-      <TabsList>
-        <TabsTrigger value="service-planning">Service planning</TabsTrigger>
-        <TabsTrigger value="festival">Festival</TabsTrigger>
-        <TabsTrigger value="incident">Incident</TabsTrigger>
-      </TabsList>
-      <TabsContent value="service-planning">
-        <ServicePlanning initialQuery={initialQuery} />
-      </TabsContent>
-      <TabsContent value="festival" className="space-y-6">
-        <Plot
-          title="Proposed departure capacity by route"
-          description="Passenger capacity by route"
-          rows={groupSum(
-            allocations
-              .filter((r) => r["Route ID"])
-              .map((r) => ({
-                route: r["Route ID"]!,
-                capacity:
-                  num(r, "Planning limit per departure") *
-                  String(r["Proposed departure times local"]).split("|").length,
-              })),
-            "route",
-            ["capacity"]
+    <div className="space-y-6">
+      <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
+        <Metric
+          title="Protected evening buses"
+          value={String(
+            dataset("Incident baseline", "Protected evening duties").rows.length
           )}
-          series={[{ key: "capacity", label: "Proposed passenger places" }]}
+          detail="16 October · baseline known at 17:00"
         />
-        <SourcePicker
-          tables={data.tables.filter((t) => t.sheet === "Festival allocation")}
+        <Metric
+          title="Held vehicle"
+          value="NW-V050"
+          detail="Door-interlock inspection · release unconfirmed"
         />
-      </TabsContent>
-      <TabsContent value="incident" className="space-y-6">
-        <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
-          <Metric
-            title="Protected evening buses"
-            value={String(
-              dataset("Incident baseline", "Protected evening duties").rows
-                .length
-            )}
-            detail="16 October · baseline known at 17:00"
-          />
-          <Metric
-            title="Held vehicle"
-            value="NW-V050"
-            detail="Door-interlock inspection · release unconfirmed"
-          />
-          <Metric
-            title="Initial waiting people"
-            value={String(
-              dataset("Incident baseline", "Relief decision requirements")
-                .rows[0]?.["Initial waiting people"] ?? "Not supplied"
-            )}
-            detail="Planning baseline at 17:00"
-          />
-        </div>
-        <Plot
-          title="Assumed relief queue arrivals"
-          description="Planned arrivals per half-hour"
-          rows={arrivals.map((r) => ({
-            name: String(r["Window start"]).slice(11, 16),
-            arrivals: r["Arrivals people"]!,
-          }))}
-          series={[{ key: "arrivals", label: "Assumed arrivals" }]}
+        <Metric
+          title="Initial waiting people"
+          value={String(
+            dataset("Incident baseline", "Relief decision requirements")
+              .rows[0]?.["Initial waiting people"] ?? "Not supplied"
+          )}
+          detail="Planning baseline at 17:00"
         />
-        <SourcePicker
-          tables={data.tables.filter((t) => t.sheet === "Incident baseline")}
-        />
-      </TabsContent>
-    </Tabs>
+      </div>
+      <Plot
+        title="Assumed relief queue arrivals"
+        description="Planned arrivals per half-hour"
+        rows={arrivals.map((r) => ({
+          name: String(r["Window start"]).slice(11, 16),
+          arrivals: r["Arrivals people"]!,
+        }))}
+        series={[{ key: "arrivals", label: "Assumed arrivals" }]}
+      />
+      <SourcePicker
+        tables={data.tables.filter((t) => t.sheet === "Incident baseline")}
+      />
+    </div>
   )
 }
 function Passengers() {
@@ -517,68 +466,133 @@ function Costs() {
     </div>
   )
 }
-export function FleetDashboard({
-  initialPlanningQuery = "",
+function subscribeNavigation(listener: () => void) {
+  window.addEventListener("popstate", listener)
+  return () => window.removeEventListener("popstate", listener)
+}
+
+function DashboardReport({
+  view,
+  vehicle,
+  period,
+  initialQuery,
 }: {
-  initialPlanningQuery?: string
+  view: DashboardView
+  vehicle: string
+  period: string
+  initialQuery: string
+}) {
+  switch (view) {
+    case "overview":
+      return <Overview vehicle={vehicle} period={period} />
+    case "vehicles":
+      return (
+        <OperationsSources
+          key={view}
+          initialTable="vehicles"
+          allowedTables={["vehicles", "vehicle_readiness"]}
+        />
+      )
+    case "day-schedule":
+      return (
+        <OperationsSources
+          key={view}
+          initialTable="trips"
+          allowedTables={[
+            "trips",
+            "timetable_records",
+            "stop_calls",
+            "service_calendar",
+          ]}
+        />
+      )
+    case "control-log":
+      return (
+        <OperationsSources
+          key={view}
+          initialTable="control_actions"
+          allowedTables={["control_actions"]}
+        />
+      )
+    case "network":
+      return (
+        <OperationsSources
+          key={view}
+          initialTable="routes"
+          allowedTables={[
+            "routes",
+            "route_stops",
+            "stops",
+            "service_patterns",
+            "rail_stations",
+            "rail_links",
+          ]}
+        />
+      )
+    case "reliability":
+    case "crowding":
+    case "resources":
+      return <OperationsDashboard view={view} />
+    case "usage":
+      return <SelectedOperations />
+    case "maintenance":
+      return <Maintenance vehicle={vehicle} period={period} />
+    case "workshop":
+      return <Workshop />
+    case "workshop-register":
+      return (
+        <OperationsSources
+          key={view}
+          initialTable="workshop_work_orders"
+          allowedTables={["workshop_work_orders", "workshop_vehicles"]}
+        />
+      )
+    case "service-planning":
+      return <ServicePlanning initialQuery={initialQuery} />
+    case "festival":
+      return <Festival />
+    case "incident":
+      return <Incident />
+    case "passengers":
+      return <Passengers />
+    case "costs":
+      return <Costs />
+    default: {
+      const exhaustive: never = view
+      return exhaustive
+    }
+  }
+}
+
+export function FleetDashboard({
+  initialQuery = "",
+}: {
+  initialQuery?: string
 }) {
   const { vehicles } = useDashboard()
-  const [section, setSection] = useState<string>(
-    new URLSearchParams(initialPlanningQuery).get("view") === "service-planning"
-      ? "planning"
-      : "overview"
+  const search = useSyncExternalStore(
+    subscribeNavigation,
+    () => window.location.search,
+    () => initialQuery
   )
+  const current = dashboardPage(search)
   const [vehicle, setVehicle] = useState("all")
   const [period, setPeriod] = useState("latest")
-  const current = sections.find((s) => s.id === section)!
-  const historical = section === "overview" || section === "maintenance"
+  const historical = current.id === "overview" || current.id === "maintenance"
   return (
-    <SidebarProvider className="[--chart-1:oklch(0.55_0.11_175)] [--chart-2:oklch(0.67_0.13_65)] [--chart-3:oklch(0.6_0.12_260)] [--chart-4:oklch(0.65_0.1_310)] [--sidebar-width:15rem]">
-      <Sidebar>
-        <SidebarHeader className="px-5 py-6">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <BusFront className="size-5" />
-            </div>
-            <div>
-              <p className="text-lg font-semibold tracking-tight">
-                LionLink<span className="text-primary">.</span>
-              </p>
-              <p className="text-[10px] tracking-[0.18em] text-muted-foreground uppercase">
-                Fleet intelligence
-              </p>
-            </div>
-          </div>
-        </SidebarHeader>
-        <SidebarContent className="px-3 pt-5">
-          <p className="mb-2 px-3 text-[10px] font-medium tracking-widest text-muted-foreground uppercase">
-            Workspace
-          </p>
-          <SidebarMenu>
-            {sections.map((s) => (
-              <SidebarMenuItem key={s.id}>
-                <SidebarMenuButton
-                  isActive={section === s.id}
-                  onClick={() => {
-                    setSection(s.id)
-                  }}
-                  className="h-10 gap-3 px-3 data-active:bg-primary/10 data-active:text-primary"
-                >
-                  <s.icon className="size-4" />
-                  <span>{s.label}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarContent>
-      </Sidebar>
+    <SidebarProvider className="[--chart-1:oklch(0.55_0.11_175)] [--chart-2:oklch(0.67_0.13_65)] [--chart-3:oklch(0.6_0.12_260)] [--chart-4:oklch(0.65_0.1_310)] [--sidebar-width:16.5rem]">
+      <DashboardSidebar
+        view={current.id}
+        workspace={current.workspace}
+        search={search}
+      />
       <SidebarInset className="min-w-0 bg-muted/35">
         <header className="flex h-16 items-center justify-between gap-3 border-b bg-background px-4 lg:px-8">
           <div className="flex items-center gap-3">
             <SidebarTrigger />
             <Separator orientation="vertical" className="h-4" />
             <span className="hidden text-xs text-muted-foreground sm:inline">
-              Analytics
+              {current.workspaceLabel}
             </span>
             <ChevronRight className="size-3 text-muted-foreground" />
             <span className="text-xs font-medium">{current.label}</span>
@@ -587,7 +601,7 @@ export function FleetDashboard({
         <main
           id="active-report"
           data-report-title={current.label}
-          data-report-section={section}
+          data-report-section={current.workspace}
           className="@container/dashboard mx-auto w-full max-w-400 space-y-6 p-4 lg:p-8"
         >
           <div className="flex flex-wrap items-start justify-between gap-5">
@@ -595,6 +609,9 @@ export function FleetDashboard({
               <h1 className="text-3xl font-semibold tracking-tight">
                 {current.label}
               </h1>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                {current.description}
+              </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {historical && (
@@ -639,42 +656,12 @@ export function FleetDashboard({
               <span>SGD excluding tax</span>
             </div>
           )}
-          {section === "overview" && (
-            <Overview vehicle={vehicle} period={period} />
-          )}
-          {section === "maintenance" && (
-            <Tabs defaultValue="history" className="gap-6">
-              <TabsList>
-                <TabsTrigger value="history">Maintenance history</TabsTrigger>
-                <TabsTrigger value="workshop">Workshop</TabsTrigger>
-              </TabsList>
-              <TabsContent value="history">
-                <Maintenance vehicle={vehicle} period={period} />
-              </TabsContent>
-              <TabsContent value="workshop">
-                <Workshop />
-              </TabsContent>
-            </Tabs>
-          )}
-          {section === "operations" && (
-            <Tabs defaultValue="network" className="gap-6">
-              <TabsList>
-                <TabsTrigger value="network">Network</TabsTrigger>
-                <TabsTrigger value="selected">Usage & service</TabsTrigger>
-              </TabsList>
-              <TabsContent value="network">
-                <OperationsDashboard />
-              </TabsContent>
-              <TabsContent value="selected">
-                <SelectedOperations />
-              </TabsContent>
-            </Tabs>
-          )}
-          {section === "planning" && (
-            <Planning initialQuery={initialPlanningQuery} />
-          )}
-          {section === "passengers" && <Passengers />}
-          {section === "costs" && <Costs />}
+          <DashboardReport
+            view={current.id}
+            vehicle={vehicle}
+            period={period}
+            initialQuery={search}
+          />
         </main>
       </SidebarInset>
     </SidebarProvider>

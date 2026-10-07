@@ -11,14 +11,14 @@ export default async function Page({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const params = await searchParams
-  const initialPlanningQuery = new URLSearchParams(
+  const initialQuery = new URLSearchParams(
     Object.entries(params).flatMap(([key, value]) =>
       typeof value === "string" ? [[key, value]] : []
     )
   ).toString()
   return (
     <DashboardProvider data={readDashboardData()}>
-      <FleetDashboard initialPlanningQuery={initialPlanningQuery} />
+      <FleetDashboard initialQuery={initialQuery} />
     </DashboardProvider>
   )
 }

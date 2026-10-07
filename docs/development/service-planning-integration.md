@@ -4,7 +4,7 @@ The service planner adapts the behavior of `kuma` at `f6434e1` into the existing
 
 ## Planner workflow
 
-Open **Planning**, then **Service planning**. Workshop is under **Maintenance**, alongside maintenance history. Choose a date and service, adjust the planning assumptions, and select **Apply assumptions**. Select a service in the watchlist to inspect its dated departures, queue observations, and linked maintenance holds. The detail tabs contain candidate windows and timeline replay. Tables support search, export, and full record inspection, with no record mutation controls.
+Expand **Planning** in the sidebar, then select **Service planning**. Workshop planning and the workshop register are under **Maintenance**, alongside maintenance history. Choose a date and service, adjust the planning assumptions, and select **Apply assumptions**. Select a service in the watchlist to inspect its dated departures, queue observations, and linked maintenance holds. The detail tabs contain candidate windows and timeline replay. Tables support search, export, and full record inspection, with no record mutation controls.
 
 The URL preserves the service, date, observation window, thresholds, review horizon, and detail tab. For example, `/dashboard?view=service-planning&date=2026-10-07&service=132&queue=30&delay=5` opens that investigation directly. Replay starts at the window start when reopened.
 

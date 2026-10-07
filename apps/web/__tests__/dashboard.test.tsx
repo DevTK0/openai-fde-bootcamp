@@ -1,4 +1,12 @@
-import { beforeAll, afterAll, describe, expect, it, vi } from "vitest"
+import {
+  beforeAll,
+  beforeEach,
+  afterAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest"
 import {
   render,
   screen,
@@ -15,10 +23,13 @@ import { GET as planningGET } from "@/app/api/service-planning/route"
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
 
+beforeEach(() => window.history.replaceState(null, "", "/dashboard"))
+
 beforeAll(() => {
   vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
     new DOMRect(0, 0, 1024, 400)
   )
+  vi.spyOn(window, "scrollTo").mockImplementation(() => {})
   vi.stubGlobal(
     "ResizeObserver",
     class {
@@ -45,7 +56,7 @@ afterAll(() => {
 })
 
 describe("SQLite dashboard interactions", () => {
-  it("renders each dashboard and its report tabs with database data", async () => {
+  it("opens nested workspace pages and their source records", async () => {
     const user = userEvent.setup()
     render(
       <DashboardProvider data={readDashboardData()}>
@@ -56,101 +67,140 @@ describe("SQLite dashboard interactions", () => {
       screen.getByRole("heading", { name: "Fleet overview" })
     ).toBeInTheDocument()
     expect(
-      screen.queryByRole("button", { name: "Relationships" })
-    ).not.toBeInTheDocument()
-    expect(
-      screen.queryByRole("button", { name: "Data explorer" })
-    ).not.toBeInTheDocument()
+      screen.getByRole("link", { name: "Fleet overview" })
+    ).toHaveAttribute("aria-current", "page")
     expect(
       screen.getAllByRole("button", { name: "Upload new records" })
     ).toHaveLength(1)
-    await user.click(screen.getByRole("tab", { name: "vehicles" }))
-    expect(await screen.findAllByRole("table")).toHaveLength(1)
-    expect(
-      screen.getByRole("button", { name: "Add record" })
-    ).toBeInTheDocument()
-    for (const name of [
-      "Maintenance",
-      "Operations",
-      "Planning",
-      "Passenger reports",
-      "Cost options",
-    ]) {
-      await user.click(screen.getByRole("button", { name }))
-      expect(screen.getByRole("heading", { name })).toBeInTheDocument()
-      if (name === "Planning") {
+
+    const groups = [
+      { workspace: "Fleet", pages: ["Vehicle register", "Fleet overview"] },
+      {
+        workspace: "Operations",
+        pages: [
+          "Day schedule",
+          "Control log",
+          "Resource records",
+          "Network records",
+          "Usage & service",
+          "Passenger queues",
+          "Service reliability",
+        ],
+      },
+      {
+        workspace: "Maintenance",
+        pages: [
+          "Maintenance history",
+          "Workshop planning",
+          "Workshop register",
+        ],
+      },
+      {
+        workspace: "Planning",
+        pages: ["Festival allocation", "Incident response"],
+      },
+      { workspace: "Passengers", pages: ["Passenger reports"] },
+      { workspace: "Finance", pages: ["Cost options"] },
+    ]
+    for (const group of groups) {
+      const trigger = screen.getByRole("button", {
+        name: group.workspace,
+      })
+      if (trigger.getAttribute("aria-expanded") !== "true")
+        await user.click(trigger)
+      for (const name of group.pages) {
+        const link = screen.getByRole("link", { name })
+        await user.click(link)
+        expect(screen.getByRole("heading", { name })).toBeInTheDocument()
+        expect(link).toHaveAttribute("aria-current", "page")
+        expect(screen.getAllByRole("link", { current: "page" })).toHaveLength(1)
+        expect(await screen.findAllByRole("table")).toHaveLength(1)
         expect(
-          screen.getByRole("tab", { name: "Service planning" })
-        ).toHaveAttribute("aria-selected", "true")
+          screen.getByRole("textbox", { name: "Search records" })
+        ).toBeInTheDocument()
         expect(
           screen.queryByRole("tab", { name: "Workshop" })
         ).not.toBeInTheDocument()
-        await user.click(screen.getByRole("tab", { name: "Festival" }))
-      }
-      expect(
-        screen.queryByText("Source notes & coverage")
-      ).not.toBeInTheDocument()
-      expect(
-        (await screen.findAllByRole("textbox", { name: "Search records" }))
-          .length
-      ).toBeGreaterThan(0)
-      expect(
-        screen.getAllByRole("combobox", { name: "Filter by" }).length
-      ).toBeGreaterThan(0)
-      expect(await screen.findAllByRole("table")).toHaveLength(1)
-      if (name === "Passenger reports") {
-        expect(screen.queryByText("PC01 · Service 132")).not.toBeInTheDocument()
-        await user.type(
-          screen.getByRole("textbox", { name: "Search records" }),
-          "NO-SUCH-RECORD"
-        )
-        expect(screen.getByText("No matching records.")).toBeInTheDocument()
-        await user.click(screen.getByRole("button", { name: "Reset" }))
-        expect(
-          screen.queryByText("No matching records.")
-        ).not.toBeInTheDocument()
-        await user.click(screen.getByRole("combobox", { name: "Filter by" }))
-        await user.click(screen.getByRole("option", { name: "Channel" }))
-        await user.type(
-          screen.getByRole("textbox", { name: "Filter value" }),
-          "call"
-        )
-        expect(
-          screen.getByText("2 records · Page 1 of 1 · 25 per page")
-        ).toBeInTheDocument()
-      }
-      if (name === "Maintenance") {
-        await user.click(screen.getByRole("tab", { name: "Workshop" }))
-        expect(await screen.findAllByRole("table")).toHaveLength(1)
-        expect(
-          screen.queryByRole("tab", { name: "Service planning" })
-        ).not.toBeInTheDocument()
-      }
-      if (name === "Operations") {
-        expect(
-          await screen.findByText("6,900 completed · 172 actual vehicles")
-        ).toBeInTheDocument()
-        for (const tab of ["Crowding", "Resources", "Records", "Reliability"]) {
-          await user.click(screen.getByRole("tab", { name: tab }))
-          expect(await screen.findAllByRole("table")).toHaveLength(1)
-          expect(screen.getByRole("tab", { name: tab })).toHaveAttribute(
-            "aria-selected",
-            "true"
+        if (name === "Workshop register") {
+          expect(
+            screen.queryByRole("combobox", { name: "Historical period" })
+          ).not.toBeInTheDocument()
+          await user.click(screen.getByRole("combobox", { name: "Dataset" }))
+          await user.click(
+            screen.getByRole("option", { name: "workshop vehicles" })
           )
+          expect(
+            await screen.findByLabelText("workshop vehicles records")
+          ).toBeInTheDocument()
         }
-      }
-      if (name === "Planning") {
-        for (const tab of ["Festival", "Incident"]) {
-          await user.click(screen.getByRole("tab", { name: tab }))
-          expect(await screen.findAllByRole("table")).toHaveLength(1)
-          expect(screen.getByRole("tab", { name: tab })).toHaveAttribute(
-            "aria-selected",
-            "true"
+        if (name === "Service reliability") {
+          expect(
+            await screen.findByText("6,900 completed · 172 actual vehicles")
+          ).toBeInTheDocument()
+        }
+        if (name === "Passenger reports") {
+          await user.type(
+            screen.getByRole("textbox", { name: "Search records" }),
+            "NO-SUCH-RECORD"
           )
+          expect(screen.getByText("No matching records.")).toBeInTheDocument()
+          await user.click(screen.getByRole("button", { name: "Reset" }))
+          await user.click(screen.getByRole("combobox", { name: "Filter by" }))
+          await user.click(screen.getByRole("option", { name: "Channel" }))
+          await user.type(
+            screen.getByRole("textbox", { name: "Filter value" }),
+            "call"
+          )
+          expect(
+            screen.getByText("2 records · Page 1 of 1 · 25 per page")
+          ).toBeInTheDocument()
         }
       }
     }
-  }, 20000)
+  }, 30000)
+
+  it("restores a linked page, follows browser history, and keeps planning assumptions", async () => {
+    const user = userEvent.setup()
+    window.history.replaceState(
+      null,
+      "",
+      "/dashboard?view=workshop-register&date=2026-10-07&service=132&queue=44"
+    )
+    render(
+      <DashboardProvider data={readDashboardData()}>
+        <FleetDashboard />
+      </DashboardProvider>
+    )
+    expect(
+      screen.getByRole("heading", { name: "Workshop register" })
+    ).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Maintenance" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    )
+    await user.click(screen.getByRole("button", { name: "Maintenance" }))
+    await user.click(screen.getByRole("button", { name: "Planning" }))
+    await user.click(screen.getByRole("link", { name: "Service planning" }))
+    expect(
+      screen.getByRole("spinbutton", { name: "Queue threshold" })
+    ).toHaveValue(44)
+    expect(new URLSearchParams(window.location.search).get("service")).toBe(
+      "132"
+    )
+    window.history.back()
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: "Workshop register" })
+      ).toBeInTheDocument()
+    )
+    expect(screen.getByRole("button", { name: "Maintenance" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    )
+    expect(
+      screen.getByRole("link", { name: "Workshop register" })
+    ).toHaveAttribute("aria-current", "page")
+  })
 })
 
 it("investigates SQLite service evidence, changes assumptions, and replays recorded zero versus unknown", async () => {
@@ -161,10 +211,7 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     </DashboardProvider>
   )
   await user.click(screen.getByRole("button", { name: "Planning" }))
-  expect(
-    screen.getByRole("tab", { name: "Service planning" })
-  ).toBeInTheDocument()
-  await user.click(screen.getByRole("tab", { name: "Service planning" }))
+  await user.click(screen.getByRole("link", { name: "Service planning" }))
   const watchlist = await screen.findByRole("table", {
     name: "Service watchlist",
   })
