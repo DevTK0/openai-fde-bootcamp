@@ -205,6 +205,29 @@ describe("Operations CSV ingestion", () => {
       database.close()
     }
   )
+  it("accepts one long text record within the CSV file limit", () => {
+    const csv = `${header}\nTEST-LONG,007,DD,100,2,${"x".repeat(120000)}\n`
+    expect(importRecords({ table: "vehicles", csv, commit: false }).count).toBe(
+      1
+    )
+    expect(count()).toBe(172)
+  })
+  it.each([",extra", ""])(
+    "rejects mismatched CSV row widths (%s)",
+    (suffix) => {
+      const cells = suffix
+        ? "TEST-WIDTH,007,DD,100,2,note" + suffix
+        : "TEST-WIDTH,007,DD,100,2"
+      expect(() =>
+        importRecords({
+          table: "vehicles",
+          csv: `${header}\n${cells}\n`,
+          commit: true,
+        })
+      ).toThrow("CSV could not be read")
+      expect(count()).toBe(172)
+    }
+  )
   it("rejects more than 1,000 rows before writing", () => {
     const manyRows = Array.from(
       { length: 1001 },

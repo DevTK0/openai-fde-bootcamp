@@ -168,7 +168,7 @@ export function mutateDataset(input: DatasetMutation) {
         raw = parse(input.csv, {
           bom: true,
           skip_empty_lines: true,
-          max_record_size: 100_000,
+          max_record_size: 2_000_000,
         })
       } catch {
         throw new RecordValidationError(
