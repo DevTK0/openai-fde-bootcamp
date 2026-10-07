@@ -46,13 +46,14 @@ async function run() {
     await fs.writeFile(path.join(evidence, 'actions.json'), JSON.stringify(actions, null, 2));
   };
   let browser;
+  let context;
   let page;
   let savedSource;
   let failure;
   const pageUrl = new URL('s/ridership?p=1', baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`).href;
   try {
     browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+    context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
     await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
     page = await context.newPage();
     const snapshot = async (name) => {
@@ -112,12 +113,15 @@ async function run() {
     await snapshot('shape-selected');
     await fs.writeFile(path.join(evidence, 'selections.json'), JSON.stringify({ labelState, shapeState }, null, 2));
     await record('Select chart label and bar independently', { labelLine: labelState.selection.line, shapeLine: shapeState.selection.line });
-    await context.tracing.stop({ path: path.join(evidence, 'trace.zip') });
   } catch (error) {
     failure = error;
     await record('Verification failed', String(error));
     if (page) await page.screenshot({ path: path.join(evidence, 'failure.png') }).catch(() => {});
   } finally {
+    if (context) {
+      await context.tracing.stop({ path: path.join(evidence, 'trace.zip') })
+        .catch((error) => record('Trace capture failed', String(error)));
+    }
     if (browser) await browser.close();
     try {
       const result = await restoreSource({ sourcePath, original, savedSource });
