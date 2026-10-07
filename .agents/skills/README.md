@@ -1,4 +1,4 @@
-# Pstack for this repository
+# Repository skills
 
 A selected port of [pstack](https://github.com/cursor/plugins/tree/main/pstack).
 The entrypoint is **`/pstack`**, adapted from upstream `poteto-mode`. The original
@@ -19,7 +19,7 @@ our repository prompt alias, not a new built-in Codex command. If a client
 intercepts unknown slash commands, use `$pstack` or explicitly ask the agent to
 read `.agents/skills/pstack/SKILL.md`. See the [official skill discovery documentation](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills).
 
-All 37 skills (the entrypoint, 12 supporting skills, and 24 principles) are
+All 43 skills (the pstack entrypoint, 12 supporting skills, 24 principles, five open-slide authoring skills, and verify-slides) are
 stored directly in `.agents/skills/`. Playbooks are loaded
 by `/pstack`. Edit the skill sources in place. The skills are available to Codex on the next turn.
 No global installation, model configuration, or companion plugin is required.
@@ -27,7 +27,40 @@ The original pstack repository is a provenance reference, not a runtime
 dependency. Agent-facing skill edits use Codex's built-in `skill-creator`, resolved
 from the session skill catalog. Removed pstack skills are not fetched or invoked.
 
-## Included subset
+## Open-slide skills
+
+The five skills from the [official open-slide overview](https://open-slide.dev/docs/skills/overview) target the existing `apps/slides/` workspace. Paths such as `slides/` and `themes/` in those skills are relative to that workspace.
+
+| Skill | Purpose |
+| --- | --- |
+| [create-slide](create-slide/SKILL.md) | Draft a new presentation. |
+| [slide-authoring](slide-authoring/SKILL.md) | Author and edit slide pages, with seven framework references. |
+| [apply-comments](apply-comments/SKILL.md) | Apply inspector comments to slide source. |
+| [create-theme](create-theme/SKILL.md) | Create a reusable theme and its demo. |
+| [current-slide](current-slide/SKILL.md) | Resolve the slide, page, and element selected in the viewer. |
+
+The [pstack entrypoint](pstack/SKILL.md#open-slide-routing) selects these skills
+directly. For example:
+
+```text
+/pstack create a deck about fleet maintenance for the operations team
+/pstack add speaker notes to the scheduling deck
+/pstack apply the inspector comments in the ridership deck
+/pstack extract a reusable slide theme from the maintenance deck
+/pstack fix the spacing on this slide
+```
+
+For the last example, pstack reads the current viewer selection before editing.
+Slide content changes use [verify-slides](verify-slides/SKILL.md), its mapped
+native-editability checks, and `pnpm check`. Add "open a PR" to use the existing PR workflow after authoring.
+
+Imported from [`open-slide/open-slide`, `packages/core/skills`, at `ad82b8966793`](https://github.com/open-slide/open-slide/tree/ad82b8966793a90113e7d69988f6dc354bfec421/packages/core/skills). The MIT notice is preserved in [LICENSE.open-slide](LICENSE.open-slide). Local changes resolve the app directory, use available Codex tools, honor existing user preferences, and follow the repository's UI and preview rules. The framework examples remain upstream reference material; repository styling rules take precedence.
+
+To update, use the skill-installer helper with that repository, a pinned `--ref`, and the five `packages/core/skills/<name>` paths. Import into a temporary `--dest`, compare against the pinned source, and preserve local adaptations when copying changes here. Do not run `open-slide sync:skills` over the adapted copies.
+
+Count discoverable skills with `find .agents/skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l`.
+
+## Included pstack subset
 
 All **24 principles** are included. Their index and triggers are in
 [pstack/SKILL.md](pstack/SKILL.md#principles); each full text lives in its
@@ -58,10 +91,12 @@ The **7 playbooks** cover:
 | PR lifecycle | [opening a PR](pstack/playbooks/opening-a-pr.md), [babysit](pstack/playbooks/babysit.md), [shipping](pstack/playbooks/shipping.md) |
 
 There are **12 supporting skills**, plus the entrypoint and all 24 principles.
-Count the skill files with `rg --files --hidden .agents/skills -g SKILL.md | wc -l`.
-The verification skills are generators and maintenance workflows; no app-specific
-`verify-*` skill has been generated yet. Invoke `/pstack create a verification
-skill for apps/web` to run that workflow separately.
+[verify-slides](verify-slides/SKILL.md) verifies the slides app through its native
+UI and a [feature map](verify-slides/features/README.md). Its local Playwright
+helper proves editable text, independent chart objects, native persistence,
+discard, and restoration. Use `/maintain-verification-skill` to audit the map.
+No app-specific verification skill exists for web yet; invoke `/pstack create a
+verification skill for apps/web` to generate one separately.
 
 General feature, bug-fix, investigation, prototype, refactoring, eval,
 performance/forensics workflows, arena/interrogate, general orchestration,
