@@ -18,23 +18,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@workspace/ui/components/sheet"
 import { Input } from "@workspace/ui/components/input"
 
 import { Label } from "@workspace/ui/components/label"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs"
 import {
   Table,
   TableBody,
@@ -44,18 +30,14 @@ import {
   TableRow,
 } from "@workspace/ui/components/table"
 import { useDashboard } from "./dashboard-provider"
-import { DatasetTable } from "./dataset-table"
-import { Metric, Notice, Pick } from "./report-ui"
+import { Notice, Pick } from "./report-ui"
 import {
   planningReportSchema,
   planningSelectionSchema,
   planningTime,
-  replayAt,
   type PlanningReport,
   type PlanningSelection,
-  type ServiceWatch,
 } from "@/lib/service-planning"
-import type { Row } from "@/lib/fleet"
 
 function subscribe(listener: () => void) {
   window.addEventListener("popstate", listener)
@@ -74,83 +56,6 @@ function queryFor(selection: PlanningSelection) {
     Object.entries(selection).map(([key, value]) => [key, String(value)])
   ).toString()
 }
-function timestamp(value: number | null) {
-  if (value === null) return "Unknown"
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Singapore",
-    dateStyle: "medium",
-    timeStyle: "medium",
-  }).format(value * 1000)
-}
-function EvidenceTable({
-  title,
-  rows,
-  columns,
-}: {
-  title: string
-  rows: Row[]
-  columns: string[]
-}) {
-  return (
-    <DatasetTable
-      source={{
-        kind: "report",
-        rows,
-        table: {
-          id: `planning-${title}`,
-          file: "",
-          title,
-          columns,
-        },
-      }}
-    />
-  )
-}
-
-function EvidenceDetails({
-  title,
-  rows,
-  columns,
-}: {
-  title: string
-  rows: Row[]
-  columns: string[]
-}) {
-  return (
-    <Sheet>
-      <SheetTrigger render={<Button variant="outline" />}>
-        {title} ({rows.length})
-      </SheetTrigger>
-      <SheetContent className="overflow-y-auto sm:max-w-xl">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>Dated evidence · Singapore time</SheetDescription>
-        </SheetHeader>
-        <div className="space-y-4 px-4 pb-6">
-          {rows.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              No matching records.
-            </p>
-          )}
-          {rows.map((row, index) => (
-            <dl
-              key={index}
-              className="grid grid-cols-[7rem_1fr] gap-3 rounded-lg border p-4 text-sm"
-            >
-              {columns.map((column) => (
-                <div key={column} className="contents">
-                  <dt className="text-muted-foreground">{column}</dt>
-                  <dd className="break-words">{row[column] ?? "Unknown"}</dd>
-                </div>
-              ))}
-            </dl>
-          ))}
-        </div>
-      </SheetContent>
-    </Sheet>
-  )
-}
-
 export function ServicePlanning({
   initialQuery = "",
 }: {
@@ -178,7 +83,6 @@ export function ServicePlanning({
     ? parsed.data
     : planningSelectionSchema.parse(defaults)
   const query = queryFor(selection)
-  const tab = params.get("planningTab") ?? "evidence"
   const [request, setRequest] = useState<{
     query: string
     report: PlanningReport
@@ -221,8 +125,7 @@ export function ServicePlanning({
         <div>
           <h2 className="text-xl font-semibold">Service optimisation</h2>
           <p className="text-sm text-muted-foreground">
-            Investigate a service, inspect its evidence, and review available
-            resources.
+            Review service priorities and replay recorded journeys.
           </p>
         </div>
         <Button variant="outline" onClick={() => setAttempt((a) => a + 1)}>
@@ -303,7 +206,6 @@ export function ServicePlanning({
                             onClick={() =>
                               updateLocation({
                                 service: s.service,
-                                planningTab: "evidence",
                               })
                             }
                           >
@@ -355,27 +257,7 @@ export function ServicePlanning({
               <h2 className="text-xl font-semibold">
                 Service {selected.service} investigation
               </h2>
-              <Tabs
-                value={tab}
-                onValueChange={(value) =>
-                  updateLocation({ planningTab: String(value) })
-                }
-              >
-                <TabsList className="h-auto flex-wrap">
-                  <TabsTrigger value="evidence">Dated evidence</TabsTrigger>
-                  <TabsTrigger value="candidates">Candidate buses</TabsTrigger>
-                  <TabsTrigger value="replay">Timeline & replay</TabsTrigger>
-                </TabsList>
-                <TabsContent value="evidence">
-                  <Evidence report={report} selected={selected} />
-                </TabsContent>
-                <TabsContent value="candidates">
-                  <Candidates report={report} />
-                </TabsContent>
-                <TabsContent value="replay">
-                  <Replay key={query} report={report} />
-                </TabsContent>
-              </Tabs>
+              <Replay key={query} report={report} />
             </div>
           )}
         </>
@@ -395,7 +277,7 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
     })
     if (!parsed.success) {
       setError(
-        "Enter a valid window, delay from 0 to 120, queue from 1 to 10,000, and review horizon from 1 to 240 minutes."
+        "Enter a valid window, delay from 0 to 120, queue from 1 to 10,000."
       )
       return
     }
@@ -411,8 +293,7 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
         <CardTitle>Planning assumptions</CardTitle>
         <CardDescription>
           Proposed defaults: delay ≥5 min, peak queue ≥30 people, 06:00–12:00
-          window, 30-minute availability review. Validate against operating
-          policy.
+          window. Validate against operating policy.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -424,7 +305,7 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
             required
           />
           <PlanningTimePicker
-            label="Window end / decision time"
+            label="Window end"
             name="end"
             defaultValue={selection.end}
             required
@@ -454,18 +335,6 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
               required
             />
           </div>
-          <div className="w-36 space-y-1">
-            <Label htmlFor="planning-horizon">Review window (min)</Label>
-            <Input
-              id="planning-horizon"
-              name="horizon"
-              type="number"
-              min={1}
-              max={240}
-              defaultValue={selection.horizon}
-              required
-            />
-          </div>
           <Button type="submit">Apply assumptions</Button>
         </form>
         {error && (
@@ -478,181 +347,6 @@ function Assumptions({ selection }: { selection: PlanningSelection }) {
   )
 }
 
-function Evidence({
-  report,
-  selected,
-}: {
-  report: PlanningReport
-  selected: ServiceWatch
-}) {
-  return (
-    <div className="space-y-5">
-      <div className="grid gap-4 md:grid-cols-3">
-        <Metric
-          title="Peak observed queue"
-          value={
-            selected.peak?.queue === null || !selected.peak
-              ? "Unknown"
-              : String(selected.peak.queue)
-          }
-          detail={
-            selected.peak
-              ? `${selected.peak.id} · ${timestamp(selected.peak.observed)}`
-              : "No queue observations in this window"
-          }
-        />
-        <Metric
-          title="Boarding-position coverage"
-          value={`${selected.observed} / ${selected.total}`}
-          detail={`${selected.affected} observed positions had a positive queue`}
-        />
-        <Metric
-          title="Departure evidence"
-          value={String(selected.departuresObserved)}
-          detail={`${selected.departuresTotal} departures scheduled in this window; actual departures are counted by observed time`}
-        />
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <EvidenceDetails
-          title="Flagged departures"
-          columns={[
-            "Trip",
-            "Vehicle",
-            "Scheduled departure",
-            "Actual departure",
-            "Delay minutes",
-          ]}
-          rows={selected.delays.map((d) => ({
-            Trip: d.trip,
-            Vehicle: d.vehicle,
-            "Scheduled departure": timestamp(d.scheduled),
-            "Actual departure": timestamp(d.departure),
-            "Delay minutes": Number(d.minutes.toFixed(2)),
-          }))}
-        />
-        <Button
-          variant="outline"
-          render={
-            <a
-              href={`/dashboard?view=crowding&${queryFor(report.selection)}`}
-            />
-          }
-        >
-          View passenger queues
-        </Button>
-        <EvidenceDetails
-          title="Service-linked maintenance holds"
-          columns={[
-            "Record",
-            "Vehicle",
-            "Opened",
-            "Confirmed release",
-            "Source",
-          ]}
-          rows={selected.holds.map((h) => ({
-            Record: h.id,
-            Vehicle: h.vehicle,
-            Opened: timestamp(h.start),
-            "Confirmed release":
-              h.end === null ? "No confirmed release" : timestamp(h.end),
-            Source: h.source,
-          }))}
-        />
-      </div>
-      <Notice>
-        Holds use recorded fleet service assignments and overlap with this
-        window. Separate workshop vehicles without service assignments do not
-        flag this service. Maintenance history is a selected extract; no
-        recorded hold is not proof of full maintenance coverage.
-      </Notice>
-    </div>
-  )
-}
-function Candidates({ report }: { report: PlanningReport }) {
-  const candidates = report.candidates.filter((c) => c.status === "candidate")
-  return (
-    <div className="space-y-5">
-      <Notice>
-        Retrospective candidate review at {report.selection.end} SGT on{" "}
-        {report.selection.date}. Readiness and crew records must have been
-        issued by this time. Recorded vehicle and crew tasks remain reserved.
-        The {report.selection.horizon}-minute review window is not confirmation
-        of a complete additional journey. Check route duration, positioning,
-        later duties and evidence beyond the supplied exercise before dispatch.
-      </Notice>
-      <h3 className="font-semibold">
-        {candidates.length} supported candidate windows for service{" "}
-        {report.selection.service}
-      </h3>
-      <EvidenceTable
-        title="Supported candidate windows"
-        columns={[
-          "Vehicle",
-          "Assigned service",
-          "Crew",
-          "Location",
-          "Free from",
-          "Free until",
-          "Evidence",
-          "Readiness issued",
-          "Readiness window",
-          "Crew evidence issued",
-          "Crew availability",
-          "Protected break",
-          "Duty limit",
-          "Turnaround complete",
-          "Remaining checks",
-        ]}
-        rows={candidates.map((c) => ({
-          Vehicle: c.vehicle,
-          "Assigned service": c.assignedService,
-          Crew: c.crew,
-          Location: c.location,
-          "Free from": timestamp(
-            planningTime(report.selection.date, report.selection.end)
-          ),
-          "Free until": timestamp(c.until),
-          Evidence: c.evidence.join(", "),
-          "Readiness issued": timestamp(c.readiness.issued),
-          "Readiness window": `${timestamp(c.readiness.start)} to ${timestamp(c.readiness.end)}`,
-          "Crew evidence issued": timestamp(c.duty.issued),
-          "Crew availability": `${timestamp(c.duty.start)} to ${timestamp(c.duty.end)}`,
-          "Protected break": `${timestamp(c.duty.breakStart)} to ${timestamp(c.duty.breakEnd)}`,
-          "Duty limit": timestamp(c.dutyLimit),
-          "Turnaround complete":
-            c.turnaroundCompleteAt === null
-              ? "No prior task in supplied records; release evidence used"
-              : timestamp(c.turnaroundCompleteAt),
-          "Remaining checks":
-            "Full journey, positioning, later duties, completeness of operating evidence",
-        }))}
-      />
-      <EvidenceDetails
-        title="Other vehicle reviews"
-        columns={["Vehicle", "Assigned service", "Result", "Explanation"]}
-        rows={report.candidates.flatMap((c) =>
-          c.status === "candidate"
-            ? []
-            : [
-                {
-                  Vehicle: c.vehicle,
-                  "Assigned service": c.assignedService,
-                  Result:
-                    c.status === "unknown"
-                      ? "Insufficient evidence"
-                      : "Unavailable in this window",
-                  Explanation: c.reasons.join("; "),
-                },
-              ]
-        )}
-      />
-      <p className="text-xs text-muted-foreground">
-        Each supported window has a distinct crew member within this list.
-        Reviewing another service does not reserve vehicles or crew.
-      </p>
-    </div>
-  )
-}
 function Replay({ report }: { report: PlanningReport }) {
   const { selection, detail } = report
   const start = planningTime(selection.date, selection.start),
@@ -668,51 +362,7 @@ function Replay({ report }: { report: PlanningReport }) {
         date={selection.date}
         start={start}
         end={end}
-      >
-        {(cursor) => {
-          const replay = replayAt(detail, cursor)
-          return (
-            <div className="flex flex-wrap gap-2">
-              <EvidenceDetails
-                title="Bus states at replay time"
-                columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}
-                rows={replay.buses.map((b) => ({
-                  Vehicle: b.vehicle,
-                  Trip: b.trip,
-                  Route: b.route,
-                  State: b.state,
-                  Evidence: b.evidence,
-                }))}
-              />
-              <EvidenceDetails
-                title="Departure timeline"
-                columns={[
-                  "Trip",
-                  "Vehicle",
-                  "Scheduled",
-                  "Actual departure",
-                  "Actual arrival",
-                ]}
-                rows={detail.trips
-                  .filter(
-                    (t) =>
-                      t.departure !== null &&
-                      t.departure >= start &&
-                      t.departure <= end
-                  )
-                  .sort((a, b) => (a.departure ?? 0) - (b.departure ?? 0))
-                  .map((t) => ({
-                    Trip: t.id,
-                    Vehicle: t.vehicle,
-                    Scheduled: timestamp(t.scheduled),
-                    "Actual departure": timestamp(t.departure),
-                    "Actual arrival": timestamp(t.arrival),
-                  }))}
-              />
-            </div>
-          )
-        }}
-      </ReplayPlayer>
+      />
     </div>
   )
 }

@@ -7,13 +7,7 @@ import {
   it,
   vi,
 } from "vitest"
-import {
-  render,
-  screen,
-  within,
-  waitFor,
-  fireEvent,
-} from "@testing-library/react"
+import { render, screen, within, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { DashboardProvider } from "@/components/dashboard-provider"
 import { FleetDashboard } from "@/components/fleet-dashboard"
@@ -255,7 +249,7 @@ describe("SQLite dashboard interactions", () => {
   })
 })
 
-it("investigates SQLite service evidence, changes assumptions, and replays recorded bus states", async () => {
+it("shows the service watchlist and replay without removed investigation sections", async () => {
   const user = userEvent.setup()
   render(
     <DashboardProvider data={readDashboardData()}>
@@ -267,19 +261,18 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
   const watchlist = await screen.findByRole("table", {
     name: "Service watchlist",
   })
-  expect(
-    await screen.findByRole("link", { name: "View passenger queues" })
-  ).toHaveAttribute("href", expect.stringContaining("view=crowding"))
-  expect(screen.queryByText("Queue observations")).not.toBeInTheDocument()
+  for (const name of [
+    "Dated evidence",
+    "Candidate buses",
+    "Departure timeline",
+    "Bus states at replay time",
+  ]) {
+    expect(screen.queryByText(name)).not.toBeInTheDocument()
+  }
   expect(screen.getAllByRole("table")).toHaveLength(1)
-  await user.click(screen.getByRole("button", { name: /Flagged departures/ }))
-  expect(screen.getByRole("dialog")).toHaveTextContent("Actual departure")
-  await user.keyboard("{Escape}")
   expect(
-    screen.queryByRole("region", {
-      name: "Queue observations by route position and time",
-    })
-  ).not.toBeInTheDocument()
+    screen.getByRole("textbox", { name: "Inspect time minutes" })
+  ).toBeInTheDocument()
   const serviceRow = within(watchlist)
     .getByRole("button", { name: "Investigate service 132" })
     .closest("tr")!
@@ -303,50 +296,10 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     ).not.toBeInTheDocument()
   })
   expect(window.location.search).toContain("queue=44")
-  await user.click(screen.getByRole("tab", { name: "Candidate buses" }))
   expect(
-    await screen.findByText("3 supported candidate windows for service 132")
+    screen.getByRole("textbox", { name: "Inspect time minutes" })
   ).toBeInTheDocument()
-  await user.click(screen.getByRole("tab", { name: "Timeline & replay" }))
-  expect(
-    screen.getByRole("spinbutton", { name: "Queue threshold" })
-  ).toHaveValue(44)
-  expect(screen.queryByText("Queues at replay time")).not.toBeInTheDocument()
   expect(screen.getAllByRole("table")).toHaveLength(1)
-  expect(
-    screen.getByRole("button", { name: /Departure timeline/ })
-  ).toBeInTheDocument()
-  fireEvent.change(
-    screen.getByRole("textbox", { name: "Inspect time minutes" }),
-    { target: { value: "03" } }
-  )
-  fireEvent.change(
-    screen.getByRole("textbox", { name: "Inspect time seconds" }),
-    { target: { value: "36" } }
-  )
-  await user.click(
-    screen.getByRole("button", { name: /Bus states at replay time/ })
-  )
-  const busRow = () =>
-    within(screen.getByRole("dialog")).getByText("NW-V009").closest("dl")!
-  expect(
-    within(busRow()).getByText("Recorded dwell at position 1")
-  ).toBeInTheDocument()
-  await user.keyboard("{Escape}")
-  fireEvent.change(
-    screen.getByRole("textbox", { name: "Inspect time minutes" }),
-    { target: { value: "04" } }
-  )
-  fireEvent.change(
-    screen.getByRole("textbox", { name: "Inspect time seconds" }),
-    { target: { value: "00" } }
-  )
-  await user.click(
-    screen.getByRole("button", { name: /Bus states at replay time/ })
-  )
-  expect(
-    within(busRow()).getByText("Estimated between positions 1 and 2")
-  ).toBeInTheDocument()
   window.history.replaceState(null, "", "/")
 }, 15000)
 

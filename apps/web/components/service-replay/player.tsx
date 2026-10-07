@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useMemo, useState, type ReactNode } from "react"
+import { useEffect, useMemo, useState } from "react"
 import dynamic from "next/dynamic"
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
@@ -23,14 +23,12 @@ export function ReplayPlayer({
   start,
   end,
   initialAt,
-  children,
 }: {
   detail: ServiceMapDetail
   date: string
   start: number
   end: number
   initialAt?: number
-  children?: (cursor: number) => ReactNode
 }) {
   const [cursor, setCursor] = useState(initialAt ?? start)
   const [playing, setPlaying] = useState(false)
@@ -142,7 +140,6 @@ export function ReplayPlayer({
           </div>
         </CardContent>
       </Card>
-      {children?.(cursor)}
     </div>
   )
 }
