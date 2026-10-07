@@ -36,6 +36,12 @@ import {
   type Command,
   type NoteEvent,
 } from "@/lib/fieldnotes/schema"
+import {
+  localNotes,
+  saveLocalNote,
+  removeLocalNotes,
+  appendBatch,
+} from "./outbox"
 import { MicrophoneInput, inputLabels } from "./microphone-input"
 import { MicrophoneEqualizer } from "./microphone-equalizer"
 import { LiveCapture, type InputHealth } from "./live"
@@ -49,6 +55,14 @@ import {
 import { Separator } from "@workspace/ui/components/separator"
 
 type CaptureState = "idle" | "connecting" | "live" | "closing"
+class RequestError extends Error {
+  constructor(
+    message: string,
+    readonly status: number
+  ) {
+    super(message)
+  }
+}
 async function request(command?: Command, id?: string): Promise<unknown> {
   const response = await fetch(
     `/api/fieldnotes${id ? `?id=${encodeURIComponent(id)}` : ""}`,
@@ -62,7 +76,10 @@ async function request(command?: Command, id?: string): Promise<unknown> {
   )
   const body: unknown = await response.json()
   if (!response.ok)
-    throw new Error(z.object({ error: z.string() }).parse(body).error)
+    throw new RequestError(
+      z.object({ error: z.string() }).parse(body).error,
+      response.status
+    )
   return body
 }
 function message(error: unknown) {
@@ -124,6 +141,7 @@ export function FieldnotesApp() {
   const [draft, setDraft] = useState("")
   const [showSpec, setShowSpec] = useState(true)
   const [confirmEnd, setConfirmEnd] = useState(false)
+  const [rejected, setRejected] = useState<NoteEvent[]>([])
   const [pending, setPending] = useState<NoteEvent[]>([])
   const pendingRef = useRef<NoteEvent[]>([])
   const capture = useRef<LiveCapture | null>(null)
@@ -145,14 +163,32 @@ export function FieldnotesApp() {
     )
   }, [])
 
+  const restoreNotes = useCallback((id: string) => {
+    const saved = localNotes(id)
+    pendingRef.current = saved.pending
+    setPending(saved.pending)
+    setRejected(saved.rejected)
+  }, [])
+
   useEffect(() => {
     let cancelled = false
     void request()
-      .then((body) => {
-        if (!cancelled) {
-          setChats(z.array(chatSchema).parse(body))
-          setLoaded(true)
+      .then(async (body) => {
+        if (cancelled) return
+        const items = z.array(chatSchema).parse(body)
+        setChats(items)
+        const interrupted = items.find(
+          (item) => localNotes(item.id).pending.length > 0
+        )
+        if (interrupted) {
+          const restored = chatSchema.parse(
+            await request(undefined, interrupted.id)
+          )
+          if (cancelled) return
+          accept(restored)
+          restoreNotes(restored.id)
         }
+        setLoaded(true)
       })
       .catch((error) => {
         if (!cancelled) {
@@ -164,9 +200,18 @@ export function FieldnotesApp() {
       cancelled = true
       capture.current?.dispose()
     }
-  }, [])
+  }, [accept, restoreNotes])
 
   const enqueue = useCallback((event: NoteEvent) => {
+    const id = current.current?.id
+    if (!id) return
+    try {
+      saveLocalNote(id, event)
+    } catch {
+      setError(
+        "Browser recovery storage is unavailable. Keep this page open until your notes are saved."
+      )
+    }
     pendingRef.current = [...pendingRef.current, event]
     setPending(pendingRef.current)
   }, [])
@@ -177,10 +222,35 @@ export function FieldnotesApp() {
     if (!id || !pendingRef.current.length) return
     const work = async () => {
       while (pendingRef.current.length) {
-        const batch = pendingRef.current.slice(0, 100)
-        const updated = chatSchema.parse(
-          await request({ kind: "append", id, events: batch })
-        )
+        const batch = appendBatch(pendingRef.current)
+        let updated: Chat
+        try {
+          updated = chatSchema.parse(
+            await request({ kind: "append", id, events: batch })
+          )
+        } catch (error) {
+          if (
+            !(error instanceof RequestError) ||
+            ![404, 409, 413].includes(error.status)
+          )
+            throw error
+          const unsaved = pendingRef.current
+          try {
+            for (const event of unsaved) saveLocalNote(id, event, "rejected")
+          } catch {
+            setError(
+              "Browser recovery storage is unavailable. Download the unsaved notes before leaving."
+            )
+          }
+          setRejected((items) => [...items, ...unsaved])
+          pendingRef.current = []
+          setPending([])
+          capture.current?.mute(true)
+          setMuted(true)
+          setError(error.message)
+          return
+        }
+        removeLocalNotes(id, batch)
         const saved = new Set(batch.map((event) => event.id))
         pendingRef.current = pendingRef.current.filter(
           (event) => !saved.has(event.id)
@@ -277,6 +347,7 @@ export function FieldnotesApp() {
   async function select(id: string) {
     await run(async () => {
       accept(chatSchema.parse(await request(undefined, id)))
+      restoreNotes(id)
       setDraft("")
       failedRevision.current = -1
     })
@@ -389,6 +460,7 @@ export function FieldnotesApp() {
         onCreate={() =>
           run(async () => {
             accept(chatSchema.parse(await request({ kind: "create" })))
+            setRejected([])
             setDraft("")
             failedRevision.current = -1
           })
@@ -452,6 +524,36 @@ export function FieldnotesApp() {
               onClick={() => setError("")}
             >
               <X />
+            </Button>
+          </div>
+        )}
+        {rejected.length > 0 && (
+          <div
+            className="flex flex-wrap items-center gap-3 border-b px-5 py-3 text-sm"
+            role="status"
+          >
+            <p>
+              {rejected.length} unsaved note fragments could not be added to
+              this session. Download them before clearing browser data. You can
+              end this conversation or start a new chat.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const url = URL.createObjectURL(
+                  new Blob([JSON.stringify(rejected, null, 2)], {
+                    type: "application/json",
+                  })
+                )
+                const link = document.createElement("a")
+                link.href = url
+                link.download = "fieldnotes-unsaved-notes.json"
+                link.click()
+                setTimeout(() => URL.revokeObjectURL(url), 1000)
+              }}
+            >
+              Download unsaved notes
             </Button>
           </div>
         )}
@@ -732,12 +834,18 @@ export function FieldnotesApp() {
                 if (!target) return
                 void run(async () => {
                   await request({ kind: "delete", id: target.id })
+                  const stored = localNotes(target.id)
+                  removeLocalNotes(target.id, [
+                    ...stored.pending,
+                    ...stored.rejected,
+                  ])
                   setChats((items) =>
                     items.filter((item) => item.id !== target.id)
                   )
                   if (current.current?.id === target.id) {
                     current.current = null
                     setChat(null)
+                    setRejected([])
                     setDraft("")
                   }
                   setDeleteTarget(null)
