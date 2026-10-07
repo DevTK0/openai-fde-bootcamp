@@ -8,6 +8,7 @@ import { serviceColor } from "./service-color"
 import { passengerSymbols } from "./passenger-symbols"
 import type { Exchange } from "./passenger-exchange"
 import { addCity, loadCity } from "./city"
+import { loadBusFleet, type BusFleet } from "./bus-fleet"
 import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 import type { Route } from "./route-geometry"
 import { mapData, point, type Point } from "./geometry"
@@ -63,6 +64,9 @@ export function Scene({
   const orbit = useRef<OrbitControls | null>(null)
   const host = useRef<HTMLDivElement>(null)
   const dynamic = useRef<THREE.Group | null>(null)
+  const fleet = useRef<BusFleet | null>(null)
+  const latestMarkers = useRef(markers)
+  const [busStatus, setBusStatus] = useState("Loading LionLink buses…")
   const [error, setError] = useState("")
   const [cityStatus, setCityStatus] = useState(
     "Loading Singapore streets and buildings…"
@@ -88,6 +92,26 @@ export function Scene({
     element.appendChild(renderer.domElement)
     const scene = new THREE.Scene()
     let disposed = false
+    queueMicrotask(() => setBusStatus("Loading LionLink buses…"))
+    void loadBusFleet()
+      .then((buses) => {
+        if (disposed) {
+          buses.dispose()
+          return
+        }
+        fleet.current = buses
+        scene.add(buses)
+        buses.update(
+          latestMarkers.current.filter((marker) => marker.kind === "bus")
+        )
+        setBusStatus("")
+      })
+      .catch(() => {
+        if (!disposed)
+          setBusStatus(
+            "LionLink bus model unavailable. Route data remains visible."
+          )
+      })
     void loadCity()
       .then((city) => {
         if (disposed) return
@@ -269,6 +293,10 @@ export function Scene({
           (h) => h.object.visible && typeof h.object.userData.key === "string"
         )
       if (hit) onPick(String(hit.object.userData.key))
+      else {
+        const key = fleet.current?.pick(raycaster)
+        if (key) onPick(key)
+      }
     }
     renderer.domElement.addEventListener("pointerdown", pointerDown)
     renderer.domElement.addEventListener("pointerup", pick)
@@ -343,12 +371,19 @@ export function Scene({
       orbit.current = null
       renderer.domElement.removeEventListener("wheel", panWithWheel)
       controls.dispose()
+      if (fleet.current) {
+        scene.remove(fleet.current)
+        fleet.current.dispose()
+        fleet.current = null
+      }
       dispose(scene)
       renderer.dispose()
       renderer.domElement.remove()
     }
   }, [routes, network, onPick, cameraVersion])
   useEffect(() => {
+    latestMarkers.current = markers
+    fleet.current?.update(markers.filter((marker) => marker.kind === "bus"))
     const group = dynamic.current
     if (!group) return
     dispose(group)
@@ -381,28 +416,6 @@ export function Scene({
         group.add(anchor)
         continue
       }
-      const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1.5, 1, 3),
-        new THREE.MeshStandardMaterial({
-          color:
-            network && marker.service
-              ? serviceColor(marker.service)
-              : marker.estimated
-                ? 0xffd269
-                : 0xffffff,
-        })
-      )
-      mesh.position.set(marker.x, 5.5, marker.z)
-      mesh.rotation.y = marker.heading ?? 0
-      const windscreen = new THREE.Mesh(
-        new THREE.BoxGeometry(1.15, 0.55, 0.04),
-        new THREE.MeshBasicMaterial({ color: 0x102b45 })
-      )
-      windscreen.position.set(0, 0.12, 1.52)
-      windscreen.userData.key = marker.key
-      mesh.add(windscreen)
-      mesh.userData.key = marker.key
-      group.add(mesh)
       if (network && marker.service) {
         const canvas = document.createElement("canvas")
         canvas.width = 120
@@ -488,6 +501,7 @@ export function Scene({
         </Button>
       </div>
       <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded bg-background/85 px-3 py-2 text-xs text-foreground">
+        {busStatus && <p role="status">{busStatus}</p>}
         {cityStatus}
         <br />© OpenStreetMap contributors · OpenFreeMap
       </div>
