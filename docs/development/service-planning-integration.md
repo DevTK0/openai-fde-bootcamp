@@ -1,12 +1,14 @@
 # Service planning in Planning
 
-The service planner adapts the behavior of `kuma` at `f6434e1` into the existing dashboard. It reads the current SQLite database and uses shared UI components. The watchlist, candidate review, and timeline replay ship together in one PR. The standalone prototype and its generated assets remain unchanged.
+The service planner adapts the behavior of `kuma` at `f6434e1` into the existing dashboard. It reads the current SQLite database and uses shared UI components. The watchlist, candidate review, and timeline replay ship together in one PR. The standalone prototype remains unchanged. Two original Blender videos and their posters are included as fixed examples in Timeline & replay.
 
 ## Planner workflow
 
 Expand **Planning** in the sidebar, then select **Service planning**. Workshop planning and the workshop register are under **Maintenance**, alongside maintenance history. Choose a date and service, adjust the planning assumptions, and select **Apply assumptions**. Select a service in the watchlist to inspect its dated departures, queue observations, and linked maintenance holds. The detail tabs contain candidate windows and timeline replay. Tables support search, export, and full record inspection, with no record mutation controls.
 
 The URL preserves the service, date, observation window, thresholds, review horizon, and detail tab. For example, `/dashboard?view=service-planning&date=2026-10-07&service=132&queue=30&delay=5` opens that investigation directly. Replay starts at the window start when reopened.
+
+See [replay data provenance](replay-data-lineage.md) for the comparison with the original source files and prototype snapshot.
 
 ## Data and policy
 
@@ -22,7 +24,7 @@ Candidate review considers the operating vehicle roster, readiness issued by the
 
 The implementation uses the supplied exercise turnaround conventions: 45 seconds final alighting, 420 seconds turnaround, 120 seconds boarding after terminal movement, and at least 300 seconds for crew takeover. The crew record supplies its maximum duty span. These are exercise assumptions, not approved operating policy. Candidate windows end at the earliest recorded resource limit, next task, future maintenance hold, protected break, or duty limit. The default requested window is 30 minutes. Full additional-journey feasibility remains a separate planner check.
 
-All outputs are retrospective synthetic evidence. Future actual task timings constrain the review; this is not an at-the-time dispatch simulation. No dispatch changes are issued. Replay shows recorded dwell and explicitly estimated between-stop states. Queues show the latest observation at or before the cursor and its age, with a proposed ten-minute stale marker. The timeline has no GPS, street geometry, continuous-demand model, moving-map animation, or Blender assets.
+All outputs are retrospective synthetic evidence. Future actual task timings constrain the review; this is not an at-the-time dispatch simulation. No dispatch changes are issued. Replay shows recorded dwell and explicitly estimated between-stop states. Queues show the latest observation at or before the cursor and its age, with a proposed ten-minute stale marker. The timeline has no GPS, street geometry, or continuous-demand model. A separate Blender 3D preview offers the original ten-second renders for services 132 and 159 on 7 October, 06:00–12:00 SGT. These videos are fixed prototype snapshots, not current database evidence. Their playback is independent of the replay cursor and planning assumptions. Other service/date selections explicitly identify the mismatch. Native video controls support playback, seeking, and fullscreen, with a direct video link as a fallback. Videos load on demand and do not autoplay. Asset provenance is recorded in `apps/web/public/replay-examples/README.md`.
 
 ## Architecture decision
 

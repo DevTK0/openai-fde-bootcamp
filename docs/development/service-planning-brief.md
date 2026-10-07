@@ -6,7 +6,7 @@ Status: adapted into the main application in one PR. See [integration behavior a
 
 Help a planner identify a service problem, inspect its dated evidence, understand when it happened, and review possible interventions.
 
-The `kuma` prototype at commit `f6434e1` is a behavioral reference. Its code, generated data, and animation assets are outside this integration. The original comparison used remote main at `61a465d`; the implementation follows current main.
+The `kuma` prototype at commit `f6434e1` is a behavioral reference. Its application code and generated datasets are outside this integration. Two fixed Blender video examples are now included for visual review. The original comparison used remote main at `61a465d`; the implementation follows current main.
 
 The production work belongs in the existing dashboard and domain workspaces. It must use the current application data and shared UI conventions. The workspace comparison and existing capabilities are documented in the integration reference.
 
@@ -18,7 +18,7 @@ The following behaviors are adapted together in one PR against main, per the rev
 2. Add candidate buses for reassignment. Explain the available window, supporting evidence, and remaining feasibility checks.
 3. Add a service timeline and replay where they improve investigation. Preserve the selected service, date, and planning assumptions.
 
-Blender videos are deferred. They support demonstrations but are not necessary for the first planning workflow.
+Blender videos support demonstrations. Timeline & replay includes fixed examples for services 132 and 159 on 7 October, separate from the current database replay. Generating or synchronizing new renders remains deferred.
 
 ## Watchlist acceptance criteria
 

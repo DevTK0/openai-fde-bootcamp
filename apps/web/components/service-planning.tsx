@@ -7,6 +7,7 @@ import {
   useSyncExternalStore,
   type FormEvent,
 } from "react"
+import { BlenderReplayPreview } from "./blender-replay-preview"
 import { Play, Pause, RefreshCw } from "lucide-react"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -732,6 +733,7 @@ function Replay({ report }: { report: PlanningReport }) {
           </span>
         </CardContent>
       </Card>
+      <BlenderReplayPreview service={selection.service} date={selection.date} />
       <EvidenceTable
         title="Bus states at replay time"
         columns={["Vehicle", "Trip", "Route", "State", "Evidence"]}
