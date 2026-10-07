@@ -47,12 +47,6 @@ export const dashboardWorkspaces = [
         description: "Observed queues and boarding demand by service and stop.",
       },
       {
-        id: "resources",
-        label: "Resource overview",
-        description:
-          "Crew duties, resource updates, positioning, and operating requirements.",
-      },
-      {
         id: "usage",
         label: "Usage & service",
         description: "Selected daily usage and service observations.",
@@ -70,12 +64,6 @@ export const dashboardWorkspaces = [
         description:
           "Maintenance spending, completed services, repairs, inspections, and vehicle hold hours.",
       },
-      {
-        id: "workshop",
-        label: "Workshop planning",
-        description:
-          "Requested workshop jobs, bay capacity, and technician requirements.",
-      },
     ],
   },
   {
@@ -90,21 +78,9 @@ export const dashboardWorkspaces = [
       },
       {
         id: "service-planning",
-        label: "Service planning",
+        label: "Service optimisation",
         description:
           "Investigate service problems and review possible interventions.",
-      },
-      {
-        id: "festival",
-        label: "Festival allocation",
-        description:
-          "Proposed route capacity and festival resource allocations.",
-      },
-      {
-        id: "incident",
-        label: "Incident response",
-        description:
-          "Protected duties and assumptions for relief service planning.",
       },
     ],
   },

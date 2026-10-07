@@ -274,121 +274,6 @@ function SelectedOperations() {
     </div>
   )
 }
-function Workshop() {
-  const { dataset } = useDashboard()
-  const requests = dataset("Maintenance planning", "Requested maintenance").rows
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
-        <Metric
-          title="Requested jobs"
-          value={String(requests.length)}
-          detail="19 October 2026 · tentative requests"
-        />
-        <Metric
-          title="Available bays"
-          value={String(
-            dataset("Maintenance planning", "Bay and staffing capacity")
-              .rows[0]?.["Available bays"] ?? "Not supplied"
-          )}
-          detail="09:00–17:00 · Hougang staging"
-        />
-        <Metric
-          title="Available technicians"
-          value={String(
-            dataset("Maintenance planning", "Bay and staffing capacity")
-              .rows[0]?.["Available technicians"] ?? "Not supplied"
-          )}
-          detail="Technicians per shift"
-        />
-      </div>
-      <Plot
-        title="Requested workshop resources"
-        description="Bays and technicians"
-        rows={requests.map((r) => ({
-          name: r["Vehicle ID"]!,
-          bays: r["Required bays"]!,
-          technicians: r["Required technicians"]!,
-        }))}
-        series={[
-          { key: "bays", label: "Requested bays" },
-          { key: "technicians", label: "Requested technicians" },
-        ]}
-      />
-    </div>
-  )
-}
-
-function Festival() {
-  const { dataset } = useDashboard()
-  const allocations = dataset(
-    "Festival allocation",
-    "Proposed fleet allocations"
-  ).rows
-  return (
-    <div className="space-y-6">
-      <Plot
-        title="Proposed departure capacity by route"
-        description="Passenger capacity by route"
-        rows={groupSum(
-          allocations
-            .filter((r) => r["Route ID"])
-            .map((r) => ({
-              route: r["Route ID"]!,
-              capacity:
-                num(r, "Planning limit per departure") *
-                String(r["Proposed departure times local"]).split("|").length,
-            })),
-          "route",
-          ["capacity"]
-        )}
-        series={[{ key: "capacity", label: "Proposed passenger places" }]}
-      />
-    </div>
-  )
-}
-function Incident() {
-  const { dataset } = useDashboard()
-  const arrivals = dataset(
-    "Incident baseline",
-    "Relief queue planning arrivals"
-  ).rows
-  return (
-    <div className="space-y-6">
-      <div className="grid gap-4 @2xl/dashboard:grid-cols-3">
-        <Metric
-          title="Protected evening buses"
-          value={String(
-            dataset("Incident baseline", "Protected evening duties").rows.length
-          )}
-          detail="16 October · baseline known at 17:00"
-        />
-        <Metric
-          title="Held vehicle"
-          value="NW-V050"
-          detail="Door-interlock inspection · release unconfirmed"
-        />
-        <Metric
-          title="Initial waiting people"
-          value={String(
-            dataset("Incident baseline", "Relief decision requirements")
-              .rows[0]?.["Initial waiting people"] ?? "Not supplied"
-          )}
-          detail="Planning baseline at 17:00"
-        />
-      </div>
-      <Plot
-        title="Assumed relief queue arrivals"
-        description="Planned arrivals per half-hour"
-        rows={arrivals.map((r) => ({
-          name: String(r["Window start"]).slice(11, 16),
-          arrivals: r["Arrivals people"]!,
-        }))}
-        series={[{ key: "arrivals", label: "Assumed arrivals" }]}
-      />
-    </div>
-  )
-}
 function Passengers() {
   const { dataset } = useDashboard()
   const reports = dataset("Passenger reports")
@@ -486,14 +371,11 @@ function DashboardReport({
       )
     case "reliability":
     case "crowding":
-    case "resources":
       return <OperationsDashboard view={view} />
     case "usage":
       return <SelectedOperations />
     case "maintenance":
       return <Maintenance vehicle={vehicle} period={period} />
-    case "workshop":
-      return <Workshop />
     case "workshop-register":
       return (
         <OperationsSources
@@ -510,10 +392,6 @@ function DashboardReport({
       return <CrewPlanning />
     case "service-planning":
       return <ServicePlanning initialQuery={initialQuery} />
-    case "festival":
-      return <Festival />
-    case "incident":
-      return <Incident />
     case "passengers":
       return <Passengers />
     case "costs":

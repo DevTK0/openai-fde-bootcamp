@@ -73,13 +73,16 @@ describe("SQLite dashboard interactions", () => {
       screen.queryByRole("button", { name: "Upload new records" })
     ).not.toBeInTheDocument()
 
+    expect(
+      screen.queryByRole("link", { name: "Resource overview" })
+    ).not.toBeInTheDocument()
+
     const groups = [
       { workspace: "Fleet", pages: ["Vehicle register", "Fleet overview"] },
       {
         workspace: "Operations",
         pages: [
           "Day schedule",
-          "Resource overview",
           "Usage & service",
           "Passenger queues",
           "Service reliability",
@@ -87,11 +90,11 @@ describe("SQLite dashboard interactions", () => {
       },
       {
         workspace: "Maintenance",
-        pages: ["Maintenance history", "Workshop planning"],
+        pages: ["Maintenance history"],
       },
       {
         workspace: "Planning",
-        pages: ["Festival allocation", "Incident response"],
+        pages: [],
       },
       {
         workspace: "Data",
@@ -112,6 +115,17 @@ describe("SQLite dashboard interactions", () => {
       })
       if (trigger.getAttribute("aria-expanded") !== "true")
         await user.click(trigger)
+      for (const removed of [
+        "Resource overview",
+        "Incident response",
+        "Festival allocation",
+        "Workshop planning",
+        "Service planning",
+      ]) {
+        expect(
+          screen.queryByRole("link", { name: removed })
+        ).not.toBeInTheDocument()
+      }
       for (const name of group.pages) {
         const link = screen.getByRole("link", { name })
         await user.click(link)
@@ -198,7 +212,7 @@ describe("SQLite dashboard interactions", () => {
     )
     await user.click(screen.getByRole("button", { name: "Data" }))
     await user.click(screen.getByRole("button", { name: "Planning" }))
-    await user.click(screen.getByRole("link", { name: "Service planning" }))
+    await user.click(screen.getByRole("link", { name: "Service optimisation" }))
     expect(
       screen.getByRole("spinbutton", { name: "Queue threshold" })
     ).toHaveValue(44)
@@ -229,7 +243,7 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
     </DashboardProvider>
   )
   await user.click(screen.getByRole("button", { name: "Planning" }))
-  await user.click(screen.getByRole("link", { name: "Service planning" }))
+  await user.click(screen.getByRole("link", { name: "Service optimisation" }))
   const watchlist = await screen.findByRole("table", {
     name: "Service watchlist",
   })

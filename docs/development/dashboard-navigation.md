@@ -7,9 +7,9 @@ The dashboard sidebar groups report pages by workspace. Workspace buttons expand
 | Workspace   | Pages                                                                                                  |
 | ----------- | ------------------------------------------------------------------------------------------------------ |
 | Fleet       | Fleet overview, Vehicle register                                                                       |
-| Operations  | Day schedule, Service reliability, Passenger queues, Resource overview, Usage & service                |
-| Maintenance | Maintenance history, Workshop planning                                                                 |
-| Planning    | Crew planning, Service planning, Festival allocation, Incident response                                |
+| Operations  | Day schedule, Service reliability, Passenger queues, Usage & service                                   |
+| Maintenance | Maintenance history                                                                                    |
+| Planning    | Crew planning, Service optimisation                                                                    |
 | Data        | Operations data, Supplied datasets, Control log, Network records, Workshop register, Passenger reports |
 | Finance     | Cost options                                                                                           |
 
@@ -36,7 +36,7 @@ Historical vehicle and period controls appear only on Fleet overview and Mainten
 
 Run `pnpm check`. The dashboard tests open every workspace report, switch workshop datasets, check historical-filter scope, exercise browser Back, and preserve planning assumptions. The service-planning investigation still checks thresholds, candidate evidence, and replay observations.
 
-In the running app, open `/dashboard?view=workshop-register`. Confirm Data is expanded and Workshop register is selected. Change the Dataset selector to workshop vehicles. Open Planning / Service planning, change an assumption, visit another workspace, and return. Confirm the assumption remains. Reload the URL and use browser Back to verify page selection. At a mobile viewport, open the sidebar, expand Data, and select Control log. Confirm the drawer closes and the page has no horizontal overflow outside its table.
+In the running app, open `/dashboard?view=workshop-register`. Confirm Data is expanded and Workshop register is selected. Change the Dataset selector to workshop vehicles. Open Planning / Service optimisation, change an assumption, visit another workspace, and return. Confirm the assumption remains. Reload the URL and use browser Back to verify page selection. At a mobile viewport, open the sidebar, expand Data, and select Control log. Confirm the drawer closes and the page has no horizontal overflow outside its table.
 
 Fleet overview owns recorded distance, operating hours and the all-service history map. Maintenance history owns maintenance costs, repair counts, repair cost per kilometre, spending comparisons and maintenance hold charts, with detailed monthly vehicle history in Data / Supplied datasets. Engineering readiness records are under Data / Workshop register; Data / Operations data contains vehicle identity records. Historical filters apply to usage metrics in Fleet and maintenance metrics in Maintenance, not to the independently dated service replay.
 
@@ -46,7 +46,7 @@ The read-only `/api/crew-planning?date=YYYY-MM-DD` endpoint reads planned assign
 
 Fleet / Vehicle register shows a planned vehicle timeline. It shares the timeline renderer with Crew planning, with service-colored trips labeled by crew, recorded readiness windows, and maintenance holds. Date/service filters, vehicle-ID search, pagination and selection details work on the planning timeline. The separately held workshop cohort remains labeled. Click a vehicle ID to inspect evidence even without a planned trip.
 
-The read-only `/api/vehicle-planning` endpoint reads planned assignments, vehicle rosters, dated readiness and the same maintenance sources used by Service planning. Missing confirmed releases keep holds open; estimated completion is not a release. Exact release/end boundaries do not conflict. Overlapping planned trips or maintenance holds produce red outlines. Missing readiness, location or timing evidence remains unverified. Readiness alone does not establish turnaround, positioning or crew feasibility. Known event times set the visible time axis; longer open holds are clipped to that displayed window, with full timestamps in details.
+The read-only `/api/vehicle-planning` endpoint reads planned assignments, vehicle rosters, dated readiness and the same maintenance sources used by Service optimisation. Missing confirmed releases keep holds open; estimated completion is not a release. Exact release/end boundaries do not conflict. Overlapping planned trips or maintenance holds produce red outlines. Missing readiness, location or timing evidence remains unverified. Readiness alone does not establish turnaround, positioning or crew feasibility. Known event times set the visible time axis; longer open holds are clipped to that displayed window, with full timestamps in details.
 
 Vehicle tests cover open holds, confirmed-release boundaries, cross-service overlaps, missing evidence, planned assignments and the separate workshop cohort. Browser checks cover search, filters, hold/trip details, and Crew planning after the shared renderer change.
 
@@ -55,3 +55,7 @@ Vehicle tests cover open holds, confirmed-release boundaries, cross-service over
 Data owns raw table browsing, search, filtering, export and record actions. Operations data lists every table in the operations manifest, and Supplied datasets lists every imported dataset. Control log, Network records, Workshop register and Passenger reports retain their existing page URLs under Data. The empty Passengers workspace is removed.
 
 Analysis tables stay in their reports, including service comparisons, queue hotspots, planning watchlists, candidate evidence and departure timelines. Raw dataset pickers no longer appear below fleet, schedule, maintenance, workshop, festival, incident or cost views. The navigation test checks this separation and preserves direct links and browser history.
+
+Resource overview has been removed. Crew, readiness, movement and operating requirement source tables remain in Data / Operations data. The Queue observations analysis table is now an interactive dot field under Service optimisation / Dated evidence. Its route selector separates route directions; the service picker selects another service.
+
+Incident response, Festival allocation and Workshop planning report pages have been removed. Their supplied datasets remain under Data. Service planning is now labeled Service optimisation; the existing `view=service-planning` URL stays valid.

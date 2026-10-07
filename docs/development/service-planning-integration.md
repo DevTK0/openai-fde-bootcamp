@@ -4,7 +4,7 @@ The service planner adapts the behavior of `kuma` at `f6434e1` into the existing
 
 ## Planner workflow
 
-Expand **Planning** in the sidebar, then select **Service planning**. Workshop planning and the workshop register are under **Maintenance**, alongside maintenance history. Choose a date and service, adjust the planning assumptions, and select **Apply assumptions**. Select a service in the watchlist to inspect its dated departures, queue observations, and linked maintenance holds. The detail tabs contain candidate windows and timeline replay. Tables support search, export, and full record inspection, with no record mutation controls.
+Expand **Planning** in the sidebar, then select **Service optimisation**. Maintenance history is under **Maintenance**. Raw workshop records are under **Data**. Choose a date and service, adjust the planning assumptions, and select **Apply assumptions**. Select a service in the watchlist to inspect its dated departures, queue observations, and linked maintenance holds. The detail tabs contain candidate windows and timeline replay. Tables support search, export, and full record inspection, with no record mutation controls.
 
 The URL preserves the service, date, observation window, thresholds, review horizon, and detail tab. For example, `/dashboard?view=service-planning&date=2026-10-07&service=132&queue=30&delay=5` opens that investigation directly. Replay starts at the window start when reopened.
 
@@ -47,3 +47,11 @@ pnpm --filter web exec vitest run __tests__/service-planning.test.ts __tests__/s
 The domain tests cover inclusive thresholds, route-position deduplication, missing versus zero observations, time windows, service-linked holds, future and missing readiness, unique crew, conflicting tasks, breaks, incomplete timing, turnaround, and replay dwell. Database tests use an isolated SQLite copy and verify that changed queues and removed crew evidence change the report. Dashboard tests investigate service 132, raise its queue threshold, inspect candidates, and compare recorded dwell and queue zero with unknown positions.
 
 In the running app, inspect service 132 on 7 October. At default assumptions its peak queue is 43 and it has two flagged departures. Raising the queue threshold to 44 leaves the departure trigger and changes Critical to High. At replay time 06:03:36, call `NW-20261007-0009-01` records a queue of zero and bus `NW-V009` remains at position 1 until 06:03:41. At 06:04:00 its between-stop state is labeled estimated. Before that queue observation, its value is unknown.
+
+### Queue observation visual
+
+Dated evidence shows queue observations as selectable dots by route position and recorded time. Choose a route direction in the visual, or choose another service with the planning service picker. Directions and repeated stop positions stay separate. Dot size indicates the remaining queue; threshold-meeting counts are red, observed zeroes are hollow and unknown counts display a question mark. Positions without observations remain visible. Counts use boarding cutoff timestamps in the selected window, including its boundaries. No movement or demand is interpolated.
+
+Selecting a dot opens the source call ID, vehicle, trip, observation time, boarded, alighted and remaining counts. The chart has sticky stop labels and a sticky time axis, with scrolling contained within it. Other analysis tables and the existing replay remain unchanged. The rejected prototype alternatives are not integrated.
+
+`queue-observations.test.tsx` verifies exact time/threshold boundaries, zero versus unknown, absent evidence, repeated stop positions, direction changes, keyboard selection, and removal of stale selected records after a refresh.

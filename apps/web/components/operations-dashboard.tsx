@@ -68,7 +68,7 @@ function Pending({ error, retry }: { error?: string; retry: () => void }) {
 export function OperationsDashboard({
   view,
 }: {
-  view: "reliability" | "crowding" | "resources"
+  view: "reliability" | "crowding"
 }) {
   const { operationsManifest: manifest } = useDashboard()
   const [service, setService] = useState("all"),
@@ -80,34 +80,32 @@ export function OperationsDashboard({
     m = report?.metrics
   return (
     <div className="space-y-6">
-      {(view === "reliability" || view === "crowding") && (
-        <div className="flex flex-wrap gap-3">
-          <Pick
-            label="Operating service"
-            value={service}
-            onChange={setService}
-            options={[
-              {
-                value: "all",
-                label: `All ${manifest.services.length} services`,
-              },
-              ...manifest.services.map((s) => ({
-                value: s,
-                label: `Service ${s}`,
-              })),
-            ]}
-          />
-          <Pick
-            label="Operating date"
-            value={date}
-            onChange={setDate}
-            options={[
-              { value: "all", label: `All ${manifest.dates.length} dates` },
-              ...manifest.dates.map((d) => ({ value: d, label: d })),
-            ]}
-          />
-        </div>
-      )}
+      <div className="flex flex-wrap gap-3">
+        <Pick
+          label="Operating service"
+          value={service}
+          onChange={setService}
+          options={[
+            {
+              value: "all",
+              label: `All ${manifest.services.length} services`,
+            },
+            ...manifest.services.map((s) => ({
+              value: s,
+              label: `Service ${s}`,
+            })),
+          ]}
+        />
+        <Pick
+          label="Operating date"
+          value={date}
+          onChange={setDate}
+          options={[
+            { value: "all", label: `All ${manifest.dates.length} dates` },
+            ...manifest.dates.map((d) => ({ value: d, label: d })),
+          ]}
+        />
+      </div>
       {!report || !m ? (
         <Pending error={request.error} retry={request.retry} />
       ) : (
@@ -267,37 +265,6 @@ export function OperationsDashboard({
                   })),
                 }}
               />
-            </div>
-          )}
-          {view === "resources" && (
-            <div className="space-y-6">
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <Metric
-                  title="Operating vehicles"
-                  value={String(manifest.coverage.vehicles)}
-                  detail="Operating fleet"
-                />
-                <Metric
-                  title="Additional workshop vehicles"
-                  value={String(manifest.coverage.workshopVehicles)}
-                  detail="Workshop fleet"
-                />
-                <Metric
-                  title="Crew-duty records"
-                  value={fmt(
-                    manifest.tables.find((t) => t.id === "crew_duties")!.count
-                  )}
-                  detail="Duty records"
-                />
-                <Metric
-                  title="Control instructions"
-                  value={String(
-                    manifest.tables.find((t) => t.id === "control_actions")!
-                      .count
-                  )}
-                  detail={`${manifest.tables.find((t) => t.id === "resource_updates")!.count} resource updates`}
-                />
-              </div>
             </div>
           )}
         </>
