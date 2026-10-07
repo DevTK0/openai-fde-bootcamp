@@ -1,70 +1,58 @@
 ---
-title: From employee feedback to a proposed change
-description: Why LionLink is exploring a software factory that acts on an explicit request during a conversation.
+title: From a transcript to a feature
+description: How a steering prompt and an existing transcript become a feature brief for pstack.
 ---
 
-The software factory is a proposed way for LionLink employees to turn a pain point
-into a reviewable software change while they discuss it. The first intended source
-is a live conversation in a separate factory application.
+The workflow starts with an existing transcript and your prompt. The prompt tells
+the agent what matters and what work to do. The transcript provides the context
+and evidence for that work.
 
-This feature is in documentation-first design. The code in `apps/factory` is a
-throwaway prototype. Its structure, dependencies, and interface are experiments,
-not a production design or a compatibility commitment.
+The repository skill `transcript-to-feature` turns those inputs into a feature
+brief, then uses the existing `/pstack` skills to carry out your request. You can
+ask for a brief, documentation, or implementation. The same transcript can support
+different tasks when you give it a different prompt.
 
-## An explicit request within a conversation
+## Your prompt selects the work
 
-An employee can explain a problem more clearly in conversation than in a short
-ticket. The surrounding discussion can establish who has the problem, when it
-occurs, and what a useful change would accomplish.
+A conversation can contain a problem, several possible solutions, a rejected idea,
+and an unrelated request. Extracting every suggestion would create work that you
+did not ask for. The steering prompt sets the focus and the stopping point.
 
-Continuous conversation alone is a poor signal to begin implementation. People
-also speculate, compare alternatives, and describe work they do not want built.
-The proposed signal is an explicit phrase:
+For example, a shift handover discussion might include missing readiness information
+and a suggestion to rebuild the entire reporting system. A prompt to document a
+small handover improvement keeps the larger rewrite outside the task.
 
-> I think we can get the software factory to do this
+The skill preserves the difference between an explicit decision, a suggestion,
+and an inference. Source pointers let you check the brief against the discussion.
+If the participants disagree on something that changes the feature, the agent
+asks a focused question instead of silently choosing a side.
 
-For example, an employee describes the time spent assembling a shift handover.
-After discussing which information is missing, the employee says the phrase.
-The factory captures that context and starts an implementation request. If the
-discussion does not identify the required information, the agent asks a question.
+## A brief connects the conversation to the repository
 
-The phrase authorizes an implementation attempt within the configured scope.
-It does not authorize a production release. A person reviews the resulting change
-and the evidence from its checks before any separate release decision.
+The brief records the intended outcome, relevant evidence, scope, exclusions,
+acceptance criteria, and unresolved questions. The agent inspects the repository
+before choosing where a change belongs.
 
-## Progress that survives the conversation
+When your prompt already requests implementation, a clear brief is enough to
+continue through `/pstack`. There is no mandatory approval step for the brief.
+When your prompt requests documentation only, the workflow ends with documentation.
+A request inside the transcript cannot expand that authorization.
 
-Implementation may take longer than the conversation. The request therefore needs
-its own durable record, including its context, questions, attempts, and outcome.
-Closing the conversation must not erase accepted work.
+This division keeps the intake skill small. It interprets the conversation while
+existing skills handle architecture, implementation, verification, and delivery.
+A named domain skill can supply project conventions without duplicating those
+workflows.
 
-Employees need to distinguish a request that is waiting from one that is running
-or needs an answer. A failed attempt also needs an explanation. Presenting a draft
-as complete because an agent says it succeeded would hide the work still required.
+## Why this replaces the live factory proposal
 
-## What the prototype taught us
+This approach needs no trigger phrase, live listener, queue service, or separate
+factory application. Local recording and transcription happen before the agent
+receives the task. The workflow does not prescribe a recording tool or upload audio.
 
-The prototype explored finalized transcript input, duplicate delivery, clarification,
-isolated code changes, and visible check results. Local tests exposed practical
-problems with lost responses, draft ownership, and interrupted processes.
-Those findings inform the [proposed behavior](/docs/software-factory-behavior/).
+The code in `apps/factory` remains a throwaway prototype of the earlier approach.
+Its storage, worker, and transcription choices are not dependencies of this skill.
+The current workflow replaces the earlier live-listener proposal.
 
-The prototype's controlled-agent tests exercise process and persistence behavior.
-They do not establish the quality of changes produced by a real model. Live
-microphone accuracy, provider connectivity, and background-noise handling also
-remain unverified.
-
-SQLite, a single local worker, a shared access token, and the current transcription
-provider are prototype choices. Production design still needs decisions about
-identity, access, retention, execution isolation, operating cost, and recovery.
-Preserving prototype code is not a reason to retain those choices.
-
-## The first release boundary
-
-The proposed first release covers deliberate conversations inside the factory app,
-optional clarification, and changes prepared for human review. Listening in other
-meeting tools, continuous background capture, and automatic production release are
-outside that scope.
-
-The next step is to [evaluate the proposal](/docs/evaluate-software-factory/) against
-representative employee conversations before selecting a production implementation.
+Use [Develop a feature from a transcript](/docs/evaluate-software-factory/) to start.
+The [workflow reference](/docs/software-factory-behavior/) describes the inputs,
+brief, and stopping rules.

@@ -1,61 +1,71 @@
 ---
-title: Evaluate the software factory proposal
-description: Review the proposed workflow with representative conversations before choosing a production implementation.
+title: Develop a feature from a transcript
+description: Give pstack an existing transcript and a steering prompt, then guide the result to the right stopping point.
 ---
 
-Use this procedure to decide whether the proposed workflow fits an employee task.
-You need a representative pain point, consenting participants, and a reviewer who
-can judge the resulting software behavior. A scripted walkthrough is sufficient
-for an initial review. Use the throwaway prototype only when an executable example
-helps answer a specific question.
+Use this procedure when you have a transcript or meeting notes and want a feature
+brief, documentation, or an implementation. You need the source text and a checkout
+with this repository's skills.
 
-## Define a useful outcome
+## Prepare the source
 
-1. Write down the employee task and the point where work becomes difficult.
-2. Describe the smallest change that would improve that task.
-3. Define the observable result that would show the change works.
-4. Record the information that the agent needs from the conversation.
+1. Save the transcript to a local file, or paste the text with your request.
+2. Retain speaker labels and timestamps when available.
+3. Remove details that are unnecessary for the task before giving the transcript to the agent.
 
-## Walk through the conversation
+If the transcript remains outside the repository, supply its absolute path. The
+workflow does not require copying or committing it into the checkout.
 
-1. Explain what capture would store and where the content would be sent.
-2. Confirm participant agreement before any actual capture.
-3. Discuss the pain point without saying the trigger phrase.
-4. Verify that ordinary discussion creates no implementation request.
-5. Say "I think we can get the software factory to do this" after describing the change.
-6. Inspect the proposed request and its captured context.
-7. If necessary information is missing, answer the agent's clarification.
-8. Compare the proposed change with the observable result defined earlier.
+## State the outcome and stopping point
 
-Record any mismatch between the employee's intent and the captured request. Keep
-the conversation example with the finding so a later implementation can reproduce it.
+Give the source location, the topic to focus on, and the work you want completed.
+Name exclusions when the conversation discusses a broader change.
 
-## Exercise ambiguous and interrupted cases
+For a documentation-first task, use a prompt like this:
 
-Use a separate example for each case below. Record the expected outcome before
-the walkthrough, then record the observed outcome.
+```text
+/pstack Use /absolute/path/to/handover-transcript.txt.
+Focus on the dispatchers' difficulty finding train readiness during handover.
+Use transcript-to-feature to write the feature docs with technical-writing.
+Separate agreed needs from suggested solutions and cite the relevant passages.
+Do not implement the feature, open a PR, or deploy anything.
+```
 
-- The speaker quotes the trigger phrase while explaining how the feature works.
-- Background noise or a recognition correction changes the transcript.
-- A connection retry delivers the same finalized text twice.
-- The phrase spans two finalized transcript segments.
-- The worker is unavailable when the employee requests a change.
-- The employee closes the conversation after the factory accepts a request.
-- The employee cancels an active attempt.
-- Another employee answers a question while a draft answer is still open.
-- A worker restarts during an attempt.
-- The generated change fails a configured check.
+Replace the example path with your actual transcript path. Expect a brief with
+source pointers followed by the requested documentation.
 
-If the expected outcome is disputed, record the case as an unresolved requirement.
-Do not use the prototype's current behavior to settle a product decision.
+For implementation, state that explicitly:
 
-## Record the decision
+```text
+/pstack Use /absolute/path/to/handover-transcript.txt to implement a small
+readiness indicator in the existing handover view. Use transcript-to-feature.
+Keep the broader reporting rewrite out of scope. Verify the requested behavior.
+Leave the changes local. Do not commit, open a PR, or deploy.
+```
 
-1. Classify each finding as an agreed requirement, an open decision, or a rejected behavior.
-2. Attach the conversation example and any observed output to the finding.
-3. Separate scripted or simulated results from live microphone and provider results.
-4. Assign an owner to each open production decision in the [behavior reference](/docs/software-factory-behavior/#decisions-required-before-production).
-5. Agree on pilot acceptance criteria before selecting production technology.
+If a domain skill applies, name it in your prompt. The intake skill uses that skill
+for domain guidance and keeps pstack responsible for delivery.
 
-If live audio has not been tested, leave audio acceptance unresolved. If a
-controlled executable supplied the code change, leave real model quality unresolved.
+If your client intercepts `/pstack`, ask the agent to read
+`.agents/skills/transcript-to-feature/SKILL.md` and include the same task prompt.
+
+## Resolve material ambiguity
+
+1. Read any question that identifies conflicting or missing requirements.
+2. Check the cited passage before answering.
+3. State which interpretation to use, or narrow the requested outcome.
+
+The agent can proceed with reversible assumptions that do not materially change
+the feature. You do not need to approve a brief separately when your prompt already
+asks for implementation.
+
+## Inspect the result
+
+1. Compare the brief's scope with your steering prompt.
+2. Follow the source pointers for the requirements that matter most.
+3. Check that suggestions and inferences are not presented as agreed decisions.
+4. Compare the delivered work with the acceptance criteria.
+5. Read the verification evidence and unresolved questions before choosing the next step.
+
+If you asked only for a brief or documentation, expect no feature implementation.
+For input and output details, use the [workflow reference](/docs/software-factory-behavior/).

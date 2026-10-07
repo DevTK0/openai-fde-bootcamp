@@ -16,12 +16,15 @@ export default defineConfig({
       sidebar: [
         { label: "Overview", slug: "" },
         {
-          label: "Software factory proposal",
+          label: "Transcript workflow",
           items: [
-            { label: "From feedback to a change", slug: "software-factory" },
-            { label: "Proposed behavior", slug: "software-factory-behavior" },
             {
-              label: "Evaluate the proposal",
+              label: "From a transcript to a feature",
+              slug: "software-factory",
+            },
+            { label: "Workflow reference", slug: "software-factory-behavior" },
+            {
+              label: "Develop a feature",
               slug: "evaluate-software-factory",
             },
           ],

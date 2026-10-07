@@ -22,7 +22,7 @@ Developer setup:
 2. Open an agent session in this checkout. Skills are versioned under `.agents/skills/`.
 3. Start with `/pstack <task>`. In Codex's native skill UI, use `$pstack` or
    select it through `/skills`. The checked-in `.agents/skills/` directories
-   register all 36 skills for this repository. Restart the session if the new entry does not appear.
+   register all 37 skills for this repository. Restart the session if the new entry does not appear.
 4. If the client intercepts `/pstack`, use `$pstack` or
    `Read .agents/skills/pstack/SKILL.md and use it for <task>`.
 

@@ -10,11 +10,11 @@ This guide explains how those records support a finding and where the evidence e
 The examples use fictional sample records. Each article states its coverage and
 includes graphs with the source values behind them.
 
-## Explore the software factory proposal
+## Develop a feature from a conversation
 
-[From employee feedback to a proposed change](/docs/software-factory/) explains
-the proposed conversation-to-implementation workflow. The feature is in
-documentation-first design. Its current code is a throwaway prototype.
+[From a transcript to a feature](/docs/software-factory/) explains how your prompt
+and an existing transcript guide the repository's pstack workflow. The current
+workflow uses a skill rather than the earlier live-listener prototype.
 
 ## Learn to read a comparison
 

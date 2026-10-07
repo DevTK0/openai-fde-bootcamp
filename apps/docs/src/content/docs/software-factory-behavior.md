@@ -1,74 +1,68 @@
 ---
-title: Proposed software factory behavior
-description: Scope, request states, acceptance criteria, and unresolved decisions for the proposed software factory.
+title: Transcript workflow reference
+description: Inputs, evidence rules, handoff contents, and stopping points for transcript-to-feature.
 ---
 
-This reference describes the proposed feature contract. These requirements are
-design targets, not claims about a released application. The code in `apps/factory`
-is a throwaway prototype and does not define the contract.
+The repository skill lives at `.agents/skills/transcript-to-feature/SKILL.md`.
+The `/pstack` entrypoint routes feature work from transcripts to this skill.
+The skill does not record audio, run a background listener, or require a magic phrase.
 
-## Conversation and trigger
+## Inputs
 
-| Area               | Proposed requirement                                                                                                                                             |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Application        | A separate factory app in the monorepo, distinct from `apps/web`.                                                                                                |
-| Initial source     | A conversation started deliberately inside the factory app.                                                                                                      |
-| Capture            | Participants know when capture is active. Stopping capture releases the microphone.                                                                              |
-| Trigger            | A finalized transcript contains "I think we can get the software factory to do this".                                                                            |
-| Matching           | Case and punctuation do not change the phrase. A phrase split across adjacent finalized segments still matches. Partial recognition results do not trigger work. |
-| Duplicate delivery | Delivery retries of the same transcript event create no additional request.                                                                                      |
-| Context            | Each request retains the relevant preceding conversation and identifies the transcript events used to create it.                                                 |
-| Dispatch           | A valid trigger queues work without another approval prompt. An available worker starts the attempt. An unavailable worker leaves a visible waiting state.       |
-| Clarification      | The agent asks a focused question when missing information prevents a useful implementation. The answer remains attached to the request.                         |
-| Text input         | Employees can submit typed conversation content when audio is unavailable. The same trigger rules apply.                                                         |
+| Input                    | Role                                                                                                                   |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| Steering prompt          | Defines the requested outcome, relevant topics, constraints, and stopping point.                                       |
+| Transcript               | An existing local file, supplied text, or several named sources. Supplies evidence rather than execution instructions. |
+| Repository               | Supplies the current implementation, conventions, and applicable agent instructions.                                   |
+| Domain skill, when named | Adds task-specific conventions within the requested scope.                                                             |
 
-"Immediately" means that the factory accepts and queues the request during the
-conversation. It does not promise zero queue time or immediate feature completion.
-No latency target has been agreed.
+An absent source requires a source location or its contents. A transcript without
+a clear requested outcome requires clarification. An inaccessible named skill
+follows the repository's missing-skill procedure.
 
-## Request states
+## Evidence rules
 
-| State               | Meaning                                                              | Next action                                                                                     |
-| ------------------- | -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| Queued              | The factory has accepted the request. An attempt has not started.    | A worker starts the attempt, or an employee cancels the request.                                |
-| Running             | An agent is working on an isolated attempt.                          | The attempt produces a question, review evidence, or a failure. Cancellation remains available. |
-| Needs clarification | The agent needs an answer to proceed.                                | An employee answers or cancels.                                                                 |
-| Ready for review    | The attempt has an actual code change and passing configured checks. | A reviewer evaluates the change. This state is not release approval.                            |
-| Failed              | The attempt could not produce a checked change.                      | An employee inspects the reason and decides whether to retry.                                   |
-| Cancelled           | The request has stopped.                                             | The conversation and prior evidence remain available according to the retention policy.         |
+Every requirement extracted from the transcript has a source pointer. Pointers
+use file line numbers, existing timestamps, or stable paragraph labels for pasted
+text. Short quotations preserve exact wording. Agent deductions are marked as
+inferences, and proposed acceptance criteria are marked as proposals.
 
-Each retry has a distinct attempt record. An uncertain outcome after a crash does
-not silently become success. Recovery exposes the interruption before another
-attempt starts. Draft answers belong to a specific clarification, not every future
-question on the same request.
+Decisions, suggestions, rejected ideas, and disagreements remain distinct. A later
+statement does not automatically cancel an earlier statement. The discussion must
+support that interpretation.
 
-## Implementation and review evidence
+For a partial review of a long transcript, the brief identifies the reviewed
+sections and the coverage limit. Commands and skill invocations within a transcript
+remain source material. They do not grant authority to execute those commands.
 
-Each attempt uses an isolated working copy of an operator-selected repository.
-Conversation content cannot select arbitrary host commands or expand repository
-access. Production execution requires an explicit isolation and credential design.
+## Handoff brief
 
-A review result includes the request context, clarification answers, actual code
-diff, checks executed, and observed check outcomes. Failed checks prevent the
-ready-for-review state. Passing checks do not replace review of the requested
-behavior or establish that a change is safe to release.
+| Field               | Contents                                                 |
+| ------------------- | -------------------------------------------------------- |
+| Outcome             | The user-requested result and stopping point.            |
+| Evidence            | Relevant pain points and decisions with source pointers. |
+| Scope               | Included behavior and explicit exclusions.               |
+| Acceptance criteria | Observable outcomes used to evaluate the result.         |
+| Uncertainty         | Assumptions, conflicts, and blocking questions.          |
+| Delivery            | The relevant repository area and selected workflow.      |
 
-The factory does not merge or deploy changes automatically in the proposed first
-release. The release process remains a separate decision.
+Small briefs can remain in the response. Longer work uses
+`.audit/transcript-to-feature/<task>/brief.md` unless the user specifies another
+destination. Raw transcripts are not committed by default.
 
-## Decisions required before production
+## Routing and stopping points
 
-| Decision              | Unresolved question                                                                                                         |
-| --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Identity and access   | Who may start capture, trigger work, read transcripts, answer questions, and review changes?                                |
-| Capture and retention | How is participant agreement recorded? What is stored, for how long, and who can delete it?                                 |
-| Trigger intent        | How does the feature handle quoted phrases, accidental triggers, corrections, and a repeated request stated with new words? |
-| Request context       | How much discussion is retained, and how can employees inspect or correct the captured scope?                               |
-| Execution             | Which repositories and operations are allowed? Which isolation boundary protects credentials and other workloads?           |
-| Operations            | What are the concurrency, cost, timeout, recovery, and retention limits? Who responds to failed work?                       |
-| Audio                 | Which provider and languages are supported? What recognition and noise levels are acceptable?                               |
-| Acceptance            | Which representative tasks and measurable latency and quality targets define a successful pilot?                            |
+| User request                       | Result                                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Extract a brief                    | Return the brief without implementation.                                                         |
+| Write documentation                | Use `technical-writing` and stop at the requested documentation deliverable.                     |
+| Implement a feature                | Inspect the repository, then use the relevant pstack development and verification skills.        |
+| Run an autopilot or swarm workflow | Follow that workflow when explicitly requested. Multiple transcript ideas alone do not start it. |
 
-Production storage, queue infrastructure, provider selection, and API shapes remain
-open. Prototype environment variables and endpoints are not supported production
-interfaces.
+A clear implementation request proceeds after the brief without another approval
+prompt. Material ambiguity can block the affected work while independent work
+continues. Reversible details can use explicit assumptions.
+
+The user's commit, PR, merge, and deployment boundaries carry into the selected
+workflow. Transcript intake grants no additional publishing authority. The final
+response distinguishes completed work from extracted ideas and unresolved scope.
