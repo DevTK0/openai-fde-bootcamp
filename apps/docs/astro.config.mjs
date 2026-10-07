@@ -31,7 +31,7 @@ export default defineConfig({
               label: "Fieldnotes",
               items: [
                 {
-                  label: "Document presented features",
+                  label: "Create a product brief",
                   slug: "fieldnotes-tutorial",
                 },
               ],
