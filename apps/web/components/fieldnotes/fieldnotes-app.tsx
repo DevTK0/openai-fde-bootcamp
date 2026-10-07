@@ -476,11 +476,6 @@ export function FieldnotesApp() {
             >
               <div className="px-5 pt-6 md:px-8">
                 <div className="flex flex-col items-center gap-4 py-6">
-                  <MicrophoneEqualizer
-                    level={
-                      state === "live" && !muted ? (inputHealth?.level ?? 0) : 0
-                    }
-                  />
                   <div className="flex w-full items-center gap-4">
                     <Button
                       className="size-12 shrink-0 rounded-full"
@@ -504,27 +499,14 @@ export function FieldnotesApp() {
                         <Play className="size-5 fill-current" />
                       )}
                     </Button>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 text-sm font-medium">
-                        {ended
-                          ? "Presentation complete"
-                          : state === "live"
-                            ? muted
-                              ? "Microphone muted"
-                              : inputLabels[inputHealth?.status ?? "waiting"]
-                            : state === "connecting"
-                              ? "Connecting microphone…"
-                              : state === "closing"
-                                ? "Finishing and saving…"
-                                : "Ready when you are"}
-                      </div>
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                        {ended
-                          ? "Your specification is ready to review."
-                          : state === "live"
-                            ? "GPT-Live · microphone input"
-                            : "Press Play to start capturing audio."}
-                      </p>
+                    <div className="flex min-w-0 flex-1 justify-center">
+                      <MicrophoneEqualizer
+                        level={
+                          state === "live" && !muted
+                            ? (inputHealth?.level ?? 0)
+                            : 0
+                        }
+                      />
                     </div>
                     <Button
                       variant="secondary"
@@ -540,6 +522,28 @@ export function FieldnotesApp() {
                     >
                       {muted ? <MicOff /> : <Mic />}
                     </Button>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm font-medium">
+                      {ended
+                        ? "Presentation complete"
+                        : state === "live"
+                          ? muted
+                            ? "Microphone muted"
+                            : inputLabels[inputHealth?.status ?? "waiting"]
+                          : state === "connecting"
+                            ? "Connecting microphone…"
+                            : state === "closing"
+                              ? "Finishing and saving…"
+                              : "Ready when you are"}
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {ended
+                        ? "Your specification is ready to review."
+                        : state === "live"
+                          ? "GPT-Live · microphone input"
+                          : "Press Play to start capturing audio."}
+                    </p>
                   </div>
                   {!ended && (
                     <MicrophoneInput

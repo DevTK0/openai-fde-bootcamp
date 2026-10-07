@@ -25,7 +25,7 @@ The screenshots below show the implemented app with the shared web app component
 
 Chats use numbered names such as **Presentation 1** and **Presentation 2**. To rename one, right-click its name and choose **Rename**, enter a name, and click **Save**.
 
-Choose your microphone below the equalizer. Speak and check that the bars move, then wait for **Transcribing your presentation** and your words in the notes. A connected session alone does not confirm that speech is being captured. The player changes to **Stop**. GPT-Live transcribes the presentation, and the app updates `product-spec.md` in the **Specification** panel in batches. No opening task prompt is needed.
+The equalizer sits between **Play** and **Mute**. Choose your microphone below the controls. Speak and check that the bars move, then wait for **Transcribing your presentation** and your words in the notes. A connected session alone does not confirm that speech is being captured. The player changes to **Stop**. GPT-Live transcribes the presentation, and the app updates `product-spec.md` in the **Specification** panel in batches. No opening task prompt is needed.
 
 While audio capture is active, finish the conversation before switching chats. If you only want to pause your microphone, use **Mute**. On a narrow screen, use **Toggle Sidebar** to open the chat list.
 
@@ -68,7 +68,7 @@ If an update fails, your previous draft and saved notes remain available. Click 
 
 Finish your clarifications and download the specification before ending the conversation.
 
-1. Click **Stop** below the equalizer.
+1. Click **Stop** to the left of the equalizer.
 2. Read the **End this conversation?** confirmation. Stopping ends the entire conversation, and you cannot resume it or send more messages.
 3. Click **End conversation** to confirm. To keep the conversation open, click **Cancel** instead.
 
