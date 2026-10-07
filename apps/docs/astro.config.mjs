@@ -7,7 +7,15 @@ export default defineConfig({
   base: "/docs",
   trailingSlash: "always",
   output: "static",
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    plugins: [tailwindcss()],
+    server: { strictPort: true },
+  },
+  server: {
+    allowedHosts: [process.env.PORTLESS_URL, process.env.PORTLESS_TAILSCALE_URL]
+      .filter(Boolean)
+      .map((url) => new URL(url).hostname),
+  },
   integrations: [
     react(),
     starlight({

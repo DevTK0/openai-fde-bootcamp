@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node ../../scripts/dev.mjs next dev --hostname 127.0.0.1",
     "build": "next build",
-    "start": "next start",
+    "start": "node ../../scripts/dev.mjs next start --hostname 127.0.0.1",
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
@@ -46,5 +46,8 @@
     "typescript": "^5",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"
+  },
+  "devPreview": {
+    "path": "/"
   }
 }

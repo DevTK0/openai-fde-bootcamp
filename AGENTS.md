@@ -44,6 +44,20 @@ lasts only for the active Codex session; stop workers and persist a handoff when
 the session ends. Do not claim an unattended scheduler is running. Report unavailable capabilities honestly. Run
 `pnpm check` and the playbook's task-specific verification before handing off.
 
+## Preview ownership
+
+Use the app's `pnpm dev` script for previews, including `/pstack` and
+`/technical-writing` prototypes. The shared Portless launcher assigns separate
+addresses to each worktree and app. For docs, run
+`pnpm --filter @workspace/docs dev` in your worktree and share its full HTTPS
+`Preview:` URL, including `/docs/`. See
+[the preview guide](docs/development/previews.md) for all apps and troubleshooting.
+
+Retain the terminal session handle for every preview you start. Stop only your
+own launch through that session. Do not use broad process kills, force-replace
+another preview, reset Tailscale Serve, or stop the shared Portless proxy to free
+a port. If another server owns the same app directory, use an isolated worktree.
+
 ## UI components: use shadcn/ui
 
 All UI must be built from shadcn/ui components living in `packages/ui`.

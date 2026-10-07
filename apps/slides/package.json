@@ -4,14 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm generate && node scripts/dev.mjs",
+    "dev": "node ../../scripts/dev.mjs pnpm run dev:app",
     "generate": "node scripts/generate-evidence.mjs",
     "build": "pnpm generate && open-slide build",
-    "start": "node scripts/dev.mjs",
+    "start": "node ../../scripts/dev.mjs node scripts/dev.mjs",
     "lint": "eslint . --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "preview": "open-slide preview --host 127.0.0.1 --port 3004"
+    "preview": "node ../../scripts/dev.mjs open-slide preview --host 127.0.0.1",
+    "dev:app": "pnpm generate && node scripts/dev.mjs"
   },
   "dependencies": {
     "@open-slide/core": "2.0.1",
@@ -29,5 +30,8 @@
     "typescript": "^5",
     "vite": "^8.3.2",
     "vitest": "^5.0.3"
+  },
+  "devPreview": {
+    "path": "/slides/"
   }
 }

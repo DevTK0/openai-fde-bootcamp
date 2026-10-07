@@ -8,12 +8,15 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",
-    "test": "turbo test",
-    "check": "turbo lint typecheck test"
+    "test": "pnpm test:previews && turbo test",
+    "check": "pnpm test:previews && turbo lint typecheck test",
+    "previews": "node scripts/dev.mjs list",
+    "test:previews": "node --test scripts/dev.test.mjs"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "portless": "0.15.7",
     "prettier": "^3.9.9",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "turbo": "^2.11.5",
