@@ -3,6 +3,7 @@
 import { Plot } from "@workspace/ui/components/report-chart"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Pick, Notice, Metric, Records } from "@/components/report-ui"
 import {
   OperationsDashboard,
@@ -824,6 +825,26 @@ export function FleetDashboard() {
             Workspace
           </p>
           <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                render={<Link href="/live" />}
+                className="h-10 gap-3 px-3"
+              >
+                <Activity className="size-4" />
+                <span>Live operations</span>
+                <ArrowUpRight className="ml-auto size-3" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                render={<Link href="/planner" />}
+                className="h-10 gap-3 px-3 text-primary"
+              >
+                <CalendarDays className="size-4" />
+                <span>Planning copilot</span>
+                <ArrowUpRight className="ml-auto size-3" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             {sections.map((s) => (
               <SidebarMenuItem key={s.id}>
                 <SidebarMenuButton
