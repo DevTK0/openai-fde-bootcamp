@@ -37,6 +37,15 @@ export default defineConfig({
         {
           label: "Tutorials",
           items: [
+            {
+              label: "Fieldnotes",
+              items: [
+                {
+                  label: "Create a product brief",
+                  slug: "fieldnotes-tutorial",
+                },
+              ],
+            },
             { label: "Read a maintenance comparison", slug: "getting-started" },
           ],
         },
