@@ -56,3 +56,7 @@ apps/slides/.editor-data/
 
 # Fieldnotes runtime database
 .fieldnotes/
+
+# Operations planner runtime evidence and Python bytecode
+/apps/web/.ops-planning/
+__pycache__/

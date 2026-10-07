@@ -1,0 +1,15 @@
+{
+  "cases": 876,
+  "assessments": 5263,
+  "dates": 10,
+  "route_directions": 36,
+  "trips_in_actual_projected_inputs": 6900,
+  "total_database_trips": 6900,
+  "missing_trips": [],
+  "bus_days_in_actual_inputs": 1720,
+  "total_bus_days": 1720,
+  "missing_bus_days": [],
+  "crew_days_in_actual_inputs": 3272,
+  "total_crew_days": 3272,
+  "missing_crew_days": []
+}

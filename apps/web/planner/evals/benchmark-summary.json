@@ -1,0 +1,192 @@
+{
+  "decisions_gate": true,
+  "astra_completed": true,
+  "astra": {
+    "completed_workflows": 936,
+    "total_workflows": 936,
+    "failures": [],
+    "model_assessments": 1080,
+    "physical_exclusions": 4603,
+    "comparison_calls": 160,
+    "errors": []
+  },
+  "astra_handouts": [
+    {
+      "case": "engineering-history-review",
+      "plan": "plan_d748537f",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "engineering-history-review",
+      "plan": "plan_cb198904",
+      "expected": "eligible",
+      "actual": "eligible"
+    },
+    {
+      "case": "engineering-history-review",
+      "plan": "plan_206c191b",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "engineering-history-review",
+      "plan": "plan_383077e9",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "engineering-history-review",
+      "plan": "plan_b2585be1",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "engineering-history-review",
+      "plan": "plan_73e1d450",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "evening-hold",
+      "plan": "plan_c9cea1b9",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "evening-hold",
+      "plan": "plan_256b2caa",
+      "expected": "eligible",
+      "actual": "eligible"
+    },
+    {
+      "case": "evening-hold",
+      "plan": "plan_2390d58a",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "evening-hold",
+      "plan": "plan_c175ed16",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "evening-hold",
+      "plan": "plan_f558cc68",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "evening-hold",
+      "plan": "plan_c8cbd273",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "festival-allocation",
+      "plan": "plan_4a33fefe",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "festival-allocation",
+      "plan": "plan_5e469d5d",
+      "expected": "conditional",
+      "actual": "conditional"
+    },
+    {
+      "case": "festival-allocation",
+      "plan": "plan_3d205511",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "festival-allocation",
+      "plan": "plan_c726c4b5",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "festival-allocation",
+      "plan": "plan_c522a2af",
+      "expected": "conditional",
+      "actual": "conditional"
+    },
+    {
+      "case": "festival-allocation",
+      "plan": "plan_7e6f29c1",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "maintenance-cover",
+      "plan": "plan_d92a8b33",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "maintenance-cover",
+      "plan": "plan_eb8a4ac3",
+      "expected": "conditional",
+      "actual": "conditional"
+    },
+    {
+      "case": "maintenance-cover",
+      "plan": "plan_9dfb00f2",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "maintenance-cover",
+      "plan": "plan_b7645f32",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "maintenance-cover",
+      "plan": "plan_4a390edb",
+      "expected": "blocked",
+      "actual": "blocked"
+    },
+    {
+      "case": "maintenance-cover",
+      "plan": "plan_b8638c10",
+      "expected": "blocked",
+      "actual": "blocked"
+    }
+  ],
+  "paired_core_input_checks": {
+    "equal": 660,
+    "different": []
+  },
+  "trace_metrics": {
+    "decisions_network": {
+      "successful_response_count": 660,
+      "input_tokens": 4398886,
+      "output_tokens": 0,
+      "median_request_to_response_seconds": 0.28,
+      "timing_basis": "Approximate request-file to response-file elapsed time; includes HTTP time and local serialization. Not a controlled provider latency measurement."
+    },
+    "decisions_cluster_validation": {
+      "successful_response_count": 580,
+      "input_tokens": 7214583,
+      "output_tokens": 0,
+      "median_request_to_response_seconds": 0.296,
+      "timing_basis": "Approximate request-file to response-file elapsed time; includes HTTP time and local serialization. Not a controlled provider latency measurement."
+    },
+    "astra": {
+      "successful_response_count": 1244,
+      "input_tokens": 11682717,
+      "output_tokens": 54690,
+      "median_request_to_response_seconds": 2.796,
+      "timing_basis": "Approximate request-file to response-file elapsed time; includes HTTP time and local serialization. Not a controlled provider latency measurement."
+    }
+  },
+  "limits": [
+    "Physical availability exclusions are shared deterministic behavior, not model accuracy.",
+    "Earlier raw Decisions classification produced unsafe approvals and remains recorded separately.",
+    "The corpus covers every core trip/resource day and includes all handout datasets, but is not exhaustive across incidents or combinations.",
+    "Timing comes from overlapping runs and is descriptive, not a controlled speed benchmark."
+  ]
+}

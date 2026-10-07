@@ -1,0 +1,154 @@
+[
+  {
+    "id": "maintenance-cover",
+    "decision_at": "2026-10-16T16:00:00+08:00",
+    "objective": "Propose a conditional 19 October workshop and cover roster. Keep all eight trips. Future planning conditions must be explicit. A conditional plan is not dispatch authorization.",
+    "candidates": [
+      {
+        "id": "option_1",
+        "proposal": "Book V020 09:00-13:00 and V009 13:00-15:00. Use NW-V005 with EXT-MC01 for both EXT-MD01 trips, and EXT-MC04 for both EXT-MD04 trips. Retain other assignments. Takeover and boarding begin 08:53 and 13:23 respectively. Subject to confirmed daily releases and V020 signed release by 13:08 before its 13:15 departure. Replan if scope or release slips."
+      },
+      {
+        "id": "option_2",
+        "proposal": "Start both requested workshop jobs at 09:00 in parallel, retaining all trips by having NW-V005 cover both morning duties simultaneously."
+      },
+      {
+        "id": "option_3",
+        "proposal": "Book V020 09:00-13:00 and V009 13:00-15:00. Use V050 as extra morning and afternoon cover with each original driver."
+      },
+      {
+        "id": "option_4",
+        "proposal": "Book V020 09:00-13:00 and V009 13:00-15:00. Cover V020 morning and V009 afternoon with V005 and their original drivers. Authorize V020 to resume at 13:15 regardless of signed release because the workshop estimate ends at 13:00."
+      },
+      {
+        "id": "option_5",
+        "proposal": "Cancel both V020 morning trips so it can enter the workshop."
+      },
+      {
+        "id": "option_6",
+        "proposal": "Run both jobs after all assigned service ends at 16:23, with all work complete by 17:00."
+      }
+    ],
+    "sheets": [
+      "Maintenance planning"
+    ]
+  },
+  {
+    "id": "festival-allocation",
+    "decision_at": "2026-10-19T12:00:00+08:00",
+    "objective": "Increase event shuttle capacity within supplied allocations. Preserve protected services. Future daily releases remain conditions, not facts. Do not claim unobserved demand or guaranteed transfers.",
+    "candidates": [
+      {
+        "id": "option_1",
+        "proposal": "Conditionally add NW-V005 with EXT-FC06 to EXT-E1 at 21:00 and 22:30. Start takeover at 20:20, position 20:25-20:55, board 20:55-21:00. Final full cycle ends midnight, return positioning ends 00:30. Preserve every other allocation. Confirm daily Engineering release, servicing and defect closure before deployment."
+      },
+      {
+        "id": "option_2",
+        "proposal": "Conditionally add NW-V005 with EXT-FC06 to EXT-E2 at 21:00 and 22:15. Takeover 20:50-20:55, board 20:55-21:00, complete final cycle at 23:30. Preserve every other allocation. Confirm daily Engineering release, servicing and defect closure before deployment."
+      },
+      {
+        "id": "option_3",
+        "proposal": "Add NW-V009 and EXT-FC07 as spare resources on EXT-E1."
+      },
+      {
+        "id": "option_4",
+        "proposal": "Use NW-V005 and EXT-FC06 for EXT-E1 at 23:00 and promise return by 00:30 after the complete cycle and return positioning."
+      },
+      {
+        "id": "option_5",
+        "proposal": "Move protected NW-V001 departures from EXT-E1 to EXT-E2 without replacement."
+      },
+      {
+        "id": "option_6",
+        "proposal": "Keep the roster but guarantee that riders on the 22:30 EXT-E1 departure connect to the listed 22:45 EXT-E2 departure."
+      }
+    ],
+    "sheets": [
+      "Festival allocation"
+    ]
+  },
+  {
+    "id": "evening-hold",
+    "decision_at": "2026-10-16T17:00:00+08:00",
+    "objective": "Respond to the rail-relief request with actions supported at 17:00. Preserve protected loops and contracted relief. A safe hold-and-prepare action is valid even when no extra dispatch is possible.",
+    "candidates": [
+      {
+        "id": "option_1",
+        "proposal": "Retain protected evening loops and the contracted 17:20 and 18:20 relief departures. Brief EXT-RC08 with held NW-V050 while stationary. Request signed Engineering release and re-evaluate positioning, queue and return time when it arrives. Promise no additional departure yet."
+      },
+      {
+        "id": "option_2",
+        "proposal": "Dispatch NW-V050 at 17:30 because Engineering estimated completion at 17:30."
+      },
+      {
+        "id": "option_3",
+        "proposal": "Borrow NW-V001 and EXT-RC01 for relief from 17:00 to 18:00, cancelling their overlapping evening loops."
+      },
+      {
+        "id": "option_4",
+        "proposal": "Treat contracted relief vehicle and crew for the 17:20 departure as an additional spare for another simultaneous departure."
+      },
+      {
+        "id": "option_5",
+        "proposal": "Dispatch held NW-V050 immediately with EXT-RC08 because the driver is free and qualified."
+      },
+      {
+        "id": "option_6",
+        "proposal": "Keep commitments and ask for V050 release. In the current 17:00 plan guarantee an extra 17:55 relief departure and zero waiting at 19:00."
+      }
+    ],
+    "sheets": [
+      "Incident baseline"
+    ]
+  },
+  {
+    "id": "engineering-history-review",
+    "decision_at": "2026-10-19T16:00:00+08:00",
+    "objective": "Review the supplied historical extract and prospective cost options for Engineering follow-up. This is retrospective triage, not dispatch authorization. Preserve scope, avoid duplicate costs and unsupported causal claims.",
+    "candidates": [
+      {
+        "id": "option_1",
+        "proposal": "Refer repeated comfort reports and supplied condition findings to Engineering for targeted diagnosis. Compare the quoted V020 diagnostic scope with historical repair, service and component records. Keep quotes separate from incurred spending, deduplicate workbook and CSV monthly views, and make no guaranteed savings or causal-failure claim."
+      },
+      {
+        "id": "option_2",
+        "proposal": "Buy the quoted new double-decker and treat it as an immediately available spare for 19 October."
+      },
+      {
+        "id": "option_3",
+        "proposal": "Add the monthly CSV costs, workbook monthly costs, twelve-month repair-spend totals and selected component charges to calculate total historical expenditure."
+      },
+      {
+        "id": "option_4",
+        "proposal": "Diagnose every delayed service 132 trip as the same HVAC failure and replace its fan assembly without a confirming diagnosis."
+      },
+      {
+        "id": "option_5",
+        "proposal": "Treat completion of routine servicing as automatic Engineering release, overriding any open repair hold."
+      },
+      {
+        "id": "option_6",
+        "proposal": "Compute exact individual passenger waiting times from approximate journey reports alone, and merge riders across route directions and rail connections as interchangeable."
+      }
+    ],
+    "sheets": [
+      "Fleet",
+      "Repairs",
+      "Servicing",
+      "Inspections",
+      "Monthly maintenance",
+      "Selected observations",
+      "Daily usage",
+      "Weekly usage",
+      "Service observations",
+      "Control evidence",
+      "Readiness",
+      "Monthly usage",
+      "Passenger reports",
+      "Cost options",
+      "Repair spend by bus",
+      "Monthly costs",
+      "CSV"
+    ]
+  }
+]

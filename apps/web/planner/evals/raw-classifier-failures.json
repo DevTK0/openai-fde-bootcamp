@@ -1,0 +1,1435 @@
+{
+  "completed_cases": 730,
+  "assessments": 4386,
+  "errors": [
+    {
+      "case": "2026-10-13-B159_2-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B159_2-new_bus/01"
+    },
+    {
+      "case": "2026-10-06-NW-V134-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V134-coverage/00"
+    },
+    {
+      "case": "2026-10-06-NW-V134-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V134-coverage/02"
+    },
+    {
+      "case": "2026-10-06-NW-V134-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V134-coverage/04"
+    },
+    {
+      "case": "2026-10-08-NW-V083-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V083-coverage/03"
+    },
+    {
+      "case": "2026-10-15-NW-V166-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V166-coverage/03"
+    },
+    {
+      "case": "2026-10-06-NW-V170-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V170-coverage/01"
+    },
+    {
+      "case": "2026-10-08-NW-V119-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V119-coverage/05"
+    },
+    {
+      "case": "2026-10-13-NW-V056-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V056-coverage/04"
+    },
+    {
+      "case": "2026-10-13-NW-V104-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V104-coverage/04"
+    },
+    {
+      "case": "2026-10-08-NW-V113-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V113-coverage/05"
+    },
+    {
+      "case": "2026-10-07-NW-V072-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V072-coverage/05"
+    },
+    {
+      "case": "2026-10-13-NW-V048-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V048-coverage/01"
+    },
+    {
+      "case": "2026-10-13-NW-V048-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V048-coverage/02"
+    },
+    {
+      "case": "2026-10-13-NW-V040-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V040-coverage/03"
+    },
+    {
+      "case": "2026-10-13-NW-V040-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V040-coverage/05"
+    },
+    {
+      "case": "2026-10-09-NW-V101-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V101-coverage/04"
+    },
+    {
+      "case": "2026-10-05-NW-V113-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V113-coverage/02"
+    },
+    {
+      "case": "2026-10-13-B410G_1-faulty_service.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B410G_1-faulty_service/01"
+    },
+    {
+      "case": "2026-10-15-NW-V053-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V053-coverage/01"
+    },
+    {
+      "case": "2026-10-08-B235_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B235_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-08-B235_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B235_1-new_bus/03"
+    },
+    {
+      "case": "2026-10-08-B235_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B235_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-12-B76_2-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B76_2-new_bus/05"
+    },
+    {
+      "case": "2026-10-05-B76_2-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B76_2-new_bus/04"
+    },
+    {
+      "case": "2026-10-14-NW-V072-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V072-coverage/01"
+    },
+    {
+      "case": "2026-10-14-NW-V072-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V072-coverage/03"
+    },
+    {
+      "case": "2026-10-07-NW-V143-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V143-coverage/05"
+    },
+    {
+      "case": "2026-10-05-B130_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B130_1-new_bus/03"
+    },
+    {
+      "case": "2026-10-13-NW-V081-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V081-coverage/04"
+    },
+    {
+      "case": "2026-10-12-NW-V044-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V044-coverage/01"
+    },
+    {
+      "case": "2026-10-05-B22_2-faulty_service.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B22_2-faulty_service/04"
+    },
+    {
+      "case": "2026-10-14-NW-V097-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V097-coverage/05"
+    },
+    {
+      "case": "2026-10-06-B162_1-new_crew.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B162_1-new_crew/05"
+    },
+    {
+      "case": "2026-10-15-NW-V083-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V083-coverage/04"
+    },
+    {
+      "case": "2026-10-14-NW-V115-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V115-coverage/00"
+    },
+    {
+      "case": "2026-10-14-B410G_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B410G_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-14-B410G_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B410G_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-13-B76_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B76_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-15-B238_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B238_1-new_crew/03"
+    },
+    {
+      "case": "2026-10-15-B238_1-new_crew.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B238_1-new_crew/05"
+    },
+    {
+      "case": "2026-10-05-NW-V155-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V155-coverage/00"
+    },
+    {
+      "case": "2026-10-09-NW-V117-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V117-coverage/02"
+    },
+    {
+      "case": "2026-10-08-B56_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B56_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-08-B56_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B56_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-14-NW-V089-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V089-coverage/00"
+    },
+    {
+      "case": "2026-10-07-NW-V078-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V078-coverage/02"
+    },
+    {
+      "case": "2026-10-07-NW-V078-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V078-coverage/04"
+    },
+    {
+      "case": "2026-10-12-B410W_1-faulty_service.json",
+      "plan": "candidate_2",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B410W_1-faulty_service/03"
+    },
+    {
+      "case": "2026-10-12-B410W_1-faulty_service.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B410W_1-faulty_service/05"
+    },
+    {
+      "case": "2026-10-16-NW-V092-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V092-coverage/05"
+    },
+    {
+      "case": "2026-10-14-B54_1-sick_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B54_1-sick_crew/01"
+    },
+    {
+      "case": "2026-10-12-NW-V038-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V038-coverage/01"
+    },
+    {
+      "case": "2026-10-12-NW-V038-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V038-coverage/04"
+    },
+    {
+      "case": "2026-10-06-B159_1-faulty_service.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B159_1-faulty_service/02"
+    },
+    {
+      "case": "2026-10-07-B238_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-B238_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-07-B238_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-B238_1-new_bus/04"
+    },
+    {
+      "case": "2026-10-16-NW-V057-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V057-coverage/05"
+    },
+    {
+      "case": "2026-10-07-NW-V136-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V136-coverage/03"
+    },
+    {
+      "case": "2026-10-13-NW-V077-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V077-coverage/04"
+    },
+    {
+      "case": "2026-10-07-NW-V047-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V047-coverage/00"
+    },
+    {
+      "case": "2026-10-09-NW-V072-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V072-coverage/03"
+    },
+    {
+      "case": "2026-10-08-NW-V054-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V054-coverage/00"
+    },
+    {
+      "case": "2026-10-14-NW-V121-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V121-coverage/03"
+    },
+    {
+      "case": "2026-10-13-B261_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B261_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-05-B130_2-new_crew.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B130_2-new_crew/00"
+    },
+    {
+      "case": "2026-10-09-B57_2-faulty_service.json",
+      "plan": "candidate_2",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-B57_2-faulty_service/02"
+    },
+    {
+      "case": "2026-10-12-B231_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B231_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-16-B232_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-B232_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-12-NW-V126-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V126-coverage/02"
+    },
+    {
+      "case": "2026-10-08-B265_1-faulty_service.json",
+      "plan": "candidate_2",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B265_1-faulty_service/05"
+    },
+    {
+      "case": "2026-10-13-NW-V083-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V083-coverage/01"
+    },
+    {
+      "case": "2026-10-05-B76_1-faulty_service.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B76_1-faulty_service/03"
+    },
+    {
+      "case": "2026-10-06-NW-V156-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V156-coverage/03"
+    },
+    {
+      "case": "2026-10-15-B54_2-faulty_service.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B54_2-faulty_service/04"
+    },
+    {
+      "case": "2026-10-05-B262_1-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B262_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-07-NW-V039-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V039-coverage/01"
+    },
+    {
+      "case": "2026-10-14-B261_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B261_1-new_crew/02"
+    },
+    {
+      "case": "2026-10-09-B70_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-B70_1-new_bus/04"
+    },
+    {
+      "case": "2026-10-14-NW-V044-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V044-coverage/03"
+    },
+    {
+      "case": "2026-10-14-NW-V044-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V044-coverage/04"
+    },
+    {
+      "case": "2026-10-06-NW-V147-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V147-coverage/01"
+    },
+    {
+      "case": "2026-10-13-B132_2-faulty_service.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B132_2-faulty_service/03"
+    },
+    {
+      "case": "2026-10-07-NW-V156-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V156-coverage/00"
+    },
+    {
+      "case": "2026-10-09-NW-V157-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V157-coverage/02"
+    },
+    {
+      "case": "2026-10-09-NW-V044-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V044-coverage/01"
+    },
+    {
+      "case": "2026-10-09-NW-V044-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V044-coverage/04"
+    },
+    {
+      "case": "2026-10-06-B262_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B262_1-new_crew/04"
+    },
+    {
+      "case": "2026-10-06-NW-V041-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V041-coverage/04"
+    },
+    {
+      "case": "2026-10-08-B57_2-faulty_depot.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B57_2-faulty_depot/05"
+    },
+    {
+      "case": "2026-10-09-B130_1-faulty_service.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-B130_1-faulty_service/03"
+    },
+    {
+      "case": "2026-10-08-NW-V057-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V057-coverage/01"
+    },
+    {
+      "case": "2026-10-12-NW-V074-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V074-coverage/03"
+    },
+    {
+      "case": "2026-10-12-NW-V074-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V074-coverage/04"
+    },
+    {
+      "case": "2026-10-05-NW-V083-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V083-coverage/05"
+    },
+    {
+      "case": "2026-10-09-B262_1-faulty_service.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-B262_1-faulty_service/00"
+    },
+    {
+      "case": "2026-10-16-NW-V070-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V070-coverage/00"
+    },
+    {
+      "case": "2026-10-16-NW-V043-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V043-coverage/01"
+    },
+    {
+      "case": "2026-10-14-B238_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B238_1-new_bus/01"
+    },
+    {
+      "case": "2026-10-14-B238_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B238_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-14-B238_1-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B238_1-new_bus/03"
+    },
+    {
+      "case": "2026-10-14-B238_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B238_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-15-NW-V056-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V056-coverage/04"
+    },
+    {
+      "case": "2026-10-12-NW-V082-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V082-coverage/02"
+    },
+    {
+      "case": "2026-10-05-NW-V148-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V148-coverage/02"
+    },
+    {
+      "case": "2026-10-14-NW-V158-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V158-coverage/04"
+    },
+    {
+      "case": "2026-10-05-B133_1-faulty_service.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B133_1-faulty_service/02"
+    },
+    {
+      "case": "2026-10-09-NW-V045-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V045-coverage/00"
+    },
+    {
+      "case": "2026-10-09-NW-V045-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V045-coverage/05"
+    },
+    {
+      "case": "2026-10-15-B73_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B73_1-new_crew/05"
+    },
+    {
+      "case": "2026-10-07-B132_2-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-B132_2-new_bus/03"
+    },
+    {
+      "case": "2026-10-06-NW-V053-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V053-coverage/05"
+    },
+    {
+      "case": "2026-10-14-NW-V054-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V054-coverage/03"
+    },
+    {
+      "case": "2026-10-06-NW-V055-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V055-coverage/04"
+    },
+    {
+      "case": "2026-10-06-NW-V104-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V104-coverage/00"
+    },
+    {
+      "case": "2026-10-15-B269_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B269_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-15-B269_1-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B269_1-new_bus/03"
+    },
+    {
+      "case": "2026-10-14-NW-V104-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V104-coverage/00"
+    },
+    {
+      "case": "2026-10-09-NW-V118-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V118-coverage/02"
+    },
+    {
+      "case": "2026-10-15-NW-V075-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V075-coverage/00"
+    },
+    {
+      "case": "2026-10-15-NW-V057-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V057-coverage/02"
+    },
+    {
+      "case": "2026-10-09-NW-V112-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V112-coverage/01"
+    },
+    {
+      "case": "2026-10-05-NW-V075-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V075-coverage/04"
+    },
+    {
+      "case": "2026-10-07-NW-V150-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V150-coverage/01"
+    },
+    {
+      "case": "2026-10-07-NW-V150-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V150-coverage/03"
+    },
+    {
+      "case": "2026-10-08-B261_1-sick_crew.json",
+      "plan": "candidate_2",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B261_1-sick_crew/00"
+    },
+    {
+      "case": "2026-10-12-B57_2-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B57_2-new_bus/03"
+    },
+    {
+      "case": "2026-10-06-B73_1-faulty_service.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B73_1-faulty_service/00"
+    },
+    {
+      "case": "2026-10-06-B73_1-faulty_service.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B73_1-faulty_service/05"
+    },
+    {
+      "case": "2026-10-12-NW-V112-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V112-coverage/03"
+    },
+    {
+      "case": "2026-10-05-B231_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B231_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-05-B231_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B231_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-13-B130_1-new_crew.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B130_1-new_crew/04"
+    },
+    {
+      "case": "2026-10-06-B410W_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B410W_1-new_bus/04"
+    },
+    {
+      "case": "2026-10-15-NW-V142-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V142-coverage/04"
+    },
+    {
+      "case": "2026-10-13-B238_1-faulty_service.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B238_1-faulty_service/01"
+    },
+    {
+      "case": "2026-10-16-NW-V050-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V050-coverage/02"
+    },
+    {
+      "case": "2026-10-16-NW-V037-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V037-coverage/05"
+    },
+    {
+      "case": "2026-10-13-NW-V073-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V073-coverage/00"
+    },
+    {
+      "case": "2026-10-13-NW-V073-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V073-coverage/04"
+    },
+    {
+      "case": "2026-10-15-NW-V135-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V135-coverage/00"
+    },
+    {
+      "case": "2026-10-14-B57_1-new_crew.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B57_1-new_crew/00"
+    },
+    {
+      "case": "2026-10-14-B57_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B57_1-new_crew/05"
+    },
+    {
+      "case": "2026-10-09-NW-V057-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V057-coverage/02"
+    },
+    {
+      "case": "2026-10-15-B56_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B56_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-08-B22_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B22_1-new_crew/04"
+    },
+    {
+      "case": "2026-10-05-NW-V063-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V063-coverage/00"
+    },
+    {
+      "case": "2026-10-08-NW-V038-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V038-coverage/00"
+    },
+    {
+      "case": "2026-10-08-B269_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B269_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-08-B269_1-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B269_1-new_bus/04"
+    },
+    {
+      "case": "2026-10-08-B269_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B269_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-14-NW-V122-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V122-coverage/04"
+    },
+    {
+      "case": "2026-10-14-NW-V160-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-NW-V160-coverage/00"
+    },
+    {
+      "case": "2026-10-06-B56_2-faulty_service.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-B56_2-faulty_service/00"
+    },
+    {
+      "case": "2026-10-08-NW-V059-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V059-coverage/03"
+    },
+    {
+      "case": "2026-10-06-NW-V068-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V068-coverage/05"
+    },
+    {
+      "case": "2026-10-13-NW-V070-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V070-coverage/00"
+    },
+    {
+      "case": "2026-10-14-B73_1-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B73_1-new_bus/04"
+    },
+    {
+      "case": "2026-10-14-B73_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B73_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-15-B22_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B22_1-new_crew/00"
+    },
+    {
+      "case": "2026-10-13-NW-V051-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V051-coverage/00"
+    },
+    {
+      "case": "2026-10-13-NW-V051-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V051-coverage/03"
+    },
+    {
+      "case": "2026-10-15-B141_2-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B141_2-new_bus/00"
+    },
+    {
+      "case": "2026-10-08-NW-V080-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V080-coverage/05"
+    },
+    {
+      "case": "2026-10-13-B133_2-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B133_2-new_crew/01"
+    },
+    {
+      "case": "2026-10-09-B141_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-B141_1-new_bus/05"
+    },
+    {
+      "case": "2026-10-13-NW-V075-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V075-coverage/03"
+    },
+    {
+      "case": "2026-10-06-NW-V090-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-06-NW-V090-coverage/05"
+    },
+    {
+      "case": "2026-10-08-B163_2-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B163_2-new_bus/05"
+    },
+    {
+      "case": "2026-10-08-NW-V139-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V139-coverage/00"
+    },
+    {
+      "case": "2026-10-08-NW-V139-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V139-coverage/04"
+    },
+    {
+      "case": "2026-10-07-B269_1-faulty_service.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-B269_1-faulty_service/01"
+    },
+    {
+      "case": "2026-10-07-NW-V145-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V145-coverage/03"
+    },
+    {
+      "case": "2026-10-15-B410G_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-B410G_1-new_crew/03"
+    },
+    {
+      "case": "2026-10-15-NW-V048-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V048-coverage/02"
+    },
+    {
+      "case": "2026-10-13-B159_1-faulty_service.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B159_1-faulty_service/03"
+    },
+    {
+      "case": "2026-10-16-NW-V077-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V077-coverage/01"
+    },
+    {
+      "case": "2026-10-16-B130_1-faulty_service.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-B130_1-faulty_service/05"
+    },
+    {
+      "case": "2026-10-12-B130_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B130_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-16-NW-V052-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V052-coverage/01"
+    },
+    {
+      "case": "2026-10-15-NW-V082-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-15-NW-V082-coverage/04"
+    },
+    {
+      "case": "2026-10-09-NW-V062-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V062-coverage/01"
+    },
+    {
+      "case": "2026-10-09-NW-V062-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-NW-V062-coverage/04"
+    },
+    {
+      "case": "2026-10-12-B262_1-new_bus.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B262_1-new_bus/00"
+    },
+    {
+      "case": "2026-10-12-B262_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B262_1-new_bus/01"
+    },
+    {
+      "case": "2026-10-12-B262_1-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-B262_1-new_bus/03"
+    },
+    {
+      "case": "2026-10-05-NW-V134-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V134-coverage/00"
+    },
+    {
+      "case": "2026-10-05-NW-V134-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V134-coverage/04"
+    },
+    {
+      "case": "2026-10-09-B133_2-faulty_service.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-09-B133_2-faulty_service/03"
+    },
+    {
+      "case": "2026-10-13-NW-V043-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V043-coverage/03"
+    },
+    {
+      "case": "2026-10-05-B57_2-new_bus.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B57_2-new_bus/01"
+    },
+    {
+      "case": "2026-10-05-B57_2-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-B57_2-new_bus/05"
+    },
+    {
+      "case": "2026-10-08-NW-V037-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V037-coverage/00"
+    },
+    {
+      "case": "2026-10-08-NW-V037-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-NW-V037-coverage/03"
+    },
+    {
+      "case": "2026-10-05-NW-V068-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-05-NW-V068-coverage/00"
+    },
+    {
+      "case": "2026-10-08-B141_2-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-08-B141_2-new_bus/02"
+    },
+    {
+      "case": "2026-10-07-NW-V083-coverage.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-07-NW-V083-coverage/01"
+    },
+    {
+      "case": "2026-10-14-B76_1-new_crew.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B76_1-new_crew/01"
+    },
+    {
+      "case": "2026-10-13-B410W_1-new_bus.json",
+      "plan": "candidate_6",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B410W_1-new_bus/02"
+    },
+    {
+      "case": "2026-10-13-B410W_1-new_bus.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-B410W_1-new_bus/03"
+    },
+    {
+      "case": "2026-10-13-NW-V068-coverage.json",
+      "plan": "candidate_5",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-13-NW-V068-coverage/04"
+    },
+    {
+      "case": "2026-10-12-NW-V050-coverage.json",
+      "plan": "candidate_4",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-12-NW-V050-coverage/01"
+    },
+    {
+      "case": "2026-10-14-B163_2-faulty_service.json",
+      "plan": "candidate_2",
+      "expected": "blocked",
+      "actual": "unresolved",
+      "trace": "runs/full-network-1791402973524084804/2026-10-14-B163_2-faulty_service/05"
+    },
+    {
+      "case": "2026-10-16-NW-V065-coverage.json",
+      "plan": "candidate_3",
+      "expected": "blocked",
+      "actual": "eligible",
+      "trace": "runs/full-network-1791402973524084804/2026-10-16-NW-V065-coverage/01"
+    }
+  ],
+  "run_status": "incomplete: HTTP 503; recovered all completed case artifacts after worker drain"
+}

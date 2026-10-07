@@ -1,0 +1,73 @@
+{
+  "reports": [
+    {
+      "name": "depot no cover",
+      "runId": "36ca21a9-7ab0-4481-a98a-cf834598415b",
+      "recommendations": 0,
+      "assessments": 0,
+      "comparisons": 0
+    },
+    {
+      "name": "service rescue unknown",
+      "runId": "5c32ec88-fa99-446d-805b-2206e947f758",
+      "recommendations": 0,
+      "assessments": 0,
+      "comparisons": 0
+    },
+    {
+      "name": "eight confirmed buses with accessibility policy",
+      "runId": "2b94fbb2-90c1-4c01-863f-04aa657249e8",
+      "recommendations": 2,
+      "assessments": 18,
+      "comparisons": 9
+    },
+    {
+      "name": "pending buses cannot satisfy accessibility policy",
+      "runId": "e00d3225-904c-41c4-b494-d03989abfb07",
+      "recommendations": 0,
+      "assessments": 2,
+      "comparisons": 0
+    },
+    {
+      "name": "confirmed new crew",
+      "runId": "38073196-62bd-4804-bc4d-3a547e7083d3",
+      "recommendations": 2,
+      "assessments": 2,
+      "comparisons": 1
+    },
+    {
+      "name": "Maintenance Cover",
+      "runId": "fc18cf62-0a14-46eb-ad4c-2b21b8557cd3",
+      "recommendations": 1,
+      "assessments": 6,
+      "comparisons": 0
+    },
+    {
+      "name": "Festival Allocation",
+      "runId": "168da361-82ad-419d-abd8-1650de39f504",
+      "recommendations": 2,
+      "assessments": 6,
+      "comparisons": 1
+    },
+    {
+      "name": "Evening Hold",
+      "runId": "3b055441-ab6c-4e62-b7a8-c9450e8422bd",
+      "recommendations": 1,
+      "assessments": 6,
+      "comparisons": 0
+    },
+    {
+      "name": "Engineering History Review",
+      "runId": "95adf1f6-becf-47c5-b6f0-5c36da4ea230",
+      "recommendations": 1,
+      "assessments": 6,
+      "comparisons": 0
+    }
+  ],
+  "cancelled": true,
+  "mobile": {
+    "width": 390,
+    "scroll": 390
+  },
+  "pageErrors": []
+}

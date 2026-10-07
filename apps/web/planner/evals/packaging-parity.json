@@ -1,0 +1,6 @@
+{
+  "candidate_packets_compared": 5263,
+  "packet_differences": 0,
+  "admission_differences": [],
+  "note": "Production removes definite occupancy checks for interrupted trips whose recovery preparation time is unknown. Admissions remain identical on the frozen corpus."
+}
