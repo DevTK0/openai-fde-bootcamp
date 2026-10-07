@@ -168,7 +168,7 @@ it("closes removed evidence on refresh and falls back to the new service's route
           },
         ],
       }}
-      selection={{ ...selection, service: "261" }}
+      selection={selection}
     />
   )
   expect(

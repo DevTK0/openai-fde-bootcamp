@@ -19,6 +19,7 @@ import { DashboardProvider } from "@/components/dashboard-provider"
 import { FleetDashboard } from "@/components/fleet-dashboard"
 import { readDashboardData } from "@/lib/dashboard-server"
 import { GET } from "@/app/api/operations/route"
+import { GET as historyGET } from "@/app/api/service-history/route"
 import { GET as planningGET } from "@/app/api/service-planning/route"
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
@@ -45,9 +46,11 @@ beforeAll(() => {
     removeEventListener() {},
   }))
   vi.stubGlobal("fetch", (input: string) =>
-    (input.startsWith("/api/service-planning") ? planningGET : GET)(
-      new Request(new URL(input, "http://localhost"))
-    )
+    (input.startsWith("/api/service-planning")
+      ? planningGET
+      : input.startsWith("/api/service-history")
+        ? historyGET
+        : GET)(new Request(new URL(input, "http://localhost")))
   )
 })
 afterAll(() => {
@@ -132,10 +135,7 @@ describe("SQLite dashboard interactions", () => {
         expect(screen.getByRole("heading", { name })).toBeInTheDocument()
         expect(link).toHaveAttribute("aria-current", "page")
         expect(screen.getAllByRole("link", { current: "page" })).toHaveLength(1)
-        if (
-          group.workspace === "Data" ||
-          ["Passenger queues", "Service reliability"].includes(name)
-        ) {
+        if (group.workspace === "Data" || name === "Service reliability") {
           expect(await screen.findAllByRole("table")).toHaveLength(1)
           expect(
             screen.getByRole("textbox", { name: "Search records" })
@@ -152,6 +152,24 @@ describe("SQLite dashboard interactions", () => {
           expect(
             screen.getByRole("button", { name: "Upload new records" })
           ).toBeInTheDocument()
+        }
+        if (name === "Passenger queues") {
+          expect(
+            await screen.findByRole(
+              "region",
+              { name: "Queue observations by route position and time" },
+              { timeout: 5000 }
+            )
+          ).toBeInTheDocument()
+          expect(
+            screen.getByRole("combobox", { name: "Operating date" })
+          ).toHaveTextContent("2026-10-16")
+          expect(
+            screen.getByRole("combobox", { name: "Queue route" })
+          ).toBeInTheDocument()
+          expect(
+            screen.queryByText("Where queues remain at observation end")
+          ).not.toBeInTheDocument()
         }
         if (name === "Workshop register") {
           expect(
@@ -247,6 +265,12 @@ it("investigates SQLite service evidence, changes assumptions, and replays recor
   const watchlist = await screen.findByRole("table", {
     name: "Service watchlist",
   })
+  expect(await screen.findByText("Queue observations")).toBeInTheDocument()
+  expect(
+    screen.queryByRole("region", {
+      name: "Queue observations by route position and time",
+    })
+  ).not.toBeInTheDocument()
   const serviceRow = within(watchlist)
     .getByRole("button", { name: "Investigate service 132" })
     .closest("tr")!

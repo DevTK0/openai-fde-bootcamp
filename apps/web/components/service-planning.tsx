@@ -8,7 +8,6 @@ import {
 } from "react"
 import { RefreshCw } from "lucide-react"
 import { PlanningTimePicker } from "./planning-time-picker"
-import { QueueObservations } from "./queue-observations"
 import { ReplayPlayer } from "./service-replay/player"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
@@ -439,6 +438,17 @@ function Evidence({
   report: PlanningReport
   selected: ServiceWatch
 }) {
+  const start = planningTime(report.selection.date, report.selection.start),
+    end = planningTime(report.selection.date, report.selection.end)
+  const calls = report.detail.calls.filter(
+    (c) =>
+      c.observed !== null &&
+      c.observed >= start &&
+      c.observed <= end &&
+      report.detail.positions.some(
+        (p) => p.route === c.route && p.order === c.order && p.boarding === 1
+      )
+  )
   return (
     <div className="space-y-5">
       <div className="grid gap-4 md:grid-cols-3">
@@ -483,7 +493,25 @@ function Evidence({
           "Delay minutes": Number(d.minutes.toFixed(2)),
         }))}
       />
-      <QueueObservations detail={report.detail} selection={report.selection} />
+      <EvidenceTable
+        title="Queue observations"
+        columns={[
+          "Call",
+          "Trip",
+          "Route",
+          "Position",
+          "Observation time",
+          "Remaining queue",
+        ]}
+        rows={calls.map((c) => ({
+          Call: c.id,
+          Trip: c.trip,
+          Route: c.route,
+          Position: c.order,
+          "Observation time": timestamp(c.observed),
+          "Remaining queue": c.queue ?? "Unknown",
+        }))}
+      />
       <EvidenceTable
         title="Service-linked maintenance holds"
         columns={["Record", "Vehicle", "Opened", "Confirmed release", "Source"]}

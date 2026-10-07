@@ -1,5 +1,6 @@
 "use client"
 
+import { PassengerQueueObservations } from "./passenger-queue-observations"
 import { DatasetPicker } from "./dataset-picker"
 import { DatasetTable } from "./dataset-table"
 import { useDashboard } from "@/components/dashboard-provider"
@@ -72,7 +73,9 @@ export function OperationsDashboard({
 }) {
   const { operationsManifest: manifest } = useDashboard()
   const [service, setService] = useState("all"),
-    [date, setDate] = useState("all")
+    [date, setDate] = useState(
+      view === "crowding" ? (manifest.dates.at(-1) ?? "") : "all"
+    )
   const request = useReport<OperationsReport>(
     `/api/operations?service=${encodeURIComponent(service)}&date=${encodeURIComponent(date)}`
   )
@@ -101,7 +104,9 @@ export function OperationsDashboard({
           value={date}
           onChange={setDate}
           options={[
-            { value: "all", label: `All ${manifest.dates.length} dates` },
+            ...(view === "reliability"
+              ? [{ value: "all", label: `All ${manifest.dates.length} dates` }]
+              : []),
             ...manifest.dates.map((d) => ({ value: d, label: d })),
           ]}
         />
@@ -237,34 +242,7 @@ export function OperationsDashboard({
                   series={[{ key: "boardings", label: "Boarding events" }]}
                 />
               </div>
-              <DatasetTable
-                source={{
-                  kind: "report",
-                  table: {
-                    id: "queue-hotspots",
-                    title: "Where queues remain at observation end",
-                    file: "Top 20 route-position cohorts · dates summed when all dates are selected · queue_windows.csv + routes.csv + stops.csv",
-                    columns: [
-                      "Service / route",
-                      "Stop position",
-                      "Stop code",
-                      "Location",
-                      "Arrivals",
-                      "Boarded",
-                      "Final remaining",
-                    ],
-                  },
-                  rows: report.hotspots.map((r) => ({
-                    "Service / route": `${r.service} / ${r.route}`,
-                    "Stop position": r.order,
-                    "Stop code": r.stop,
-                    Location: r.name,
-                    Arrivals: r.arrivals,
-                    Boarded: r.boardings,
-                    "Final remaining": r.remaining,
-                  })),
-                }}
-              />
+              <PassengerQueueObservations date={date} service={service} />
             </div>
           )}
         </>

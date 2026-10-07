@@ -17,7 +17,11 @@ import {
   SheetTitle,
 } from "@workspace/ui/components/sheet"
 import { Pick } from "./report-ui"
-import { planningTime, type PlanningReport } from "@/lib/service-planning"
+import {
+  planningTime,
+  type PlanningDetail,
+  type PlanningSelection,
+} from "@/lib/service-planning"
 
 const clock = (at: number) =>
   new Date(at * 1000).toLocaleTimeString("en-GB", {
@@ -32,7 +36,10 @@ const count = (value: number | null | undefined) =>
 export function QueueObservations({
   detail,
   selection,
-}: Pick<PlanningReport, "detail" | "selection">) {
+}: {
+  detail: PlanningDetail
+  selection: Pick<PlanningSelection, "date" | "start" | "end" | "queue">
+}) {
   const [routeId, setRouteId] = useState(detail.routes[0]?.id ?? "")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const route = detail.routes.find((r) => r.id === routeId) ?? detail.routes[0]
@@ -113,7 +120,9 @@ export function QueueObservations({
                       className="absolute top-3 -translate-x-1/2 text-[11px] text-muted-foreground tabular-nums first:translate-x-0 last:-translate-x-full"
                       style={{ left: left(t) }}
                     >
-                      {clock(t).slice(0, 5)}
+                      {t === end && selection.end === "24:00"
+                        ? "24:00"
+                        : clock(t).slice(0, 5)}
                     </span>
                   ))}
                 </div>

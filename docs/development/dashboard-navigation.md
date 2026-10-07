@@ -56,6 +56,6 @@ Data owns raw table browsing, search, filtering, export and record actions. Oper
 
 Analysis tables stay in their reports, including service comparisons, queue hotspots, planning watchlists, candidate evidence and departure timelines. Raw dataset pickers no longer appear below fleet, schedule, maintenance, workshop, festival, incident or cost views. The navigation test checks this separation and preserves direct links and browser history.
 
-Resource overview has been removed. Crew, readiness, movement and operating requirement source tables remain in Data / Operations data. The Queue observations analysis table is now an interactive dot field under Service optimisation / Dated evidence. Its route selector separates route directions; the service picker selects another service.
+Resource overview has been removed. Crew, readiness, movement and operating requirement source tables remain in Data / Operations data. Passenger queues replaces its queue-hotspots table with the interactive queue-observation dot field. The operating date selects one day, the service filter narrows the route selector, and routes/directions stay separate. Service optimisation retains its dated queue evidence table.
 
 Incident response, Festival allocation and Workshop planning report pages have been removed. Their supplied datasets remain under Data. Service planning is now labeled Service optimisation; the existing `view=service-planning` URL stays valid.
