@@ -25,7 +25,7 @@ and app builds. SQLite is local single-instance storage; a deployed worker needs
 a process supervisor and durable storage.
 
 Configure `OPENAI_API_KEY` and optionally `OPENAI_MODEL` in `apps/.env`. Credentials
-stay on the server. The current configured default is `gpt-5.4-mini`. The agent has
+stay on the server. The current configured default is `gpt-6-luna`. The agent has
 been enabled in this workspace at the user's request. A new database starts with
 it disabled; **Configure OpenAI agent** enables it. When disabled, records remain
 queued; no coded recommendation takes its place. **Ask agent to reassess** creates

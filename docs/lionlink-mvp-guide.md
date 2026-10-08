@@ -16,7 +16,7 @@ at build time.
 
 Provider credentials stay on the server. Set `OPENAI_API_KEY` and `LTA_API_KEY`
 in `apps/.env` or the process environment. Restart after changing credentials.
-`OPENAI_MODEL` optionally overrides the default `gpt-5.4-mini`. The server also
+`OPENAI_MODEL` optionally overrides the default `gpt-6-luna`. The server also
 accepts `LTA_DATAMALL_API_KEY`, `LTA_ACCOUNT_KEY`, or `DATAMALL_API_KEY`. Do not
 use `NEXT_PUBLIC_` for these credentials. Missing or unavailable providers leave
 manual comparison, evidence inspection, and proposal review usable.

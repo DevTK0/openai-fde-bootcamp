@@ -30,7 +30,7 @@ function value(name: string) {
 export function getOpenAIConfig() {
   return {
     apiKey: value("OPENAI_API_KEY"),
-    model: value("OPENAI_MODEL") || "gpt-5.4-mini",
+    model: value("OPENAI_MODEL") || "gpt-6-luna",
   }
 }
 
