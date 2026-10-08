@@ -1,8 +1,17 @@
-import { render, screen, within } from "@testing-library/react"
+import type { ReactNode } from "react"
+import { TooltipProvider } from "@workspace/ui/components/tooltip"
+import {
+  render as renderComponent,
+  screen,
+  within,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
 import { PlanningPlanTimeline } from "@/components/planning-plan-timeline"
 import type { PlanningReport } from "@/lib/planning-schema"
+
+const render = (ui: ReactNode) =>
+  renderComponent(<TooltipProvider>{ui}</TooltipProvider>)
 
 type Calendar = PlanningReport["recommendations"][number]["calendars"][number]
 const at = (clock: string) => `2026-10-05T${clock}+08:00`
@@ -111,6 +120,20 @@ describe("coordinated plan timelines", () => {
     })) {
       expect(block).toHaveClass("bg-muted")
     }
+    const breakBand = screen.getByRole("img", {
+      name: "Crew CREW-2 protected break 12:00 to 12:30",
+    })
+    expect(breakBand).toHaveAttribute("tabindex", "0")
+    for (
+      let tabs = 0;
+      document.activeElement !== breakBand && tabs < 30;
+      tabs++
+    )
+      await user.tab()
+    expect(breakBand).toHaveFocus()
+    expect(
+      await screen.findByText("Crew CREW-2 protected break 12:00 to 12:30")
+    ).toBeVisible()
     await user.click(
       within(screen.getByRole("group", { name: "Plan Crew CREW-2" })).getByRole(
         "button",

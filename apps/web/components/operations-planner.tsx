@@ -54,11 +54,14 @@ function Result({ report }: { report: PlanningReport }) {
   return (
     <section className="space-y-4" aria-label="Planning results">
       <h2 className="text-xl font-semibold">Recommended plans</h2>
+      {report.search.searchLimited && (
+        <p className="text-sm text-muted-foreground">
+          This is a shortlist of evaluated options. Other workable plans may
+          exist.
+        </p>
+      )}
       {report.recommendations.length === 0 ? (
-        <Notice>
-          No supported complete plan was found. Adjust the requirements or
-          choose another situation and try again.
-        </Notice>
+        <Notice>{report.message}</Notice>
       ) : (
         report.recommendations.map((plan, index) => (
           <Card key={plan.id}>

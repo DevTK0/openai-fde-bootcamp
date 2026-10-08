@@ -117,3 +117,7 @@ The Operations planner page now uses the main app sidebar under Planning. It kee
 Native browser verification completed a Toa Payoh bus-withdrawal run with four recommendations, three linked selected trip blocks, no experiment controls, and no overflow at 390 pixels. Sidebar navigation to Crew planning and back worked. Cancelling a new run showed cancellation with no result. The repository check passed with 199 web tests.
 
 The production build also passed for the minimal page.
+
+Review follow-up preserves the source reason when no plan is found and adds one short note that recommendations are a shortlist. Non-action availability and break bands now have named, keyboard-focusable range graphics with visible tooltips. Regression tests first reproduced the missing reason and inaccessible break band, then passed after the fixes. Native browser keyboard focus displayed the protected-break range.
+
+After the review fixes, the repository check passed with 200 web tests and the production build passed.

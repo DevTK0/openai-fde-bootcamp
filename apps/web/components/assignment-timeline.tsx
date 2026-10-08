@@ -3,6 +3,11 @@ import { useEffect, useRef } from "react"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@workspace/ui/components/tooltip"
 import { crewClock } from "@/lib/crew-planning"
 import { serviceColor } from "./service-replay/service-color"
 
@@ -171,15 +176,20 @@ export function AssignmentTimeline({
                           {text}
                         </Button>
                       ) : (
-                        <span
-                          key={b.key}
-                          className={className}
-                          style={position(b.start, b.end)}
-                          aria-label={b.label}
-                          title={b.label}
-                        >
-                          {text}
-                        </span>
+                        <Tooltip key={b.key}>
+                          <TooltipTrigger
+                            render={<span role="img" tabIndex={0} />}
+                            className={
+                              className +
+                              " focus-visible:outline-2 focus-visible:outline-ring"
+                            }
+                            style={position(b.start, b.end)}
+                            aria-label={b.label}
+                          >
+                            {text}
+                          </TooltipTrigger>
+                          <TooltipContent>{b.label}</TooltipContent>
+                        </Tooltip>
                       )
                     })}
                     {row.blocks.map((b) =>
