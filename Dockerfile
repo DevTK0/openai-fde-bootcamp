@@ -8,7 +8,7 @@ RUN pnpm install --frozen-lockfile && pnpm build
 FROM node:24.21.0-bookworm-slim
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends nginx python3 \
+    && apt-get install -y --no-install-recommends nginx python3 ca-certificates \
     && rm -rf /var/lib/apt/lists/* /etc/nginx/sites-enabled/default \
     && npm install --global pnpm@12.9.1
 WORKDIR /app
@@ -18,6 +18,7 @@ COPY deploy/start-coolify.sh /usr/local/bin/start-coolify
 RUN chmod +x /usr/local/bin/start-coolify \
     && nginx -t \
     && test -f /app/apps/slides/dist/index.html \
+    && test -s /etc/ssl/certs/ca-certificates.crt \
     && python3 /app/apps/web/planner/cli.py catalog > /dev/null
 
 EXPOSE 3000
