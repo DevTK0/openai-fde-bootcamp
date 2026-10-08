@@ -1,5 +1,8 @@
 import { z } from "zod"
-import { planningAuthorized } from "@/lib/planning-access"
+import {
+  planningAuthorized,
+  planningSessionCookie,
+} from "@/lib/planning-access"
 import { planningRequestSchema } from "@/lib/planning-schema"
 import {
   planningAudit,
@@ -85,7 +88,7 @@ export async function POST(request: Request) {
       "Content-Type": "application/x-ndjson; charset=utf-8",
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
-      "Set-Cookie": `ops-planning-access=${process.env.OPS_PLANNING_ACCESS_KEY}; HttpOnly; Secure; SameSite=Strict; Path=/api/planning; Max-Age=28800`,
+      "Set-Cookie": planningSessionCookie(),
     },
   })
 }

@@ -85,3 +85,9 @@ The current trail was self-reviewed. Independent agent review is unavailable und
 `pnpm check --concurrency=1` passed, including 195 web tests. An earlier run timed out in the planner test while other verification processes competed for CPU. The Python suite then passed alone in 13.5 seconds, and the full check passed on the next run. The production web build passed. Both planner route traces contained the 52 planner and database assets needed by the worker. The catalog loaded from an isolated directory populated only with those traced assets.
 
 All three presets also completed through the live browser, each showing 36 entrants and 19 comparisons. End-to-end times were 23.1, 19.1 and 18.6 seconds in preset order. Audit downloads returned 200. Anonymous planning requests and audit downloads returned 401; authenticated cross-origin planning requests returned 403. A concurrent worker was refused, and cancellation released the lock so the next worker could start. The 390-pixel viewport had no horizontal page overflow or page errors.
+
+### Review follow-up
+
+Automated review identified two session defects and stale UI guidance. The session now contains a random nonce, expiry and HMAC signature instead of the operator key. The server checks the signature and expiry. A regression test first failed because a semicolon-containing key leaked into the cookie. It now verifies cookie-only POST and audit GET, tamper rejection, expiry and rejection of a session token used as a bearer key. Raw-key cookies are rejected.
+
+The README and checked-in `evals/verify-live.mjs` now describe and exercise the three coordinated presets. The verifier passed all three with 36 entrants and 19 comparisons, including cookie-only reuse, audit access, cancellation and mobile layout. Its report is `evals/coordinated-ui-verification.json`. Final repository checks passed with 196 web tests, and the production build passed again. Model inputs were unchanged by this follow-up.

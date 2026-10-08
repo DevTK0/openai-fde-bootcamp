@@ -1,61 +1,71 @@
 # Operations planner
 
-The `/ops-planning` page drafts bus and crew substitutions against the current SQLite database. It supports new buses, new crew, sick crew, depot faults, and in-service faults. Four imported scenarios cover maintenance, festival allocation, evening relief, and Engineering history.
+The `/ops-planning` page compares complete route, bus and crew recovery plans against the current SQLite database. It offers three hypothetical disruptions using existing resources, without adding spares.
+
+| Situation | Withdrawal | Services |
+| --- | --- | --- |
+| Toa Payoh bus withdrawal | NW-V001 after its current trip | 231, 232, 235, 238 |
+| Ang Mo Kio bus withdrawal | NW-V031 after its current trip | 261, 262, 269 |
+| Toa Payoh relief crew sickness | NW-C062 before relief duty | 231, 232, 235, 238 |
+
+All presets use 5 October 2026 at 09:25 Singapore time. They generate 36 complete allocations across 29, 27 and 29 future trips respectively. Earlier and outside-service commitments remain assigned.
 
 ## Run the tool
 
-Use the repository's Node and pnpm versions and Python 3. The planner has no third-party Python dependencies.
+Use the repository's Node and pnpm versions and Python 3 on a Unix-compatible runtime. The planner has no third-party Python dependencies.
 
-Set `OPENAI_API_KEY` in the server environment, or set `OPENAI_ENV_FILE` to a local file containing `OPENAI_API_KEY=...`. Keep that file outside tracked source. The server never sends the key to the browser or saves it in evidence.
+1. Set `OPENAI_API_KEY` in the server environment, or set `OPENAI_ENV_FILE` to a local file containing `OPENAI_API_KEY=...`. Keep that file outside tracked source. The server never sends this key to the browser or saves it in evidence.
+2. Set a separate, high-entropy `OPS_PLANNING_ACCESS_KEY` for operator access.
+3. Run `pnpm --filter web dev` from the repository root. Open the printed HTTPS preview URL at `/ops-planning`.
+4. Choose a situation and enter the operator key in **Planner access key**. The server issues a signed, expiring HttpOnly session cookie. This demo grants one operator capability access to all runs, not per-user ownership.
+5. Optionally add written requirements or change the ranking objective. Select **Compare plans**.
+6. Read each recommendation's complete supplied calendar before using it. **Download run evidence** includes inputs, exclusions, API requests, responses and the report.
 
-Run `pnpm --filter web dev` from the repository root. Open the printed preview URL at `/ops-planning`. The sidebar also links to the planner.
-
-Choose the situation, date, route, and target bus. For onboarding, enter up to eight new resource IDs and their confirmed or pending status. Add written requirements and a ranking objective, then select **Compare plans**. Read each proposal's complete supplied calendar before using it. **Download run evidence** includes the inputs, exclusions, API requests, responses, and report.
-
-`DASHBOARD_DATABASE_PATH` selects another compatible SQLite database. `PYTHON_BIN` selects the Python executable. `OPS_PLANNING_RUNS_DIR` selects the audit directory, which defaults to `apps/web/.ops-planning`.
+`DASHBOARD_DATABASE_PATH` selects another compatible SQLite database. `PYTHON_BIN` selects the Python executable. `OPS_PLANNING_RUNS_DIR` selects the writable audit directory, which defaults to `apps/web/.ops-planning`.
 
 ## Planning behavior
 
-The Python engine reads the full resource catalog for the selected operating day. It keeps future commitments and projects the complete schedules of every directly assigned resource into each assessment. It supplies original capacities, qualifications, issued updates, movements, and plain-text policies. Future observed outcomes do not enter advance planning.
+The engine considers all 172 buses and 327 crew profiles for the preset day. A bounded search constructs 36 distinct complete allocations while checking resource availability, capacity, qualifications, task timing and retained commitments. This is not exhaustive allocation search.
 
-Physical availability checks exclude held, absent, unqualified, overlapping, under-capacity, and out-of-window assignments before model calls. The report distinguishes these exclusions from model assessments. Decisions interprets the remaining written requirements and classifies each proposal. Eligible plans enter groups of six. Two advance from each group, and regrouping continues until at most five remain. Decisions orders those finalists. A singleton advances without an API call.
+Decisions assesses each written requirement using the relevant facts. Release, qualification, capacity and availability checks operate on one resource at a time. Identical policy inputs reuse a verdict within the run. The UI reports policy calls separately from cached checks and distinct plans.
 
-The shared engine powers the UI and frozen evaluation runner. Evaluation labels are stored only in the evaluation corpus and never enter model requests. Request hashes protect the saved replay from accidental prompt changes.
+Eligible plans enter groups of three. One advances from each group, leaving 12 survivors and then four finalists. Decisions orders the finalists. With 36 eligible entrants, this makes 19 comparison calls. Singletons advance without an API call. The default objective minimizes changed crew assignments, then changed bus assignments. A custom objective receives the full comparison evidence.
 
-Each request has a separate run directory. Cancellation stops its Python process. SQLite opens in read-only mode. Recommendations do not update rosters or dispatch resources. Failed or refused API responses fail the run instead of fabricating recommendations.
+Each request has a separate audit directory. Only one web-triggered worker may run at a time. Cancellation stops it, and the server enforces a ten-minute timeout. SQLite opens read-only. Recommendations do not update rosters or dispatch resources. Failed or refused API responses fail the run instead of fabricating recommendations.
 
 ## Scope and limits
 
-The source contains 27 tables and 308,628 rows. The catalog includes 6,900 trips, 172 buses, 3,272 crew-day records, 10 dates, 36 route directions, and 40 imported datasets. A single model call receives the relevant evidence, not every raw database row. Historical datasets and duplicated downloads are not extra future availability.
+The database contains 27 tables and 308,628 rows, including 6,900 trips, 172 buses, 3,272 crew-day records, 10 dates, 36 route directions and 40 imported datasets. A model call receives relevant evidence, not every raw row. Historical observations and duplicated downloads do not create future availability.
 
-Network scenarios use the first supplied duty for the selected target and a hypothetical incident overlay. The tool does not yet accept arbitrary incident timestamps or confirmed rescue travel, transfer, and passenger facts. In-service scenarios therefore expose missing recovery evidence rather than invent a rescue departure.
+The UI uses the three fixed exercises above. It does not accept arbitrary incident times or confirmed roadside rescue facts. Withdrawn buses complete their current trip. Crew retain their service qualifications, while buses may move between the selected services when their commitments allow it.
 
-Whole-block substitutions examine the source resource catalog. Sick-crew and depot-fault cases also search per-trip combinations, capped at 512 additional candidates and 50,000 search nodes. Search bounds appear in the report. This is not exhaustive enumeration of every possible allocation. Onboarding profiles inherit a source staging location and declare no other commitments within the entered window. Their confirmation is a scenario assumption, not an external registration check.
+The older onboarding, individual disruption and imported-handout scenarios remain available through the API and historical evaluation corpus. They are not current UI controls. Their prior Astra comparison does not establish Astra performance on the new coordinated scenarios.
 
-Imported scenarios compare six explicit action templates against live source records. They do not solve arbitrary future roster optimization. Conditional allocations retain their release conditions.
-
-The UI currently supports additions only in onboarding scenarios. It does not combine new resource registration with a disruption in one request.
+The six final coordinated trials and eight direct policy controls passed. These cases were used during tuning. Zero observed errors on them does not establish universal correctness. The shortlist is not guaranteed to contain every globally best allocation. See [the delivery record](DELIVERY.md) for the tuning history, timings, evidence and limitations.
 
 ## Verify and evaluate
 
-Run the repository checks with `pnpm check`. The planner tests exercise real database coverage, C900 relief, retained commitments and takeover time, pending resources, duplicate IDs, and singleton advancement.
+Run `pnpm check` for repository checks. Replay the current coordinated trials and controls without API calls:
 
-Replay all frozen workflows without API calls from the repository root:
+```sh
+python3 apps/web/planner/evals/replay_coordinated.py
+```
+
+For new paid Decisions trials, use fresh output directories and configure the OpenAI key:
+
+```sh
+python3 apps/web/planner/evals/coordinated_trials.py --live --seed 71 --output /tmp/new-coordinated-trials
+python3 apps/web/planner/evals/coordinated_controls.py --output /tmp/new-coordinated-controls
+```
+
+`evals/verify-live.mjs` drives all three current presets and makes paid Decisions calls. It checks 36 actual entrants, 19 comparisons, four recommendations, cookie-only session reuse, audit access, cancellation and mobile layout. Pass the preview origin with `--url`. Set `OPS_PLANNING_ACCESS_KEY` or supply its local env-file path with `--env-file`. If Playwright is outside the workspace, pass its installed module entry with `--playwright`. The default report path is `/tmp/planning-ui-verification.json`. Use the native collaborative preview when available; this script is the fallback for a headless environment.
+
+Replay the older 936-workflow corpus without API calls:
 
 ```sh
 python3 apps/web/planner/evals/run.py --output /tmp/planner-replay
 ```
 
-Use a fresh output directory for each run. To make live Decisions calls, configure the key and add `--live`. `--limit 10` runs a network smoke subset plus all four handout cases. For a paired Astra benchmark after a complete live Decisions pass:
-
-```sh
-python3 apps/web/planner/evals/run.py --astra --decisions-gate /tmp/decisions-run/summary.json --output /tmp/astra-run
-```
-
-The Astra adapter uses Responses with `gpt-6-astra` and medium reasoning. Decisions uses `gpt-6-luna`. Both use the same evidence, options, objectives, availability checks, and grouping seeds. Different selections can change later tournament groups.
-
-See [evaluation results](evals/RESULTS.md) for measured results and limitations.
-
-`evals/verify-live.mjs` drives the live UI with Playwright and makes paid Decisions calls. Pass `--url` with the preview origin and, if Playwright is outside the workspace, pass `--playwright` with its installed module entry. Its default report path is `/tmp/planning-ui-verification.json`. Use the native collaborative preview when it is available; this script is the fallback for a headless environment.
+The historical runner supports `--live`, or `--astra --decisions-gate /path/to/live-decisions-summary.json`. That Astra adapter uses Responses with `gpt-6-astra` and medium reasoning. Decisions uses `gpt-6-luna`. See [historical evaluation results](evals/RESULTS.md) for the older comparison. The coordinated runner currently evaluates Decisions only.
 
 API contracts follow the official [Decisions reference](https://developers.openai.com/api/reference/resources/decisions/methods/create) and [Astra model reference](https://developers.openai.com/api/docs/models/gpt-6-astra).

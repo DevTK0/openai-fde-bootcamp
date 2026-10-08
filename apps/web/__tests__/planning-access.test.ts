@@ -16,7 +16,7 @@ describe("planner operator access", () => {
       )
     ).toBe(false)
   })
-  it("accepts the configured operator and an established browser session", () => {
+  it("accepts the configured operator but not a raw key in a cookie", () => {
     vi.stubEnv("OPS_PLANNING_ACCESS_KEY", "test-operator")
     expect(
       planningAuthorized(
@@ -31,6 +31,6 @@ describe("planner operator access", () => {
           headers: { cookie: "ops-planning-access=test-operator" },
         })
       )
-    ).toBe(true)
+    ).toBe(false)
   })
 })
