@@ -7,7 +7,19 @@ A bus breaks down before departure. The nearest spare looks suitable, but its dr
 
 The planning problem is to propose a complete recovery that respects the rest of the operation. It must account for the bus, crew, route, passenger capacity, future assignments, preparation time, breaks, and release conditions. Only then does it make sense to ask which plan is best.
 
-LionLink explores this problem through five situations: a new bus, new crew, sick crew, a faulty bus in the depot, and a faulty bus during service. Its SQLite source also includes imported maintenance, festival, evening-relief, and Engineering records.
+The earlier evaluation explored this problem through five situations: a new bus, new crew, sick crew, a faulty bus in the depot, and a faulty bus during service. Its SQLite source also includes imported maintenance, festival, evening-relief, and Engineering records.
+
+## The shipped planner compares coordinated recovery plans
+
+The main app now offers **Planning → Operations planner**. Its three presets cover a Toa Payoh bus withdrawal, an Ang Mo Kio bus withdrawal, and a sick Toa Payoh relief crew member. All use 5 October 2026 at 09:25 Singapore time.
+
+For the preset day, the engine considers 172 buses and 327 crew profiles. A bounded search constructs 36 complete allocations across the affected services. Decisions checks written requirements through focused policy questions, with identical checks reused within the run. Eligible plans enter groups of three; one advances from each group until four finalists remain. Ordering those finalists brings each preset to 19 comparison calls. A singleton still advances without a comparison.
+
+Each recommendation shows route, bus and crew schedules on one time axis. Purple blocks identify recommended reassignments; grey blocks show existing duties. Selecting a trip highlights it across the schedules. Earlier and later commitments, preparation and protected breaks remain visible. The page keeps the run inputs and visual plans; evaluation details remain in the saved audit.
+
+Six live trials across two grouping orders admitted all 36 plans with no observed eligibility or objective-order errors. This is a finite tuning result, not proof of global optimality or general accuracy. Astra has **not** been rerun on these coordinated presets. The [delivery record](https://github.com/DevTK0/openai-fde-bootcamp/blob/5436857/apps/web/planner/DELIVERY.md) documents this stage.
+
+The rest of this explanation traces the earlier tuning and paired evaluation that led to this design. Its five-situation examples and six-plan tournament groups describe that earlier engine configuration.
 
 ## Why use AI when schedules can be checked in code?
 
@@ -49,7 +61,7 @@ The raw-classifier audit recorded **204 errors in 4,386 completed assessments**,
 
 The largest supported improvement was the change in responsibility between candidate construction and model assessment. Clearer calendars and calculated facts also helped, but the experiments did not isolate each input change in a controlled ablation. We cannot assign a percentage improvement to any individual prompt edit.
 
-## What enters Decisions now
+## What entered Decisions in the paired evaluation
 
 The planner reads the resource catalog for the selected operating day, constructs alternatives, and preserves other supplied commitments. A fault or sickness becomes an explicit scenario overlay, so an earlier release record cannot override the current incident.
 
@@ -58,7 +70,7 @@ The planner reads the resource catalog for the selected operating day, construct
   <img src="/docs/operations-planning/pipeline.svg" alt="The planner constructs complete alternatives, excludes physically unavailable plans in code, uses Decisions to assess written requirements, then compares only eligible plans. Exclusions and model assessments remain separately reported." loading="lazy" />
 </picture>
 
-Each eligibility assessment contains the complete proposed assignments and their supporting evidence. The later tournament receives four main parts:
+In that evaluation, each eligibility assessment contained the complete proposed assignments and their supporting evidence. The later tournament receives four main parts:
 
 | Input                  | Example or purpose                                                                                                                                    |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -91,7 +103,7 @@ C900's duty is the work assigned to C900, not the entire vehicle's day. This dis
 
 ## The tournament compares complete alternatives
 
-Eligible plans enter groups of six. Decisions chooses the best remaining plan, then chooses again after that plan is removed. Two plans advance from each group. If more than five survive, the planner groups them again and repeats. It then orders the finalists with the same detailed evidence.
+The paired evaluation used groups of six eligible plans. Decisions chooses the best remaining plan, then chooses again after that plan is removed. Two plans advance from each group. If more than five survive, the planner groups them again and repeats. It then orders the finalists with the same detailed evidence.
 
 <picture>
   <source media="(max-width: 600px)" srcset="/docs/operations-planning/tournament-mobile.svg" />
@@ -120,7 +132,7 @@ That coverage includes proposals rejected before model calls. It does **not** me
 
 It also does not mean that every possible incident or allocation was tested. The network corpus has 876 cases and 5,263 candidate proposals. Availability checks exclude 4,603 proposals before the model assesses the remaining 660. Thirty additional policy and tournament cases run under two grouping seeds, contributing another 420 assessments and 160 comparisons.
 
-## How the result compares with Astra
+## How the earlier paired result compares with Astra
 
 Astra ran after the final Decisions evaluation passed. Both used the same frozen scenarios, candidate pools, policies, objectives, physical checks, and grouping seeds. All 660 paired core eligibility input strings matched byte-for-byte. Different choices can still cause later tournament groups to differ.
 
@@ -140,11 +152,11 @@ The recorded request-to-response medians were about 0.28 seconds for Decisions c
 
 The earliest prototype comparison was less fair. Astra ranked the candidate pool in one call while Decisions used multiple cluster calls, and the workflows applied different final checks. Agreement with Astra was never a ground-truth correctness measure. The final paired pipeline replaced that comparison.
 
-## What the implemented tool can and cannot conclude
+## What the evaluation can and cannot establish
 
 The resulting tool shares one Python planning engine between the application and the evaluation runner. It reads SQLite without modifying it, preserves an audit of model inputs and outputs, and produces draft proposals. It does not dispatch resources or write a new roster.
 
-Whole-block substitutions examine the supplied resource catalog. Sick-crew and depot-fault cases also search per-trip combinations, bounded at 512 additional candidates and 50,000 search nodes. The result discloses a reached bound. The four imported scenarios compare explicit action templates rather than solving arbitrary future rosters.
+In the earlier evaluation, whole-block substitutions examined the supplied resource catalog. Sick-crew and depot-fault cases also search per-trip combinations, bounded at 512 additional candidates and 50,000 search nodes. The result discloses a reached bound. The four imported scenarios compare explicit action templates rather than solving arbitrary future rosters.
 
 An in-service fault remains a useful boundary case. Without confirmed positioning time, passenger load, and transfer duration, a complete rescue is unsupported. The current tool identifies that gap. It cannot yet accept those missing rescue facts or an arbitrary incident timestamp and produce a fully specified recovery.
 
@@ -161,4 +173,4 @@ The saved artifacts retain the final results and the earlier failures:
 - [Live scenario verification](https://github.com/DevTK0/openai-fde-bootcamp/blob/cdb9562/apps/web/planner/evals/ui-verification.json).
 - [Shared engine and tournament](https://github.com/DevTK0/openai-fde-bootcamp/blob/cdb9562/apps/web/planner/engine.py).
 
-The [planner guide](https://github.com/DevTK0/openai-fde-bootcamp/blob/cdb9562/apps/web/planner/README.md) documents the reproducible evaluation commands. A packaged replay matched 1,240 saved Decisions requests across the 936 network workflows. Replay verifies implementation consistency with those recorded calls; it is not another live accuracy experiment.
+The [planner guide](https://github.com/DevTK0/openai-fde-bootcamp/blob/cdb9562/apps/web/planner/README.md) documents the reproducible evaluation commands. A packaged replay matched 1,240 saved Decisions requests across the 936 network, policy, and tournament workflows. Replay verifies implementation consistency with those recorded calls; it is not another live accuracy experiment.
