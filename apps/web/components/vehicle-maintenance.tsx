@@ -1,3 +1,4 @@
+import { RepairInvestigation } from "./repairs/repair-investigation"
 import { Badge } from "@workspace/ui/components/badge"
 import { Button } from "@workspace/ui/components/button"
 import { crewClock } from "@/lib/crew-planning"
@@ -26,6 +27,14 @@ export function VehicleMaintenance({
           view.
         </p>
       </div>
+      {row.vehicle && (
+        <RepairInvestigation
+          key={`${row.vehicle}/${date}`}
+          vehicle={row.vehicle}
+          date={date}
+          onSelectTrip={onSelectTrip}
+        />
+      )}
       {latest ? (
         <div className="rounded-lg bg-muted p-3 text-sm">
           <h4 className="font-medium">Latest supplied workshop update</h4>

@@ -26,3 +26,15 @@ The detailed asset adds a roughly 4.5 MB download compared with the old box mark
 Run `pnpm --filter web exec vitest run __tests__/service-replay-bus.test.ts`
 to check the actual model's orientation, ground clearance, selection after movement,
 and resource lifetime.
+
+## Repair schematic
+
+`lionlink-maintenance.glb` is the part-labelled asset from the same source commit.
+It is byte-for-byte identical to that branch asset.
+
+SHA-256: `c49b997f846df87bef391ef4b3cb0a401fee98894fdbf422511f3a9515e112d8`.
+
+The manual repair dialog loads this roughly 3.9 MB asset on demand. Its part IDs
+allow door and system-area highlights without changing the route-map asset.
+`RepairModel` owns the scene and disposes its geometry, materials, textures,
+controls, and renderer when closed or replaced.
