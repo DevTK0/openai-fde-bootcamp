@@ -99,3 +99,13 @@ Each recommendation now uses the existing `AssignmentTimeline` from crew and veh
 A separate SVG timeline was discarded after the user requested reuse of the existing app components. The shared component gains optional preparation intervals, selection state, a time marker and automatic horizontal focus. Existing crew and vehicle callers retain their behavior. Structured break and preparation fields come from the same evidence packet used by the planner; this change does not alter model inputs or selection.
 
 Verification used the native collaborative browser with a live Toa Payoh sickness run. It covered crew and bus selection, existing and reassigned trips, keyboard activation, the decision marker, and a 390-pixel viewport with horizontal scrolling confined to the chart. Existing crew and vehicle timelines still open their assignment detail panels. Component tests cover preserved duties, exact preparation gaps, protected breaks and missing timestamps.
+
+## Coordinated recommendation timelines
+
+The coordinated view replaces the single-resource selector above. One shared time axis shows route lanes, buses and crews. Selecting a trip highlights its occurrences across all supplied calendars. The default view contains resources involved in changed assignments and preserves their earlier and later duties. Show full plan reveals all supplied calendars. Route rows describe the displayed resources' trips, not the complete service timetable.
+
+Recommended reassignments use purple, existing duties use grey, and selection uses an outline independently of assignment status. Labels and a legend supplement colour. Concurrent trips share lanes under one route label. Missing counterpart calendars and missing timing remain explicit.
+
+Native browser verification on the saved live sickness report confirmed three linked selections, keyboard activation, expansion from five to 37 rows, distinct computed colours in dark mode, and a 390-pixel page with scrolling confined to the 1600-pixel chart. Existing crew and vehicle timelines still opened their assignment details. Component tests cover linked selection, stable recommendation colours, retained duties, protected breaks, concurrent route lanes, full-plan expansion and incomplete calendars.
+
+The final repository check passed with 199 web tests, and the production web build passed. This UI update reused the existing live report and did not rerun or change model comparisons.

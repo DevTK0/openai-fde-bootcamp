@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { PlanningResourceTimeline } from "@/components/planning-resource-timeline"
+import { PlanningPlanTimeline } from "@/components/planning-plan-timeline"
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -216,7 +216,7 @@ function Result({ report }: { report: PlanningReport }) {
                 <CardDescription>{plan.summary}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <PlanningResourceTimeline
+                <PlanningPlanTimeline
                   calendars={plan.calendars}
                   original={report.affectedTrips}
                   decisionAt={report.decisionAt}

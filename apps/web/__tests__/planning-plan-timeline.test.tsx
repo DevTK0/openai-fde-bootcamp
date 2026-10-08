@@ -1,7 +1,7 @@
-import { render, screen } from "@testing-library/react"
+import { render, screen, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it } from "vitest"
-import { PlanningResourceTimeline } from "@/components/planning-resource-timeline"
+import { PlanningPlanTimeline } from "@/components/planning-plan-timeline"
 import type { PlanningReport } from "@/lib/planning-schema"
 
 type Calendar = PlanningReport["recommendations"][number]["calendars"][number]
@@ -63,45 +63,117 @@ const original = [
   },
 ]
 
-describe("resource timelines", () => {
+describe("coordinated plan timelines", () => {
   it("starts on the reassigned duty and preserves earlier work, breaks and later preparation", async () => {
     const user = userEvent.setup()
     render(
-      <PlanningResourceTimeline
-        calendars={[calendar]}
+      <PlanningPlanTimeline
+        calendars={[
+          calendar,
+          { ...calendar, kind: "bus", resourceId: "BUS-1", break: null },
+        ]}
         original={original}
         decisionAt={at("09:25:00")}
       />
     )
     expect(
-      screen.getByRole("region", { name: "Crew assignment timeline" })
-    ).toHaveAccessibleName("Crew assignment timeline")
+      screen.getByRole("region", { name: "Plan assignment timeline" })
+    ).toHaveAccessibleName("Plan assignment timeline")
     expect(
-      screen.getByRole("button", {
-        name: /Trip CHANGED, service 232, 10:00 to 10:30, Reassigned trip/,
-      })
+      within(screen.getByRole("group", { name: "Plan Crew CREW-2" })).getByRole(
+        "button",
+        {
+          name: /Trip CHANGED, service 232, 10:00 to 10:30, Reassigned trip/,
+        }
+      )
     ).toHaveAttribute("aria-pressed", "true")
     expect(screen.getByText(/Crew SICK-CREW → CREW-2/)).toBeInTheDocument()
     expect(
       screen.getByText(/Preparation 09:58 · Alighting complete 10:30/)
     ).toBeInTheDocument()
     expect(
-      screen.getByText(/Gap until next preparation: 147m 15s/)
+      screen.getAllByText(/Gap until next preparation: 147m 15s/)[0]
     ).toBeInTheDocument()
     expect(
       screen.getByText(/Protected break 12:00 to 12:30\./)
     ).toBeInTheDocument()
+    for (const block of screen.getAllByRole("button", {
+      name: /Trip CHANGED,/,
+    })) {
+      expect(block).toHaveAttribute("aria-pressed", "true")
+      expect(block).toHaveClass("bg-violet-600")
+    }
+    expect(
+      screen.getAllByRole("button", { name: /Trip CHANGED,/ })
+    ).toHaveLength(3)
+    for (const block of screen.getAllByRole("button", {
+      name: /Trip EARLIER,/,
+    })) {
+      expect(block).toHaveClass("bg-muted")
+    }
     await user.click(
-      screen.getByRole("button", { name: /Trip EARLIER, service 232/ })
+      within(screen.getByRole("group", { name: "Plan Crew CREW-2" })).getByRole(
+        "button",
+        { name: /Trip EARLIER, service 232/ }
+      )
     )
+    for (const block of screen.getAllByRole("button", {
+      name: /Trip EARLIER,/,
+    })) {
+      expect(block).toHaveAttribute("aria-pressed", "true")
+    }
+    for (const block of screen.getAllByRole("button", {
+      name: /Trip CHANGED,/,
+    })) {
+      expect(block).toHaveAttribute("aria-pressed", "false")
+      expect(block).toHaveClass("bg-violet-600")
+    }
     expect(screen.getByText("EARLIER")).toBeInTheDocument()
     expect(
-      screen.getByRole("button", { name: /Trip EARLIER, service 232/ })
+      within(screen.getByRole("group", { name: "Plan Crew CREW-2" })).getByRole(
+        "button",
+        { name: /Trip EARLIER, service 232/ }
+      )
     ).toHaveAttribute("aria-pressed", "true")
+  })
+  it("reveals retained resources and keeps concurrent route trips in separate lanes", async () => {
+    const user = userEvent.setup()
+    const extra: Calendar = {
+      ...calendar,
+      resourceId: "CREW-3",
+      tasks: calendar.tasks.map((t) => ({
+        ...t,
+        trip: "OTHER-" + t.trip,
+        crew: "CREW-3",
+      })),
+    }
+    render(
+      <PlanningPlanTimeline
+        calendars={[calendar, extra]}
+        original={original}
+        decisionAt={at("09:25:00")}
+      />
+    )
+    expect(
+      screen.queryByRole("group", { name: "Plan Crew CREW-3" })
+    ).not.toBeInTheDocument()
+    await user.click(screen.getByRole("button", { name: "Show full plan" }))
+    expect(
+      screen.getByRole("group", { name: "Plan Crew CREW-3" })
+    ).toBeInTheDocument()
+    const route = within(screen.getByRole("group", { name: "Plan Route 232" }))
+    const one = route.getByRole("button", { name: /Trip CHANGED,/ })
+    const two = route.getByRole("button", { name: /Trip OTHER-CHANGED,/ })
+    expect(one.style.top).not.toBe(two.style.top)
+    await user.click(two)
+    expect(two).toHaveAttribute("aria-pressed", "true")
+    expect(
+      screen.getByText(/No complete bus calendar is supplied for BUS-1/)
+    ).toBeInTheDocument()
   })
   it("does not invent missing preparation or departure times", () => {
     render(
-      <PlanningResourceTimeline
+      <PlanningPlanTimeline
         calendars={[
           {
             ...calendar,
