@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, expect, it, vi } from "vitest"
 import { z } from "zod"
 import { POST } from "@/app/api/repairs/analyze/route"
 import { repairEvidenceSchema, repairResultSchema } from "@/lib/repairs/schema"
@@ -63,7 +63,13 @@ function provider(output: unknown = analysis) {
     )
   )
 }
+let clock = Date.now()
+beforeEach(() => {
+  clock += 61_000
+  vi.spyOn(Date, "now").mockImplementation(() => clock)
+})
 afterEach(() => {
+  vi.restoreAllMocks()
   vi.unstubAllEnvs()
   vi.unstubAllGlobals()
 })
@@ -215,4 +221,52 @@ it("accepts the HTTPS preview origin behind the app proxy", async () => {
     "x-forwarded-host": "preview.example:8463",
   })
   expect(response.status).toBe(200)
+})
+
+it("rejects oversized body bytes before parsing or calling the provider", async () => {
+  provider()
+  const response = await POST(
+    new Request("http://localhost/api/repairs/analyze", {
+      method: "POST",
+      headers: { origin: "http://localhost" },
+      body: " ".repeat(40_000),
+    })
+  )
+  expect(response.status).toBe(413)
+  expect(vi.mocked(fetch)).not.toHaveBeenCalled()
+})
+it("bounds the shared provider quota even when clients vary forwarded addresses", async () => {
+  provider()
+  for (let index = 0; index < 6; index++)
+    expect(
+      (await submit(input, { "x-forwarded-for": `client-${index}` })).status
+    ).toBe(200)
+  const rejected = await submit(input, { "x-forwarded-for": "another-client" })
+  expect(rejected.status).toBe(429)
+  expect(rejected.headers.get("Retry-After")).toBe("60")
+  expect(vi.mocked(fetch)).toHaveBeenCalledTimes(6)
+  clock += 60_000
+  expect((await submit()).status).toBe(200)
+})
+it("admits at most two concurrent investigations and releases capacity on failure", async () => {
+  provider()
+  const failures: (() => void)[] = []
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(
+      () =>
+        new Promise<Response>((_resolve, reject) => {
+          failures.push(() => reject(new Error("provider disconnected")))
+        })
+    )
+  )
+  const first = submit(),
+    second = submit()
+  await vi.waitFor(() => expect(failures).toHaveLength(2))
+  expect((await submit()).status).toBe(429)
+  for (const fail of failures) fail()
+  expect((await first).status).toBe(502)
+  expect((await second).status).toBe(502)
+  provider()
+  expect((await submit()).status).toBe(200)
 })

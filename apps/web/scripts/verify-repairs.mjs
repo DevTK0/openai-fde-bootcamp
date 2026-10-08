@@ -34,8 +34,10 @@ try {
   page.setDefaultTimeout(30_000)
   page.on("pageerror", (error) => errors.push(error.message))
   let requests = 0
+  let modelLoads = 0
   page.on("request", (request) => {
     if (request.url().endsWith("/api/repairs/analyze")) requests++
+    if (request.url().endsWith("/lionlink-maintenance.glb")) modelLoads++
   })
   if (!live)
     await page.route("**/api/repairs/analyze", async (route) => {
@@ -189,6 +191,11 @@ try {
     "Editing discards stale conclusions"
   )
   assert.equal(requests, 1, "Editing must not rerun analysis")
+  assert.equal(
+    modelLoads,
+    1,
+    "Analysis and report edits must reuse the loaded bus"
+  )
   await dialog.getByRole("button", { name: "Close", exact: true }).click()
   await page.getByRole("button", { name: "Analyze a reported fault" }).click()
   assert.equal(

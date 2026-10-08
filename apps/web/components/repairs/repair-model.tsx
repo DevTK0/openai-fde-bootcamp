@@ -7,6 +7,14 @@ export function RepairModel({ areas }: { areas: RepairArea[] }) {
   const host = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState("Loading bus model…")
   const selection = areas.join(",")
+  const active = useRef<RepairArea[]>(areas)
+  const update = useRef<((areas: RepairArea[]) => void) | null>(null)
+  useEffect(() => {
+    active.current = repairAreaSchema.options.filter((id) =>
+      selection.split(",").includes(id)
+    )
+    update.current?.(active.current)
+  }, [selection])
   useEffect(() => {
     const container = host.current
     if (!container) return
@@ -64,24 +72,25 @@ export function RepairModel({ areas }: { areas: RepairArea[] }) {
           controls.dispose()
           bus?.dispose()
           scene.clear()
+          update.current = null
           renderer.dispose()
+          renderer.forceContextLoss()
           renderer.domElement.remove()
         }
         resize()
         const model = await new GLTFLoader().loadAsync(
           "/assets/lionlink-bus/lionlink-maintenance.glb"
         )
-        bus = new RepairBus(
-          model.scene,
-          repairAreaSchema.options.filter((id) =>
-            selection.split(",").includes(id)
-          )
-        )
+        bus = new RepairBus(model.scene, active.current)
         if (disposed) {
           bus.dispose()
           return
         }
         scene.add(bus)
+        update.current = (areas) => {
+          bus?.setAreas(areas)
+          render()
+        }
         render()
         setStatus("")
       } catch {
@@ -97,7 +106,7 @@ export function RepairModel({ areas }: { areas: RepairArea[] }) {
       disposed = true
       cleanup()
     }
-  }, [selection])
+  }, [])
   return (
     <div className="relative h-64 overflow-hidden rounded-xl border bg-muted/40 sm:h-80">
       <div ref={host} className="h-full w-full" />

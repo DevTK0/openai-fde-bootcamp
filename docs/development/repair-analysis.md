@@ -43,7 +43,13 @@ when WebGL or the model asset cannot load.
 Set `OPENAI_API_KEY` in `apps/web/.env`. `REPAIR_ANALYSIS_MODEL` defaults to
 `gpt-5.6-terra`. The key stays on the server. Analysis uses the Responses API with
 `store: false`, a structured output schema, and a 90-second request timeout. The
-app does not retry automatically or persist investigations. The endpoint checks
+app does not retry automatically or persist investigations. Each server process
+admits at most two concurrent requests and six requests per minute across all
+visitors, regardless of forwarded client addresses. Excess requests return 429.
+Bodies over 32 KiB are rejected before JSON parsing. These bounds limit accidental
+quota consumption; they do not authenticate visitors. The preview relies on its
+private hosting access controls. A public or multi-instance deployment needs
+authentication and a shared quota policy at its gateway. The endpoint checks
 request origin, including the application's forwarded preview host.
 
 ## Design choice
@@ -79,7 +85,8 @@ node apps/web/scripts/verify-repairs.mjs \
 ```
 
 This uses a fixture response and checks the real panel, model, evidence links,
-manual trigger, desktop and mobile layouts, and clearing results on edits.
+manual trigger, desktop and mobile layouts, reusing the loaded model, and clearing
+results on edits.
 Pass `--live` to submit one real report through the server instead. This
 requires a configured API key and incurs a provider request. Screenshots and the
 returned analysis are saved to `.audit/repair-browser` by default.

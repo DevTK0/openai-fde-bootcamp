@@ -37,4 +37,5 @@ SHA-256: `c49b997f846df87bef391ef4b3cb0a401fee98894fdbf422511f3a9515e112d8`.
 The manual repair dialog loads this roughly 3.9 MB asset on demand. Its part IDs
 allow door and system-area highlights without changing the route-map asset.
 `RepairModel` owns the scene and disposes its geometry, materials, textures,
-controls, and renderer when closed or replaced.
+controls, and renderer when closed. Highlight changes reuse the scene and its
+materials; they do not fetch or parse the model again.

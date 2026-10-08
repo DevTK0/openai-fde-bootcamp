@@ -77,5 +77,32 @@ it("highlights only the selected centre door despite shared source materials", a
       ).toEqual(baseline.get(object.uuid))
   })
   expect(highlighted).toBe(5)
+  const materials = new Set<THREE.Material>()
+  bus.traverse((object) => {
+    if (object instanceof THREE.Mesh)
+      for (const material of [object.material].flat()) materials.add(material)
+  })
+  bus.setAreas(["roof_ac"])
+  bus.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return
+    for (const material of [object.material].flat()) {
+      expect(materials.has(material)).toBe(true)
+      if (
+        object.userData.part_id === "roof_ac" &&
+        material instanceof THREE.MeshStandardMaterial
+      )
+        expect(material.emissive.getHex()).toBe(0xff8c32)
+    }
+  })
+  bus.setAreas([])
+  bus.traverse((object) => {
+    if (object instanceof THREE.Mesh)
+      expect(
+        [object.material]
+          .flat()
+          .filter((m) => m instanceof THREE.MeshStandardMaterial)
+          .map((m) => m.emissive.getHex())
+      ).toEqual(baseline.get(object.uuid))
+  })
   bus.dispose()
 })
