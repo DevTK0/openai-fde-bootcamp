@@ -94,11 +94,11 @@ export function RepairModel({ areas }: { areas: RepairArea[] }) {
         render()
         setStatus("")
       } catch {
+        if (disposed) return
         cleanup()
-        if (!disposed)
-          setStatus(
-            "3D view unavailable. Repair area descriptions and evidence remain available below."
-          )
+        setStatus(
+          "3D view unavailable. Repair area descriptions and evidence remain available below."
+        )
       }
     }
     void load()
