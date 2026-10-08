@@ -10,6 +10,35 @@ from packet import candidate_packet
 
 
 class PlannerTests(unittest.TestCase):
+    def test_coordinated_complete_allocations(self):
+        import sys
+
+        sys.path.insert(0, str(Path(__file__).parent / "evals"))
+        from coordinated import PRESETS, coordinated_case, generate_coordinated
+        from coordinated_oracle import evaluate
+        import copy
+
+        for key in PRESETS:
+            case = coordinated_case(key)
+            evidence, search = generate_coordinated(case)
+            plans = evidence["evidence"]["candidate_plans"]
+            self.assertEqual(len(plans), 36)
+            self.assertEqual(search["resourcesConsidered"]["buses"], 172)
+            self.assertGreaterEqual(
+                len({a["route"] for a in plans[0]["assignments"]}), 3
+            )
+            self.assertGreater(
+                len({tuple(a["crew"] for a in p["assignments"]) for p in plans}), 10
+            )
+            for plan in plans:
+                self.assertEqual(evaluate(case, plan)["status"], "feasible")
+            bad = copy.deepcopy(plans[0])
+            bad["assignments"][0]["crew"] = "NW-C001"
+            self.assertEqual(evaluate(case, bad)["status"], "invalid")
+            bad = copy.deepcopy(plans[0])
+            bad["assignments"].pop()
+            self.assertEqual(evaluate(case, bad)["status"], "invalid")
+
     def test_catalog_covers_source(self):
         data = catalog()
         self.assertEqual(

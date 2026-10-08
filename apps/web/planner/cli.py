@@ -1,4 +1,5 @@
 import json
+import fcntl
 import os
 import sys
 import uuid
@@ -79,15 +80,27 @@ def main():
         return
     request = json.load(sys.stdin)
     ident = str(uuid.uuid4())
-    directory = (
-        Path(
-            os.environ.get(
-                "OPS_PLANNING_RUNS_DIR",
-                Path(__file__).resolve().parent.parent / ".ops-planning",
-            )
+    run_root = Path(
+        os.environ.get(
+            "OPS_PLANNING_RUNS_DIR",
+            Path(__file__).resolve().parent.parent / ".ops-planning",
         )
-        / ident
     )
+    run_root.mkdir(parents=True, exist_ok=True)
+    lock = (run_root / ".worker.lock").open("a")
+    try:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        lock.close()
+        emit(
+            {
+                "type": "error",
+                "runId": ident,
+                "message": "Another planning run is active. Wait for it to finish before starting another.",
+            }
+        )
+        sys.exit(1)
+    directory = run_root / ident
     directory.mkdir(parents=True)
     (directory / "input.json").write_text(json.dumps(request, indent=2))
 
@@ -105,6 +118,8 @@ def main():
                     "Choose an operating date and route from the source database."
                 )
             report = network(request, directory, progress)
+        elif request["kind"] == "coordinated":
+            report = network(request, directory, progress)
         elif request["kind"] == "handout":
             report = handout(request, directory, progress)
         else:
@@ -121,6 +136,8 @@ def main():
         (directory / "error.json").write_text(json.dumps({"message": message}))
         emit({"type": "error", "runId": ident, "message": message})
         sys.exit(1)
+    finally:
+        lock.close()
 
 
 if __name__ == "__main__":

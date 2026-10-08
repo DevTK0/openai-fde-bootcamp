@@ -1,0 +1,157 @@
+{
+  "databaseSha256": "a2bc78bbe14d19589b94de411120c2ff4e55e21667e5ae3cc1947dc46ad2a1b2",
+  "trials": [
+    {
+      "trial": "coordinated-v15",
+      "scenario": "toa_bus",
+      "generatedPlans": 36,
+      "eligibleEntrants": 36,
+      "comparisonCalls": 19,
+      "policyCalls": 30,
+      "secondsExcludingGeneration": 16.143560075000096,
+      "crewAllocationVariants": 26,
+      "busAllocationVariants": 35,
+      "recommended": [
+        "plan_31",
+        "plan_34",
+        "plan_13",
+        "plan_22"
+      ]
+    },
+    {
+      "trial": "coordinated-v15",
+      "scenario": "amk_bus",
+      "generatedPlans": 36,
+      "eligibleEntrants": 36,
+      "comparisonCalls": 19,
+      "policyCalls": 29,
+      "secondsExcludingGeneration": 14.394446717999926,
+      "crewAllocationVariants": 27,
+      "busAllocationVariants": 36,
+      "recommended": [
+        "plan_4",
+        "plan_25",
+        "plan_34",
+        "plan_16"
+      ]
+    },
+    {
+      "trial": "coordinated-v15",
+      "scenario": "toa_crew",
+      "generatedPlans": 36,
+      "eligibleEntrants": 36,
+      "comparisonCalls": 19,
+      "policyCalls": 26,
+      "secondsExcludingGeneration": 13.91086118599992,
+      "crewAllocationVariants": 32,
+      "busAllocationVariants": 29,
+      "recommended": [
+        "plan_10",
+        "plan_30",
+        "plan_13",
+        "plan_33"
+      ]
+    },
+    {
+      "trial": "coordinated-repeat-71",
+      "scenario": "toa_bus",
+      "generatedPlans": 36,
+      "eligibleEntrants": 36,
+      "comparisonCalls": 19,
+      "policyCalls": 30,
+      "secondsExcludingGeneration": 16.67295997200017,
+      "crewAllocationVariants": 26,
+      "busAllocationVariants": 35,
+      "recommended": [
+        "plan_4",
+        "plan_34",
+        "plan_31",
+        "plan_7"
+      ]
+    },
+    {
+      "trial": "coordinated-repeat-71",
+      "scenario": "amk_bus",
+      "generatedPlans": 36,
+      "eligibleEntrants": 36,
+      "comparisonCalls": 19,
+      "policyCalls": 29,
+      "secondsExcludingGeneration": 15.832798816999912,
+      "crewAllocationVariants": 27,
+      "busAllocationVariants": 36,
+      "recommended": [
+        "plan_13",
+        "plan_4",
+        "plan_25",
+        "plan_34"
+      ]
+    },
+    {
+      "trial": "coordinated-repeat-71",
+      "scenario": "toa_crew",
+      "generatedPlans": 36,
+      "eligibleEntrants": 36,
+      "comparisonCalls": 19,
+      "policyCalls": 26,
+      "secondsExcludingGeneration": 14.256812129000082,
+      "crewAllocationVariants": 32,
+      "busAllocationVariants": 29,
+      "recommended": [
+        "plan_10",
+        "plan_30",
+        "plan_1",
+        "plan_7"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "name": "valid",
+      "expected": "eligible",
+      "actual": "eligible",
+      "reason": ""
+    },
+    {
+      "name": "held_bus",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "NW-PC02=blocked"
+    },
+    {
+      "name": "capacity",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "NW-PC02=blocked, NW-PC03=blocked"
+    },
+    {
+      "name": "qualification",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "NW-PC02=blocked"
+    },
+    {
+      "name": "overlap",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "NW-PC03=blocked"
+    },
+    {
+      "name": "break",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "NW-PC04=blocked"
+    },
+    {
+      "name": "duty",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "NW-PC04=blocked"
+    },
+    {
+      "name": "wheelchair_policy",
+      "expected": "blocked",
+      "actual": "blocked",
+      "reason": "SCENARIO-OPERATOR=blocked"
+    }
+  ]
+}

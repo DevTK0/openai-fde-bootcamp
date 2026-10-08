@@ -39,7 +39,6 @@ import {
 } from "@workspace/ui/components/table"
 import { Pick, Metric, Notice } from "@/components/report-ui"
 import {
-  networkScenarioSchema,
   planningEventSchema,
   planningRequestSchema,
   type PlanningCatalog,
@@ -53,12 +52,19 @@ type RunState =
   | { kind: "error"; message: string }
   | { kind: "cancelled" }
 const scenarios = [
-  { value: "sick_crew", label: "Sick crew" },
-  { value: "faulty_depot", label: "Faulty bus in depot" },
-  { value: "faulty_service", label: "Faulty bus during service" },
-  { value: "new_bus", label: "New bus" },
-  { value: "new_crew", label: "New crew" },
+  { value: "toa_bus", label: "Toa Payoh bus withdrawal" },
+  { value: "amk_bus", label: "Ang Mo Kio bus withdrawal" },
+  { value: "toa_crew", label: "Toa Payoh relief crew sickness" },
 ]
+const descriptions: Record<string, string> = {
+  toa_bus:
+    "5 October 2026, 09:25. Withdraw NW-V001 after its current trip. Reallocate later trips across routes 231, 232, 235 and 238 using listed buses and qualified crews.",
+  amk_bus:
+    "5 October 2026, 09:25. Withdraw NW-V031 after its current trip. Reallocate later trips across routes 261, 262 and 269 using listed buses and qualified crews.",
+  toa_crew:
+    "5 October 2026, 09:25. NW-C062 is sick before relief duty. Reallocate later trips across routes 231, 232, 235 and 238, including the uncovered route 232 duty.",
+}
+
 function clock(value: string | null) {
   if (!value) return "Not established"
   const date = new Date(value)
@@ -144,9 +150,20 @@ function Result({ report }: { report: PlanningReport }) {
           detail="Deterministic checks before model calls"
         />
         <Metric
-          title="Policy assessments"
+          title="Plans screened"
           value={report.assessments.length.toLocaleString()}
-          detail="Decisions API eligibility checks"
+          detail={
+            report.policyEvaluation
+              ? `${report.policyEvaluation.apiCalls} policy calls; ${report.policyEvaluation.reusedChecks} identical checks reused`
+              : "Written requirements assessed by Decisions"
+          }
+        />
+        <Metric
+          title="Tournament entrants"
+          value={report.assessments
+            .filter((a) => a.status === "eligible")
+            .length.toLocaleString()}
+          detail="Distinct complete plans approved for comparison"
         />
         <Metric
           title="Comparison calls"
@@ -285,7 +302,14 @@ function Result({ report }: { report: PlanningReport }) {
               {report.assessments.map((a) => (
                 <TableRow key={a.id}>
                   <TableCell>{a.id}</TableCell>
-                  <TableCell>{a.status}</TableCell>
+                  <TableCell>
+                    {a.status}
+                    {a.reason && (
+                      <span className="block text-xs text-muted-foreground">
+                        {a.reason}
+                      </span>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -369,79 +393,25 @@ function Result({ report }: { report: PlanningReport }) {
 }
 
 export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
-  const [scenario, setScenario] = useState("sick_crew")
-  const [date, setDate] = useState(
-    catalog.dates.includes("2026-10-07")
-      ? "2026-10-07"
-      : (catalog.dates[0] ?? "")
-  )
-  const [route, setRoute] = useState(
-    catalog.routes.find((r) => r.id === "B235_1")?.id ??
-      catalog.routes[0]?.id ??
-      ""
-  )
-  const [vehicle, setVehicle] = useState("")
+  const [scenario, setScenario] = useState("toa_bus")
+  const [accessKey, setAccessKey] = useState("")
   const [requirements, setRequirements] = useState("")
   const [objective, setObjective] = useState("")
-  const [resourceIds, setResourceIds] = useState("NEW-001")
-  const [confirmation, setConfirmation] = useState("pending")
-  const [capacity, setCapacity] = useState("128")
-  const [wheelchairs, setWheelchairs] = useState("2")
-  const [qualification, setQualification] = useState("")
-  const [availableFrom, setAvailableFrom] = useState("05:30")
-  const [availableUntil, setAvailableUntil] = useState("16:00")
   const [state, setState] = useState<RunState>({ kind: "idle" })
   const abort = useRef<AbortController | null>(null)
   useEffect(() => () => abort.current?.abort(), [])
-  const network = networkScenarioSchema.safeParse(scenario).success
-  const onboarding = scenario === "new_bus" || scenario === "new_crew"
   const busy = state.kind === "running"
-  const currentRoute = catalog.routes.find((r) => r.id === route)
   function reset() {
     setState({ kind: "idle" })
   }
   async function submit(event: React.FormEvent) {
     event.preventDefault()
-    const resources = onboarding
-      ? resourceIds
-          .split(",")
-          .map((id) => id.trim())
-          .filter(Boolean)
-          .map((id) =>
-            scenario === "new_bus"
-              ? {
-                  kind: "bus",
-                  id,
-                  confirmed: confirmation === "confirmed",
-                  availableFrom,
-                  availableUntil,
-                  capacity: Number(capacity),
-                  wheelchairSpaces: Number(wheelchairs),
-                }
-              : {
-                  kind: "crew",
-                  id,
-                  confirmed: confirmation === "confirmed",
-                  availableFrom,
-                  availableUntil,
-                  qualification: qualification || currentRoute?.service || "",
-                }
-          )
-      : []
-    const parsed = planningRequestSchema.safeParse(
-      network
-        ? {
-            kind: "network",
-            scenario,
-            date,
-            route,
-            vehicle,
-            resources,
-            requirements,
-            objective,
-          }
-        : { kind: "handout", scenario, requirements, objective }
-    )
+    const parsed = planningRequestSchema.safeParse({
+      kind: "coordinated",
+      scenario,
+      requirements,
+      objective,
+    })
     if (!parsed.success)
       return setState({
         kind: "error",
@@ -456,7 +426,10 @@ export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
     try {
       const response = await fetch("/api/planning", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessKey ? { Authorization: `Bearer ${accessKey}` } : {}),
+        },
         body: JSON.stringify(parsed.data),
         signal: controller.signal,
       })
@@ -559,8 +532,9 @@ export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
             <CardHeader>
               <CardTitle>Planning situation</CardTitle>
               <CardDescription>
-                All times are Singapore time. Network scenarios cover the
-                selected resource's remaining supplied duty.
+                All times are Singapore time. Compare complete route, bus and
+                crew allocations. These hypothetical disruptions use existing
+                SQLite resources without adding spares.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -569,174 +543,29 @@ export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
                 <Pick
                   label="Situation"
                   value={scenario}
-                  options={[
-                    ...scenarios,
-                    ...catalog.importedScenarios.map((s) => ({
-                      value: s.id,
-                      label: s.title,
-                    })),
-                  ]}
+                  options={scenarios}
                   onChange={(value) => {
                     setScenario(value)
                     reset()
                   }}
                 />
               </div>
-              {network ? (
-                <>
-                  <div className="space-y-2">
-                    <Label>Operating date</Label>
-                    <Pick
-                      label="Operating date"
-                      value={date}
-                      options={catalog.dates.map((value) => ({
-                        value,
-                        label: value,
-                      }))}
-                      onChange={(value) => {
-                        setDate(value)
-                        reset()
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Route direction</Label>
-                    <Pick
-                      label="Route direction"
-                      value={route}
-                      options={catalog.routes.map((r) => ({
-                        value: r.id,
-                        label: `${r.service} · ${r.id}`,
-                      }))}
-                      onChange={(value) => {
-                        setRoute(value)
-                        setVehicle("")
-                        reset()
-                      }}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Target bus</Label>
-                    <Pick
-                      label="Target bus"
-                      value={vehicle}
-                      options={[
-                        { value: "", label: "First planned bus on route" },
-                        ...catalog.vehicles
-                          .filter((v) => v.routes.includes(route))
-                          .map((v) => ({ value: v.id, label: v.id })),
-                      ]}
-                      onChange={(value) => {
-                        setVehicle(value)
-                        reset()
-                      }}
-                    />
-                  </div>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground sm:col-span-1 lg:col-span-3">
-                  {
-                    catalog.importedScenarios.find((s) => s.id === scenario)
-                      ?.objective
-                  }
-                </p>
-              )}
+              <p className="text-sm text-muted-foreground sm:col-span-1 lg:col-span-3">
+                {descriptions[scenario]}
+              </p>
             </CardContent>
           </Card>
-          {onboarding && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Additional resources in this scenario</CardTitle>
-                <CardDescription>
-                  New profiles use the selected source resource's staging
-                  location and have no other commitments within the stated
-                  window. These are hypothetical additions to the read-only
-                  dataset.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="space-y-2">
-                  <Label htmlFor="resource-ids">
-                    {scenario === "new_bus" ? "New bus IDs" : "New crew IDs"}
-                  </Label>
-                  <Input
-                    id="resource-ids"
-                    value={resourceIds}
-                    onChange={(e) => setResourceIds(e.target.value)}
-                    placeholder="Comma-separated IDs, up to eight"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Resource status</Label>
-                  <Pick
-                    label="Resource status"
-                    value={confirmation}
-                    options={[
-                      { value: "pending", label: "Pending checks" },
-                      { value: "confirmed", label: "Confirmed in scenario" },
-                    ]}
-                    onChange={(value) => {
-                      setConfirmation(value)
-                      reset()
-                    }}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="available-from">Available from</Label>
-                    <Input
-                      id="available-from"
-                      type="time"
-                      value={availableFrom}
-                      onChange={(e) => setAvailableFrom(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="available-until">Available until</Label>
-                    <Input
-                      id="available-until"
-                      type="time"
-                      value={availableUntil}
-                      onChange={(e) => setAvailableUntil(e.target.value)}
-                    />
-                  </div>
-                </div>
-                {scenario === "new_bus" ? (
-                  <>
-                    <div className="space-y-2">
-                      <Label htmlFor="capacity">Passenger capacity</Label>
-                      <Input
-                        id="capacity"
-                        type="number"
-                        min={1}
-                        value={capacity}
-                        onChange={(e) => setCapacity(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="wheelchairs">Wheelchair spaces</Label>
-                      <Input
-                        id="wheelchairs"
-                        type="number"
-                        min={0}
-                        value={wheelchairs}
-                        onChange={(e) => setWheelchairs(e.target.value)}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="space-y-2">
-                    <Label htmlFor="qualification">Qualified service</Label>
-                    <Input
-                      id="qualification"
-                      value={qualification || currentRoute?.service || ""}
-                      onChange={(e) => setQualification(e.target.value)}
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
+          <div className="max-w-sm space-y-2">
+            <Label htmlFor="planner-access">Planner access key</Label>
+            <Input
+              id="planner-access"
+              type="password"
+              autoComplete="off"
+              value={accessKey}
+              onChange={(e) => setAccessKey(e.target.value)}
+              placeholder="Required for your first run in this browser"
+            />
+          </div>
           <Card>
             <CardHeader>
               <CardTitle>Operating requirements</CardTitle>
@@ -764,7 +593,7 @@ export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
                   rows={4}
                   value={objective}
                   onChange={(e) => setObjective(e.target.value)}
-                  placeholder="Default: preserve all commitments and prefer fewer changed assignments. Or prioritize wheelchair capacity before the number of changes."
+                  placeholder="Default: minimize changed crew assignments, then changed bus assignments. You can change that priority here."
                 />
               </div>
               <div className="lg:col-span-2">
@@ -779,38 +608,24 @@ export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
                   </TabsList>
                   <TabsContent value="summary">
                     <p className="text-sm text-muted-foreground">
-                      {network
-                        ? "Listed resources, full route coverage, turnaround, qualifications, protected breaks, duty limits and information known at the decision time."
-                        : "The selected imported scenario supplies its own operating and release conditions. Every relevant source row is included in the assessment."}
+                      Listed resources, complete route coverage, turnaround,
+                      qualifications, protected breaks, duty limits and
+                      information known at the decision time.
                     </p>
                   </TabsContent>
                   <TabsContent value="policies" className="space-y-3">
-                    {network ? (
-                      catalog.policies.map((policy) => (
-                        <p key={policy.id} className="text-sm">
-                          <span className="font-medium">{policy.id}. </span>
-                          {policy.requirement}
-                        </p>
-                      ))
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Run evidence includes the imported source tables and
-                        their complete requirement notes.
+                    {catalog.policies.map((policy) => (
+                      <p key={policy.id} className="text-sm">
+                        <span className="font-medium">{policy.id}. </span>
+                        {policy.requirement}
                       </p>
-                    )}
+                    ))}
                   </TabsContent>
                 </Tabs>
               </div>
             </CardContent>
           </Card>
-          <Button
-            type="submit"
-            disabled={
-              !catalog.keyConfigured ||
-              !scenario ||
-              (network && (!date || !route))
-            }
-          >
+          <Button type="submit" disabled={!catalog.keyConfigured || !scenario}>
             <Play />
             Compare plans
           </Button>

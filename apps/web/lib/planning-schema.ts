@@ -7,6 +7,11 @@ export const networkScenarioSchema = z.enum([
   "faulty_depot",
   "faulty_service",
 ])
+export const coordinatedScenarioSchema = z.enum([
+  "toa_bus",
+  "amk_bus",
+  "toa_crew",
+])
 const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/)
 const resourceBase = {
   id: z.string().trim().min(1).max(80),
@@ -32,6 +37,11 @@ const policyFields = {
   objective: z.string().max(2000).default(""),
 }
 export const planningRequestSchema = z.discriminatedUnion("kind", [
+  z.object({
+    ...policyFields,
+    kind: z.literal("coordinated"),
+    scenario: coordinatedScenarioSchema,
+  }),
   z
     .object({
       ...policyFields,
@@ -149,8 +159,12 @@ export const planningReportSchema = z.object({
     z.object({
       id: z.string(),
       status: z.enum(["eligible", "conditional", "blocked", "unresolved"]),
+      reason: z.string().optional(),
     })
   ),
+  policyEvaluation: z
+    .object({ apiCalls: z.number(), reusedChecks: z.number() })
+    .optional(),
   physicalExclusions: z.array(
     z.object({
       id: z.string(),

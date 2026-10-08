@@ -7,6 +7,13 @@ from pathlib import Path
 from availability import unavailable_reasons
 from candidates import build_case, generate
 from catalog import Catalog
+from coordinated import (
+    DEFAULT_OBJECTIVE,
+    PRESETS,
+    coordinated_case,
+    generate_coordinated,
+    decision_view,
+)
 from packet import candidate_packet
 from provider import decide
 
@@ -30,7 +37,7 @@ def choose(packet, instructions, choices, directory):
     )[0]["choice"]
 
 
-def tournament(ids, compare, progress):
+def tournament(ids, compare, progress, group_size=6, advance=2):
     rounds = []
 
     def rank(remaining, keep, phase):
@@ -56,8 +63,10 @@ def tournament(ids, compare, progress):
     while len(survivors) > 5:
         survivors = [
             ident
-            for start in range(0, len(survivors), 6)
-            for ident in rank(survivors[start : start + 6], 2, f"Round {level}")
+            for start in range(0, len(survivors), group_size)
+            for ident in rank(
+                survivors[start : start + group_size], advance, f"Round {level}"
+            )
         ]
         level += 1
     return rank(survivors, 5, "Final order"), rounds
@@ -84,6 +93,28 @@ def compare_network(case, packets, remaining, directory, chooser=choose):
             for alias, ident in aliases.items()
         },
     }
+    if (
+        case["id"] in PRESETS
+        and case["evidence"]["scenario"]["objective"] == DEFAULT_OBJECTIVE
+    ):
+        data["plans"] = {
+            alias: {
+                "capacity_arithmetic": decision_view(packets[ident])[
+                    "capacity_arithmetic"
+                ],
+                "crew_changes": packets[ident]["proposal"]["crew_changes"],
+                "bus_changes": packets[ident]["proposal"]["bus_changes"],
+                "allocation_columns": ["trip_id", "route", "bus", "crew"],
+                "allocations": [
+                    [a[k] for k in ["trip_id", "route", "bus", "crew"]]
+                    for a in packets[ident]["proposal"]["assignments"]
+                ],
+            }
+            for alias, ident in aliases.items()
+        }
+        data["comparison_scope"] = (
+            "Every plan has already passed policy eligibility. Apply the requested objective. The crew_changes and bus_changes counts compare the complete proposed allocation to the original roster. Ties are allowed. Full feasibility evidence was assessed separately."
+        )
     choices = [
         {
             "value": alias,
@@ -91,7 +122,27 @@ def compare_network(case, packets, remaining, directory, chooser=choose):
         }
         for alias, ident in aliases.items()
     ]
-    return aliases[chooser(data, RANK_INSTRUCTIONS, choices, directory)]
+    if case["id"] in PRESETS:
+        choices = [
+            {
+                "value": alias,
+                "description": f"Changed crew assignments: {packets[ident]['proposal']['crew_changes']}. Changed bus assignments: {packets[ident]['proposal']['bus_changes']}.",
+            }
+            for alias, ident in aliases.items()
+        ]
+    return aliases[
+        chooser(
+            data,
+            RANK_INSTRUCTIONS
+            + (
+                " Follow the objective priority order exactly. When it says minimize crew changes then bus changes, compare crew_changes first and use bus_changes only to break a tie. Do not add those counts together."
+                if case["id"] in PRESETS
+                else ""
+            ),
+            choices,
+            directory,
+        )
+    ]
 
 
 def calendars(packet):
@@ -137,6 +188,8 @@ def assess_network(case, directory, progress, seed=43, chooser=choose):
     packets = {}
     assessments = []
     excluded = []
+    policy_cache = {}
+    policy_checks = 0
     for index, plan in enumerate(plans):
         packet = candidate_packet(case, plan)
         reasons = unavailable_reasons(packet)
@@ -164,14 +217,33 @@ def assess_network(case, directory, progress, seed=43, chooser=choose):
             "eligibility",
             f"Assessing operating requirements for proposal {index + 1} of {len(plans)}.",
         )
-        answer = chooser(
-            packet,
-            PROMPTS["eligibility"],
-            PROMPTS["eligibilityChoices"],
-            directory / "eligibility" / plan["id"],
-        )
-        assessments.append({"id": plan["id"], "status": answer})
-        if answer == "eligible":
+        if case["id"] in PRESETS:
+            from coordinated import assess_policies
+
+            status, policy_answers = assess_policies(
+                packet, directory / "eligibility" / plan["id"], policy_cache
+            )
+            policy_checks += len(policy_answers)
+            assessments.append(
+                {
+                    "id": plan["id"],
+                    "status": status,
+                    "reason": ", ".join(
+                        a["name"] + ":" + a.get("unit", "plan") + "=" + a["choice"]
+                        for a in policy_answers
+                        if a["choice"] != "eligible"
+                    ),
+                }
+            )
+        else:
+            status = chooser(
+                packet,
+                PROMPTS["eligibility"],
+                PROMPTS["eligibilityChoices"],
+                directory / "eligibility" / plan["id"],
+            )
+            assessments.append({"id": plan["id"], "status": status})
+        if status == "eligible":
             packets[plan["id"]] = packet
     recommended, rounds = tournament(
         list(packets),
@@ -179,6 +251,8 @@ def assess_network(case, directory, progress, seed=43, chooser=choose):
             case, packets, ids, directory / "comparisons" / str(count), chooser
         ),
         progress,
+        group_size=3 if case["id"] in PRESETS else 6,
+        advance=1 if case["id"] in PRESETS else 2,
     )
     return {
         "recommended": recommended,
@@ -186,15 +260,44 @@ def assess_network(case, directory, progress, seed=43, chooser=choose):
         "packets": packets,
         "assessments": assessments,
         "excluded": excluded,
+        **(
+            {
+                "policyEvaluation": {
+                    "apiCalls": len(policy_cache),
+                    "reusedChecks": policy_checks - len(policy_cache),
+                }
+            }
+            if case["id"] in PRESETS
+            else {}
+        ),
     }
 
 
 def network(request, directory, progress):
-    domain = build_case(request)
+    domain = (
+        coordinated_case(request["scenario"])
+        if request["kind"] == "coordinated"
+        else build_case(request)
+    )
+    if request["kind"] == "coordinated":
+        if request.get("objective", "").strip():
+            domain["objective"] = request["objective"].strip()
+        if request.get("requirements", "").strip():
+            domain["snapshot"]["policies"].append(
+                {
+                    "id": "SCENARIO-OPERATOR",
+                    "scope": "all affected trips",
+                    "requirement": request["requirements"].strip(),
+                }
+            )
     progress(
         "preparation", "Checking the full resource catalog and future commitments."
     )
-    case, search = generate(domain)
+    case, search = (
+        generate_coordinated(domain)
+        if request["kind"] == "coordinated"
+        else generate(domain)
+    )
     (directory / "evidence.json").write_text(json.dumps(case["evidence"], indent=2))
     selection = assess_network(case, directory, progress)
     plans = case["evidence"]["candidate_plans"]
@@ -216,7 +319,11 @@ def network(request, directory, progress):
                     if plan["resource_changes"] == 0
                     else f"Cover {len(plan['assignments'])} affected trips"
                 ),
-                "summary": f"{plan['resource_changes']} changed trip assignments. All other supplied commitments stay assigned.",
+                "summary": (
+                    f"{plan['crew_changes']} crew changes and {plan['bus_changes']} bus changes across {len({a['route'] for a in plan['assignments']})} routes. Earlier and outside-service commitments stay assigned."
+                    if domain["id"] in PRESETS
+                    else f"{plan['resource_changes']} changed trip assignments. All other supplied commitments stay assigned."
+                ),
                 "assignments": [
                     {
                         "trip": a["trip_id"],
@@ -245,6 +352,11 @@ def network(request, directory, progress):
         "message": message,
         "recommendations": recommendations,
         "assessments": assessments,
+        **(
+            {"policyEvaluation": selection["policyEvaluation"]}
+            if "policyEvaluation" in selection
+            else {}
+        ),
         "physicalExclusions": excluded,
         "rounds": rounds,
         "search": search,

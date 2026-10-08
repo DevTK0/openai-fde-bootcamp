@@ -36,6 +36,8 @@ export function planningStream(request: PlanningRequest, signal: AbortSignal) {
     env: environment(),
     stdio: ["pipe", "pipe", "pipe"],
   })
+  const timeout = setTimeout(() => child.kill(), 10 * 60 * 1000)
+  child.once("close", () => clearTimeout(timeout))
   const encoder = new TextEncoder()
   let stopped = false
   let cleanup = () => {}
