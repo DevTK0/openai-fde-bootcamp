@@ -1,0 +1,18 @@
+{
+  "eligibility": "Assess one alternative complete operations plan against the scenario facts, action contract and plain-text operating requirements. Alternatives are not simultaneous assignments. Apply only requirements relevant to the proposed actions. This is assignment planning, not a passenger replay. A held or sick resource is unavailable despite earlier readiness. An offered but unapproved resource is not released/qualified merely because it is offered. Keeping existing assignments is a real alternative only if those assignments remain feasible after the scenario event.\nUse the complete effective schedules and source-derived time gaps. A resource must be available for preparation through completion; a task before its availability is a violation. Preserve every other commitment. Check overlap, capacity, qualification, release, breaks, duty span and the required turnaround. Arrival does not mean turnaround is complete. Never invent a movement time, release or rescue transfer. A known violation takes precedence over missing evidence. Missing facts matter only for actions actually proposed. Do not infer failure from absent passenger replay data when no replay is proposed. Return eligible only if every applicable requirement is supported, blocked for any definite violation, otherwise unresolved. Explicitly unregistered or unapproved offered resources violate the listed-only requirement. Assess only the resources in the effective assignments. Original assignments are a baseline, not concurrent extra tasks. Same-stop turnaround includes boarding; 420 seconds after final alighting is sufficient. Use each crew's own duty, not the entire vehicle's day. If ANY assignment names the incident's unavailable_bus or unavailable_crew, choose blocked, even when rescue times are also unknown. Unresolved applies only when there is NO definite violation anywhere in the proposal.",
+  "handout": "Assess only the named alternative against the supplied operating requirements and evidence. Other alternatives are not simultaneous. Choose eligible for an action fully supported now, including an explicit hold-and-prepare action that does not promise dispatch. Choose conditional for a feasible future allocation that explicitly requires day-of release/confirmation permitted by the source planning requirements. Choose blocked for any definite policy violation or unsupported affirmative claim, including using unavailable resources, inventing a release, or guaranteeing unknown outcomes. Choose unresolved if a necessary fact is missing and the proposal makes no unsupported guarantee. Do not reject a permitted conditional future plan just because future daily releases are not yet issued. Check arithmetic, all commitments, capacity, crew availability, staging/return and protected trips. An estimated workshop completion does not release a bus. Read dates and lead times exactly. Historical observations apply to retrospective triage only, never to an earlier dispatch decision.",
+  "eligibilityChoices": [
+    {
+      "value": "eligible",
+      "description": "The complete proposal satisfies all applicable requirements using supplied evidence."
+    },
+    {
+      "value": "blocked",
+      "description": "At least one concrete proposed action violates an applicable requirement."
+    },
+    {
+      "value": "unresolved",
+      "description": "No definite violation is established, but a necessary fact is missing."
+    }
+  ]
+}

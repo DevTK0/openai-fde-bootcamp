@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],
   outputFileTracingRoot: process.cwd() + "/../..",
   outputFileTracingIncludes: {
+    "/api/planning": [
+      "./planner/*.py",
+      "./planner/*.json",
+      "../../data/operations/lionlink-network.sqlite",
+    ],
+    "/ops-planning": [
+      "./planner/*.py",
+      "./planner/*.json",
+      "../../data/operations/lionlink-network.sqlite",
+    ],
     "/api/operations": [
       "../../data/operations/lionlink-network.sqlite",
       "./lib/database-worker.mjs",

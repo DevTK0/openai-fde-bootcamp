@@ -1,0 +1,32 @@
+{
+  "reports": [
+    {
+      "name": "Toa Payoh bus withdrawal",
+      "runId": "9ecb0617-7dc9-44f5-b2d1-e23cc749ccd3",
+      "entrants": 36,
+      "comparisons": 19,
+      "seconds": 25.017
+    },
+    {
+      "name": "Ang Mo Kio bus withdrawal",
+      "runId": "1b3760cf-77a9-4804-97ab-3889832d5d17",
+      "entrants": 36,
+      "comparisons": 19,
+      "seconds": 20.771
+    },
+    {
+      "name": "Toa Payoh relief crew sickness",
+      "runId": "287b77c4-b453-4173-80ed-b42f8a767173",
+      "entrants": 36,
+      "comparisons": 19,
+      "seconds": 19.263
+    }
+  ],
+  "cancelled": true,
+  "mobile": {
+    "width": 390,
+    "scroll": 390
+  },
+  "pageErrors": [],
+  "accessChecksPassed": true
+}
