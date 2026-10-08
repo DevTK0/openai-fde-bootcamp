@@ -32,6 +32,12 @@ export const dashboardWorkspaces = [
     icon: Activity,
     pages: [
       {
+        id: "live-operations",
+        label: "Live AI operations",
+        description:
+          "Monitor incoming reports and review evidence-backed AI recommendations.",
+      },
+      {
         id: "day-schedule",
         label: "Day schedule",
         description: "Scheduled service simulation.",

@@ -22,6 +22,7 @@ Open the HTTPS `Preview:` URLs printed by each app from a device on the same
 Tailscale network. Each app and worktree gets its own address. Keep the terminal
 running; Ctrl+C stops only that launch. Run `pnpm previews` to list addresses.
 
+The web preview includes `/dashboard`, `/planner`, and `/live`.
 To start one app, use `pnpm --filter web dev`,
 `pnpm --filter @workspace/slides dev`, or `pnpm --filter @workspace/docs dev`.
 For local-only development, prefix the command with `PORTLESS_TAILSCALE=0`.
@@ -43,13 +44,13 @@ restart Codex in this checkout. You can always ask directly:
 
 Choose a workflow based on where your work stands:
 
-| I want to… | Ask Codex |
-| --- | --- |
-| Open a PR for my changes | `$pstack opening-a-pr: verify this change, commit it, and open a PR.` |
-| Get a PR ready to merge | `$pstack babysit PR 123: address feedback and failing checks.` |
-| Verify and merge existing PRs | `$pstack shipping: verify and land PRs 123 and 124 in order.` |
+| I want to…                              | Ask Codex                                                                   |
+| --------------------------------------- | --------------------------------------------------------------------------- |
+| Open a PR for my changes                | `$pstack opening-a-pr: verify this change, commit it, and open a PR.`       |
+| Get a PR ready to merge                 | `$pstack babysit PR 123: address feedback and failing checks.`              |
+| Verify and merge existing PRs           | `$pstack shipping: verify and land PRs 123 and 124 in order.`               |
 | Build a queue of tasks for human review | `$pstack autopilot-stack: build this task queue and open a stack of PRs: …` |
-| Build and merge a queue of tasks | `$pstack autopilot-full: build this task queue and merge verified PRs: …` |
+| Build and merge a queue of tasks        | `$pstack autopilot-full: build this task queue and merge verified PRs: …`   |
 
 For a task queue, describe each change and what counts as done. **Autopilot-stack
 leaves merging to you. Autopilot-full can merge when you authorize it.** Both use
@@ -66,12 +67,13 @@ The main places to work are:
 
 | Location | What's there |
 | --- | --- |
-| [apps/web](apps/web) | Dashboard pages and app components |
+| [apps/web](apps/web) | Dashboard, planner and live operations pages |
 | [apps/slides](apps/slides) | Presentations and supporting evidence |
 | [apps/docs](apps/docs) | Astro Starlight documentation served at `/docs/` |
 | [packages/ui](packages/ui) | Shared shadcn/ui components and theme |
 | [skills](.agents/skills) | Codex workflows and principles |
 | [data/operations/lionlink-network.sqlite](data/operations/lionlink-network.sqlite) | Runtime dashboard database |
+| [apps/web/lib/fleet-data.json](apps/web/lib/fleet-data.json) | Converted handout data and source documentation |
 
 Use the shared components for UI work. To add a missing shadcn component, run
 `pnpm dlx shadcn@latest add <component> -c apps/web` from the repo root.
@@ -180,3 +182,31 @@ For the deck list, data caveats, and slide deployment instructions, see the
 Run `bash scripts/deploy-docs.sh` to build and publish the Astro Starlight docs on this VM.
 Nginx serves the static release at `/docs/`. The nginx snippet is `deploy/nginx/docs.conf`. Verify the published site with
 `python3 scripts/verify-docs.py http://127.0.0.1:8000`.
+
+## Planning copilot MVP
+
+Visit `/planner` for the bootcamp planning workflow. Compare Service 235 morning
+recovery assignments or Service 238 timetable offsets, inspect source records,
+ask the OpenAI copilot, and save or review an exercise proposal. The planner
+keeps published decision-time facts separate from retrospective outcomes.
+
+See [MVP guide](docs/lionlink-mvp-guide.md) for configuration, demo steps,
+persistence, and the prototype's boundaries. The [build plan](docs/lionlink-mvp-plan.md)
+records the original scope and later expansion options.
+
+## Live recommendations
+
+Visit `/live` and run `pnpm --filter web monitor` in a separate terminal. The
+OpenAI agent investigates new events and operational database changes using
+multi-day trip/queue history, fleet readiness, driver duties and workshop records.
+It generates cited insights and its own resource proposals; code validates the
+assignments without selecting a canned recommendation. API failure is visible
+and does not generate a rule-based substitute.
+
+Record reports as free text with an optional service hint. OpenAI interprets
+signal types and IDs separately from the immutable report. The service catalogue
+comes from route data (currently 24 services). **Explore operations** shows ordered
+route stops and workshop records on the supplied interactive LionLink bus model.
+
+See the [live agent guide](docs/lionlink-live-guide.md) for database insertion,
+context tools, review history, OpenAI enablement and deployment boundaries.

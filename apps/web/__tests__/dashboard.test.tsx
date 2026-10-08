@@ -53,6 +53,41 @@ afterAll(() => {
 })
 
 describe("SQLite dashboard interactions", () => {
+  it("exposes live AI operations inside the Operations workspace", async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      "EventSource",
+      class {
+        addEventListener() {}
+        close() {}
+      }
+    )
+    const fetcher = globalThis.fetch
+    vi.stubGlobal("fetch", (input: string) =>
+      input === "/api/live/events"
+        ? Promise.resolve({ ok: false })
+        : fetcher(input)
+    )
+    render(
+      <DashboardProvider data={readDashboardData()}>
+        <FleetDashboard />
+      </DashboardProvider>
+    )
+    await user.click(screen.getByRole("button", { name: "Operations" }))
+    const link = screen.getByRole("link", { name: "Live AI operations" })
+    expect(link).toHaveAttribute("href", "/dashboard?view=live-operations")
+    await user.click(link)
+    expect(window.location.search).toBe("?view=live-operations")
+    expect(link).toHaveAttribute("aria-current", "page")
+    expect(
+      screen.getByRole("heading", { name: "Live AI operations" })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole("main", { name: "Live AI operations" })
+    ).toBeInTheDocument()
+    vi.stubGlobal("fetch", fetcher)
+  })
+
   it("opens nested workspace pages and their source records", async () => {
     const user = userEvent.setup()
     render(

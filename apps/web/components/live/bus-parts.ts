@@ -1,0 +1,168 @@
+// Stable component identifiers and illustrative system zones; coordinates are glTF metres.
+export type BusPart = {
+  label: string
+  nodes: string[]
+  anchor: [number, number, number]
+  view: string
+  note?: string
+  approximate?: boolean
+}
+export const PARTS: Record<string, BusPart> = {
+  front_door: {
+    label: "Front passenger door",
+    nodes: ["front_door"],
+    anchor: [-5.15, 1.7, 1.42],
+    view: "doors",
+  },
+  centre_door: {
+    label: "Centre passenger door",
+    nodes: ["centre_door"],
+    anchor: [0.72, 1.7, 1.42],
+    view: "doors",
+  },
+  doors: {
+    label: "Passenger door system",
+    nodes: ["front_door", "centre_door"],
+    anchor: [0.72, 2.15, 1.45],
+    view: "doors",
+    note: "Door not specified; both passenger doors are highlighted.",
+  },
+  wipers: {
+    label: "Wipers",
+    nodes: ["wipers"],
+    anchor: [-6.18, 1.65, 0],
+    view: "front",
+  },
+  windshield: {
+    label: "Front windscreen",
+    nodes: ["windshield"],
+    anchor: [-6.16, 2.0, 0],
+    view: "front",
+  },
+  mirrors: {
+    label: "Mirror assemblies",
+    nodes: ["mirrors"],
+    anchor: [-6.2, 2.45, 1.62],
+    view: "front",
+  },
+  front_lights: {
+    label: "Front lights",
+    nodes: ["front_lights"],
+    anchor: [-6.16, 0.86, 0.92],
+    view: "front",
+  },
+  rear_lights: {
+    label: "Rear lights",
+    nodes: ["rear_lights"],
+    anchor: [6.16, 1.2, 0.95],
+    view: "rear",
+  },
+  roof_ac: {
+    label: "Roof air conditioning",
+    nodes: ["roof_ac"],
+    anchor: [2.75, 4.6, 0],
+    view: "roof",
+  },
+  cooling: {
+    label: "Cooling / rear service area",
+    nodes: ["engine_bay"],
+    anchor: [6.17, 1.5, 0],
+    view: "rear",
+    approximate: true,
+    note: "Illustrative rear service area. Cooling components are not modeled or located by this record.",
+  },
+  electrical: {
+    label: "Electrical / service area",
+    nodes: ["engine_bay"],
+    anchor: [5.7, 1.35, 1.45],
+    view: "rear",
+    approximate: true,
+    note: "Illustrative service area. The battery and electrical components are not modeled; exact location needs confirmation.",
+  },
+  air_system: {
+    label: "Pneumatic system area",
+    nodes: ["underbody"],
+    anchor: [-0.5, 0.85, 1.43],
+    view: "doors",
+    approximate: true,
+    note: "Illustrative underbody system area. The record does not identify a leak location; pneumatic lines are not modeled.",
+  },
+  suspension: {
+    label: "Suspension / axle areas",
+    nodes: [
+      "wheel_1_l",
+      "wheel_1_r",
+      "wheel_2_l",
+      "wheel_2_r",
+      "wheel_3_l",
+      "wheel_3_r",
+    ],
+    anchor: [3.15, 0.9, 1.45],
+    view: "doors",
+    approximate: true,
+    note: "Axle areas only. Suspension components are not modeled; no affected axle is specified.",
+  },
+  brakes: {
+    label: "Brake / wheel areas",
+    nodes: [
+      "wheel_1_l",
+      "wheel_1_r",
+      "wheel_2_l",
+      "wheel_2_r",
+      "wheel_3_l",
+      "wheel_3_r",
+    ],
+    anchor: [-3.45, 0.9, 1.45],
+    view: "doors",
+    approximate: true,
+    note: "Wheel areas only. Brake internals are not modeled; no affected wheel is specified.",
+  },
+  wheel_1_l: {
+    label: "Front left wheel",
+    nodes: ["wheel_1_l"],
+    anchor: [-3.45, 0.65, 1.45],
+    view: "doors",
+  },
+  wheel_1_r: {
+    label: "Front right wheel",
+    nodes: ["wheel_1_r"],
+    anchor: [-3.45, 0.65, -1.45],
+    view: "right",
+  },
+  wheel_2_l: {
+    label: "Middle left wheel",
+    nodes: ["wheel_2_l"],
+    anchor: [3.15, 0.65, 1.45],
+    view: "doors",
+  },
+  wheel_2_r: {
+    label: "Middle right wheel",
+    nodes: ["wheel_2_r"],
+    anchor: [3.15, 0.65, -1.45],
+    view: "right",
+  },
+  wheel_3_l: {
+    label: "Rear left wheel",
+    nodes: ["wheel_3_l"],
+    anchor: [4.65, 0.65, 1.45],
+    view: "doors",
+  },
+  wheel_3_r: {
+    label: "Rear right wheel",
+    nodes: ["wheel_3_r"],
+    anchor: [4.65, 0.65, -1.45],
+    view: "right",
+  },
+  windows: {
+    label: "Passenger windows",
+    nodes: ["windows"],
+    anchor: [0, 3.55, 1.43],
+    view: "doors",
+  },
+  body: {
+    label: "Bodywork",
+    nodes: ["body"],
+    anchor: [0, 1.15, 1.43],
+    view: "doors",
+  },
+}

@@ -8,6 +8,7 @@ import { DatasetPicker } from "@/components/dataset-picker"
 import { useDashboard } from "@/components/dashboard-provider"
 
 import { Plot } from "@workspace/ui/components/report-chart"
+import { LiveConsole } from "@/components/live/console"
 
 import { useState, useSyncExternalStore } from "react"
 import { DashboardSidebar } from "@/components/dashboard-sidebar"
@@ -340,6 +341,8 @@ function DashboardReport({
       return <Overview vehicle={vehicle} period={period} />
     case "vehicles":
       return <VehiclePlanning />
+    case "live-operations":
+      return <LiveConsole embedded />
     case "day-schedule":
       return <ServiceHistory mode="scheduled" />
     case "data-operations":
@@ -445,6 +448,7 @@ export function FleetDashboard({
         </header>
         <main
           id="active-report"
+          aria-label={current.label}
           data-report-title={current.label}
           data-report-section={current.workspace}
           className="@container/dashboard mx-auto w-full max-w-400 space-y-6 p-4 lg:p-8"

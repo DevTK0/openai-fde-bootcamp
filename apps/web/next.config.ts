@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
       "./lib/database-worker.mjs",
     ],
     "/dashboard": ["../../data/operations/lionlink-network.sqlite"],
+    "/api/planning/*": ["../../data/operations/lionlink-network.sqlite"],
+    "/api/live/*": ["../../data/operations/lionlink-network.sqlite"],
   },
   // Allow the VM proxy and the collaborative browser development hostname.
   allowedDevOrigins: [
