@@ -1,6 +1,7 @@
 import { ArrowRight, Check, ShieldCheck } from "lucide-react"
 import { useSlidePageNumber, type Page } from "@open-slide/core"
 import "../../components/deck.css"
+import "./theme.css"
 
 export const meta = {
   title: "LionLink AI scheduling",
@@ -30,7 +31,7 @@ const PageNumber = () => {
 const Page1: Page = () => (
   <section
     aria-label="Problem: a local fix can delay the next bus"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -100,7 +101,7 @@ const Page1: Page = () => (
 const Page2: Page = () => (
   <section
     aria-label="Evidence: late terminal arrivals concentrate on two services"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -180,7 +181,7 @@ const Page2: Page = () => (
 const Page3: Page = () => (
   <section
     aria-label="Evidence: demand changes by day while some duties have spare capacity"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -198,7 +199,7 @@ const Page3: Page = () => (
       aria-label="Ten-date origin boardings and remaining queues, compared with Service 261 occupancy"
       className="relative my-7 min-h-0 w-full flex-1"
     >
-      <div className="absolute top-[30px] left-0 h-[18px] w-[28px] bg-chart-1" />
+      <div className="absolute top-[30px] left-0 h-[18px] w-[28px] bg-primary" />
       <p className="absolute top-[19px] left-[42px] text-[27px]">{"Boarded"}</p>
       <div className="absolute top-[30px] left-[222px] h-[18px] w-[28px] bg-destructive" />
       <p className="absolute top-[19px] left-[264px] text-[27px]">
@@ -208,7 +209,7 @@ const Page3: Page = () => (
       <p className="absolute top-[85px] left-0 w-[84px] text-center text-[26px]">
         {"39"}
       </p>
-      <div className="absolute top-[200px] left-0 h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-0 h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-0 w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
@@ -219,7 +220,7 @@ const Page3: Page = () => (
       <p className="absolute top-[103px] left-[110px] w-[84px] text-center text-[26px]">
         {"30"}
       </p>
-      <div className="absolute top-[200px] left-[110px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[110px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[110px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
@@ -230,7 +231,7 @@ const Page3: Page = () => (
       <p className="absolute top-[107px] left-[220px] w-[84px] text-center text-[26px]">
         {"28"}
       </p>
-      <div className="absolute top-[200px] left-[220px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[220px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[220px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
@@ -241,14 +242,14 @@ const Page3: Page = () => (
       <p className="absolute top-[115px] left-[330px] w-[84px] text-center text-[26px]">
         {"24"}
       </p>
-      <div className="absolute top-[200px] left-[330px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[330px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[330px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
       <p className="absolute top-[391px] left-[330px] w-[84px] text-center text-[24px]">
         {"8"}
       </p>
-      <div className="absolute top-[334px] left-[440px] h-[36px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[334px] left-[440px] h-[36px] w-[84px] bg-primary" />
       <p className="absolute top-[292px] left-[440px] w-[84px] text-center text-[26px]">
         {"18"}
       </p>
@@ -259,7 +260,7 @@ const Page3: Page = () => (
       <p className="absolute top-[105px] left-[550px] w-[84px] text-center text-[26px]">
         {"29"}
       </p>
-      <div className="absolute top-[200px] left-[550px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[550px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[550px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
@@ -270,7 +271,7 @@ const Page3: Page = () => (
       <p className="absolute top-[97px] left-[660px] w-[84px] text-center text-[26px]">
         {"33"}
       </p>
-      <div className="absolute top-[200px] left-[660px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[660px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[660px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
@@ -281,7 +282,7 @@ const Page3: Page = () => (
       <p className="absolute top-[101px] left-[770px] w-[84px] text-center text-[26px]">
         {"31"}
       </p>
-      <div className="absolute top-[200px] left-[770px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[770px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[770px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
@@ -292,14 +293,14 @@ const Page3: Page = () => (
       <p className="absolute top-[105px] left-[880px] w-[84px] text-center text-[26px]">
         {"29"}
       </p>
-      <div className="absolute top-[200px] left-[880px] h-[170px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[200px] left-[880px] h-[170px] w-[84px] bg-primary" />
       <p className="absolute top-[278px] left-[880px] w-[84px] text-center text-[26px] text-primary-foreground">
         {"85"}
       </p>
       <p className="absolute top-[391px] left-[880px] w-[84px] text-center text-[24px]">
         {"15"}
       </p>
-      <div className="absolute top-[318px] left-[990px] h-[52px] w-[84px] bg-chart-1" />
+      <div className="absolute top-[318px] left-[990px] h-[52px] w-[84px] bg-primary" />
       <p className="absolute top-[276px] left-[990px] w-[84px] text-center text-[26px]">
         {"26"}
       </p>
@@ -340,7 +341,7 @@ const Page3: Page = () => (
 const Page4: Page = () => (
   <section
     aria-label="Maintenance: plan workshop resources and service duties together"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -393,7 +394,7 @@ const Page4: Page = () => (
       <p className="absolute top-[211px] left-[1455px] text-[26px] text-muted-foreground">
         {"15:00"}
       </p>
-      <div className="absolute top-[259px] left-[790px] h-[72px] w-[440px] bg-chart-1" />
+      <div className="absolute top-[259px] left-[790px] h-[72px] w-[440px] bg-primary" />
       <p className="absolute top-[275px] left-[820px] text-[28px] text-primary-foreground">
         {"4 hours, 2 technicians"}
       </p>
@@ -430,7 +431,7 @@ const Page4: Page = () => (
 const Page5: Page = () => (
   <section
     aria-label="Proposed AI copilot: forecast, solve, explain and obtain planner approval"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -529,7 +530,7 @@ const Page5: Page = () => (
 const Page6: Page = () => (
   <section
     aria-label="Feasibility replay: relief driver protects all published Service 235 trips"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -611,7 +612,7 @@ const Page6: Page = () => (
 const Page7: Page = () => (
   <section
     aria-label="Assumed value: annual planning hours released and capacity value"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -636,7 +637,7 @@ const Page7: Page = () => (
         {"3 hours"}
       </p>
       <p className="absolute top-[221px] left-0 text-[36px]">{"Target"}</p>
-      <div className="absolute top-[223px] left-[160px] h-[52px] w-[225px] bg-chart-1" />
+      <div className="absolute top-[223px] left-[160px] h-[52px] w-[225px] bg-primary" />
       <p className="absolute top-[219px] left-[414px] text-[40px] font-semibold">
         {"1 hour"}
       </p>
@@ -696,7 +697,7 @@ const Page7: Page = () => (
 const Page8: Page = () => (
   <section
     aria-label="Proposed pilot: measure planner time, passenger waiting and constraint compliance"
-    className="dark flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
+    className="lionlink-ai-slide flex h-full w-full flex-col overflow-hidden bg-background px-[88px] py-[58px] text-foreground"
   >
     <header className="flex items-center justify-between border-b border-border pb-6 text-[21px] tracking-wide text-muted-foreground">
       <span>{"LionLink"}</span>
@@ -723,7 +724,7 @@ const Page8: Page = () => (
       <p className="absolute top-[38px] left-[725px] text-[28px] text-muted-foreground">
         {"4 weeks of approved changes"}
       </p>
-      <div className="absolute top-[97px] left-[725px] h-[12px] w-[1010px] bg-chart-1" />
+      <div className="absolute top-[97px] left-[725px] h-[12px] w-[1010px] bg-primary" />
       <p className="absolute top-[132px] left-[725px] w-[930px] text-[29px] leading-snug">
         {
           "Planners approve changes. Measure passenger waits and departure and arrival delays."
