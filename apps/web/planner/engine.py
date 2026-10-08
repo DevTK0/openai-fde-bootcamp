@@ -152,7 +152,7 @@ def calendars(packet):
         detail = (
             f"{r['capacity']} people; {r['wheelchair_spaces']} wheelchair spaces; {r['release']}"
             if timeline["kind"] == "bus"
-            else f"Qualified for {r['qualification']}; protected break {r['break_start']} to {r['break_end']}; maximum duty {r['max_duty_minutes']} minutes"
+            else f"Qualified for {r['qualification']}; maximum duty {r['max_duty_minutes']} minutes"
         )
         rows.append(
             {
@@ -161,11 +161,19 @@ def calendars(packet):
                 "availableFrom": r["available_from"],
                 "availableUntil": r["available_until"],
                 "details": detail,
+                "break": (
+                    {"start": r["break_start"], "end": r["break_end"]}
+                    if timeline["kind"] == "crew"
+                    else None
+                ),
                 "tasks": [
                     {
                         "trip": t["trip"],
                         "bus": t["bus"],
                         "crew": t["crew"],
+                        "route": t["service"],
+                        "preparation": t["preparation_at"],
+                        "alightingUntil": t["final_alighting_at"],
                         "departure": (
                             t["scheduled_departure"] if t["preparation_at"] else None
                         ),

@@ -128,11 +128,15 @@ const calendarSchema = z.object({
   availableFrom: z.string(),
   availableUntil: z.string(),
   details: z.string(),
+  break: z.object({ start: z.string(), end: z.string() }).nullable(),
   tasks: z.array(
     z.object({
       trip: z.string(),
       bus: z.string(),
       crew: z.string(),
+      route: z.string(),
+      preparation: z.string().nullable(),
+      alightingUntil: z.string().nullable(),
       departure: z.string().nullable(),
       arrival: z.string().nullable(),
       origin: z.string(),

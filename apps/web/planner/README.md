@@ -19,7 +19,7 @@ Use the repository's Node and pnpm versions and Python 3 on a Unix-compatible ru
 3. Run `pnpm --filter web dev` from the repository root. Open the printed HTTPS preview URL at `/ops-planning`.
 4. Choose a situation and enter the operator key in **Planner access key**. The server issues a signed, expiring HttpOnly session cookie. This demo grants one operator capability access to all runs, not per-user ownership.
 5. Optionally add written requirements or change the ranking objective. Select **Compare plans**.
-6. Read each recommendation's complete supplied calendar before using it. **Download run evidence** includes inputs, exclusions, API requests, responses and the report.
+6. Use each recommendation's **Resource timeline** to inspect a crew or bus. Click a trip for its assignment changes and exact times. Reassigned trips are prominent, existing duties are faded, and protected breaks are hatched. Use **View complete assignment table** for every affected trip. Read the complete supplied calendar before using the plan. **Download run evidence** includes inputs, exclusions, API requests, responses and the report.
 
 `DASHBOARD_DATABASE_PATH` selects another compatible SQLite database. `PYTHON_BIN` selects the Python executable. `OPS_PLANNING_RUNS_DIR` selects the writable audit directory, which defaults to `apps/web/.ops-planning`.
 

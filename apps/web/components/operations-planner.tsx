@@ -1,6 +1,12 @@
 "use client"
 
 import Link from "next/link"
+import { PlanningResourceTimeline } from "@/components/planning-resource-timeline"
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@workspace/ui/components/collapsible"
 import { useEffect, useRef, useState } from "react"
 import { z } from "zod"
 import {
@@ -210,58 +216,20 @@ function Result({ report }: { report: PlanningReport }) {
                 <CardDescription>{plan.summary}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <PlanningResourceTimeline
+                  calendars={plan.calendars}
+                  original={report.affectedTrips}
+                  decisionAt={report.decisionAt}
+                />
                 {plan.assignments.length > 0 && (
-                  <Assignments rows={plan.assignments} />
-                )}
-                {plan.calendars.length > 0 && (
-                  <Tabs defaultValue={plan.calendars[0]?.resourceId}>
-                    <h3 className="text-sm font-medium">
-                      Complete supplied resource schedules
-                    </h3>
-                    <TabsList className="flex-wrap group-data-horizontal/tabs:h-auto [&>[data-slot=tabs-trigger]]:h-7">
-                      {plan.calendars.map((calendar) => (
-                        <TabsTrigger
-                          key={calendar.resourceId}
-                          value={calendar.resourceId}
-                        >
-                          {calendar.resourceId}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-                    {plan.calendars.map((calendar) => (
-                      <TabsContent
-                        key={calendar.resourceId}
-                        value={calendar.resourceId}
-                      >
-                        <p className="mb-2 text-xs text-muted-foreground">
-                          Available {clock(calendar.availableFrom)}–
-                          {clock(calendar.availableUntil)}. {calendar.details}
-                        </p>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Trip</TableHead>
-                              <TableHead>Bus / crew</TableHead>
-                              <TableHead>Departure</TableHead>
-                              <TableHead>Arrival</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {calendar.tasks.map((task) => (
-                              <TableRow key={task.trip}>
-                                <TableCell>{task.trip}</TableCell>
-                                <TableCell>
-                                  {task.bus} / {task.crew}
-                                </TableCell>
-                                <TableCell>{clock(task.departure)}</TableCell>
-                                <TableCell>{clock(task.arrival)}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TabsContent>
-                    ))}
-                  </Tabs>
+                  <Collapsible>
+                    <CollapsibleTrigger render={<Button variant="outline" />}>
+                      View complete assignment table
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-3">
+                      <Assignments rows={plan.assignments} />
+                    </CollapsibleContent>
+                  </Collapsible>
                 )}
               </CardContent>
             </Card>

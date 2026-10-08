@@ -1,4 +1,5 @@
 "use client"
+import { useEffect, useRef } from "react"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Card, CardContent } from "@workspace/ui/components/card"
@@ -23,6 +24,9 @@ type Block = {
   conflict: boolean
   unverified: boolean
   muted: boolean
+  preparationStart?: number | null
+  selected?: boolean
+  annotation?: string
   onSelect: () => void
 }
 export type AssignmentTimelineRow = {
@@ -40,11 +44,15 @@ export function AssignmentTimeline({
   start,
   end,
   label,
+  marker,
+  focusTime,
 }: {
   rows: AssignmentTimelineRow[]
   start: number
   end: number
   label: "Crew" | "Vehicle"
+  marker?: { time: number; label: string }
+  focusTime?: number
 }) {
   const ticks = Array.from(
     { length: Math.round((end - start) / 3600) + 1 },
@@ -55,10 +63,24 @@ export function AssignmentTimeline({
     width: `${(100 * (Math.min(end, b) - Math.max(start, a))) / (end - start)}%`,
   })
   const width = Math.max(1600, ((end - start) / 3600) * 120 + 160)
+  const viewport = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (focusTime === undefined) return
+    const focus = () => {
+      const element = viewport.current
+      if (!element) return
+      const point = 160 + ((focusTime - start) / (end - start)) * (width - 180)
+      element.scrollLeft = Math.max(0, point - (element.clientWidth + 160) / 2)
+    }
+    focus()
+    window.addEventListener("resize", focus)
+    return () => window.removeEventListener("resize", focus)
+  }, [focusTime, start, end, width])
   return (
     <Card className="overflow-hidden py-0">
       <CardContent className="p-0">
         <div
+          ref={viewport}
           className="max-h-160 overflow-auto"
           role="region"
           aria-label={`${label} assignment timeline`}
@@ -143,6 +165,26 @@ export function AssignmentTimeline({
                           </Button>
                         )
                     )}
+                    {row.blocks.map((b) =>
+                      b.preparationStart != null &&
+                      b.start !== null &&
+                      b.preparationStart < b.start &&
+                      b.start > start &&
+                      b.preparationStart < end ? (
+                        <Button
+                          key={`prep:${b.key}`}
+                          variant="outline"
+                          className="absolute h-8 min-w-0 rounded-sm border-dashed border-foreground/60 bg-muted/40 p-0"
+                          style={{
+                            ...position(b.preparationStart, b.start),
+                            top: 28 + b.lane * 36,
+                          }}
+                          aria-label={`Preparation for trip ${b.key}, ${crewClock(b.preparationStart)} to ${crewClock(b.start)}`}
+                          title={`Preparation ${crewClock(b.preparationStart)} to ${crewClock(b.start)}`}
+                          onClick={b.onSelect}
+                        />
+                      ) : null
+                    )}
                     {row.blocks.map(
                       (b) =>
                         b.start !== null &&
@@ -153,14 +195,15 @@ export function AssignmentTimeline({
                           <Button
                             key={b.key}
                             variant="outline"
-                            className={`absolute h-8 min-w-0 flex-col items-start justify-center gap-0 overflow-hidden rounded-md px-1 text-[10px] leading-tight text-slate-950 ${b.conflict ? "ring-2 ring-red-500 ring-offset-1 ring-offset-background" : ""}`}
+                            className={`absolute h-8 min-w-0 flex-col items-start justify-center gap-0 overflow-hidden rounded-md px-1 text-[10px] leading-tight text-slate-950 ${b.conflict ? "ring-2 ring-red-500 ring-offset-1 ring-offset-background" : b.selected ? "ring-2 ring-foreground ring-offset-1 ring-offset-background" : ""}`}
                             style={{
                               ...position(b.start, b.end),
                               top: 28 + b.lane * 36,
                               backgroundColor: serviceColor(b.service),
                               opacity: b.muted ? 0.4 : 1,
                             }}
-                            aria-label={`Trip ${b.key}, service ${b.service}, ${crewClock(b.start)} to ${crewClock(b.end)}${b.conflict ? ", timing conflict" : ""}`}
+                            aria-label={`Trip ${b.key}, service ${b.service}, ${crewClock(b.start)} to ${crewClock(b.end)}${b.conflict ? ", timing conflict" : ""}${b.annotation ? `, ${b.annotation}` : ""}`}
+                            aria-pressed={b.selected}
                             title={`${b.service} · ${b.secondary} · ${crewClock(b.start)}–${crewClock(b.end)}`}
                             onClick={b.onSelect}
                           >
@@ -178,6 +221,18 @@ export function AssignmentTimeline({
                             </span>
                           </Button>
                         )
+                    )}
+                    {marker && marker.time >= start && marker.time <= end && (
+                      <div
+                        className="pointer-events-none absolute inset-y-0 z-10 border-l border-dashed border-foreground"
+                        style={{
+                          left: `${(100 * (marker.time - start)) / (end - start)}%`,
+                        }}
+                      >
+                        <span className="absolute -top-1 left-1 rounded bg-card px-1 text-[10px] whitespace-nowrap text-foreground">
+                          {marker.label}
+                        </span>
+                      </div>
                     )}
                   </div>
                   {row.blocks
