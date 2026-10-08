@@ -5,5 +5,6 @@ export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
 export default async function Page() {
-  return <OperationsPlanner catalog={await planningCatalog()} />
+  const { keyConfigured } = await planningCatalog()
+  return <OperationsPlanner enabled={keyConfigured} />
 }

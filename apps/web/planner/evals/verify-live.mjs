@@ -51,19 +51,39 @@ try {
     await page.getByRole("combobox", { name: "Situation", exact: true }).click()
     await page.getByRole("option", { name, exact: true }).click()
     const start = Date.now()
+    const runResponse = page.waitForResponse(
+      (response) =>
+        response.url() === base + "/api/planning" &&
+        response.request().method() === "POST"
+    )
     await page
       .getByRole("button", { name: "Compare plans", exact: true })
       .click()
     await page
       .getByRole("region", { name: "Planning results" })
       .waitFor({ timeout: 180000 })
-    const href = await page
-      .locator('a[href^="/api/planning?run="]')
-      .getAttribute("href")
-    const response = await context.request.get(base + href)
+    const events = (await (await runResponse).text())
+      .trim()
+      .split("\n")
+      .map((line) => JSON.parse(line))
+    const report = events.find((event) => event.type === "result")?.report
+    assert(report, "The stream must finish with a report")
+    assert.equal(
+      await page
+        .getByRole("region", { name: "Coordinated plan timeline", exact: true })
+        .count(),
+      4
+    )
+    assert.equal(
+      await page
+        .getByRole("tab", { name: "Comparison rounds", exact: true })
+        .count(),
+      0
+    )
+    const response = await context.request.get(
+      base + "/api/planning?run=" + report.runId
+    )
     assert.equal(response.status(), 200)
-    const audit = await response.json()
-    const report = audit.files.find((file) => file.path === "report.json").data
     const entrants = report.assessments.filter((a) => a.status === "eligible")
     assert.equal(entrants.length, 36)
     assert.equal(report.rounds.length, 19)

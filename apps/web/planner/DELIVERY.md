@@ -109,3 +109,11 @@ Recommended reassignments use purple, existing duties use grey, and selection us
 Native browser verification on the saved live sickness report confirmed three linked selections, keyboard activation, expansion from five to 37 rows, distinct computed colours in dark mode, and a 390-pixel page with scrolling confined to the 1600-pixel chart. Existing crew and vehicle timelines still opened their assignment details. Component tests cover linked selection, stable recommendation colours, retained duties, protected breaks, concurrent route lanes, full-plan expansion and incomplete calendars.
 
 The final repository check passed with 199 web tests, and the production web build passed. This UI update reused the existing live report and did not rerun or change model comparisons.
+
+## Minimal main-app page
+
+The Operations planner page now uses the main app sidebar under Planning. It keeps scenario selection, access, additional requirements, ranking objective, progress and cancellation, followed by ranked coordinated timelines. The experiment metrics, comparison tabs, source tables, assignment tables and audit-download control are removed from the page. The client receives only availability configuration from the catalog. Model inputs and audit storage are unchanged.
+
+Native browser verification completed a Toa Payoh bus-withdrawal run with four recommendations, three linked selected trip blocks, no experiment controls, and no overflow at 390 pixels. Sidebar navigation to Crew planning and back worked. Cancelling a new run showed cancellation with no result. The repository check passed with 199 web tests.
+
+The production build also passed for the minimal page.

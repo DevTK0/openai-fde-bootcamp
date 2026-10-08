@@ -16,10 +16,10 @@ Use the repository's Node and pnpm versions and Python 3 on a Unix-compatible ru
 
 1. Set `OPENAI_API_KEY` in the server environment, or set `OPENAI_ENV_FILE` to a local file containing `OPENAI_API_KEY=...`. Keep that file outside tracked source. The server never sends this key to the browser or saves it in evidence.
 2. Set a separate, high-entropy `OPS_PLANNING_ACCESS_KEY` for operator access.
-3. Run `pnpm --filter web dev` from the repository root. Open the printed HTTPS preview URL at `/ops-planning`.
+3. Run `pnpm --filter web dev` from the repository root. Open the printed HTTPS preview URL at `/ops-planning`, or choose **Planning → Operations planner** in the app sidebar.
 4. Choose a situation and enter the operator key in **Planner access key**. The server issues a signed, expiring HttpOnly session cookie. This demo grants one operator capability access to all runs, not per-user ownership.
 5. Optionally add written requirements or change the ranking objective. Select **Compare plans**.
-6. Use each recommendation's coordinated timeline to inspect its route, bus and crew schedules together. Click a trip to select it across all three rows and see assignment changes and exact times. Purple blocks are recommended reassignments; grey blocks are existing duties. A separate outline marks the selected trip. Overlapping route trips occupy lanes under one route label. Protected breaks are hatched. The default view retains the earlier and later duties of resources involved in changes; **Show full plan** reveals all supplied resource calendars. Route rows show those resources' trips, not the entire service timetable. Use **View complete assignment table** for every affected trip. Read the complete supplied calendar before using the plan. **Download run evidence** includes inputs, exclusions, API requests, responses and the report.
+6. Use each recommendation's coordinated timeline to inspect its route, bus and crew schedules together. Click a trip to select it across all three rows and see assignment changes and exact times. Purple blocks are recommended reassignments; grey blocks are existing duties. A separate outline marks the selected trip. Overlapping route trips occupy lanes under one route label. Protected breaks are hatched. The default view retains the earlier and later duties of resources involved in changes; **Show full plan** reveals all supplied resource calendars. Route rows show those resources' trips, not the entire service timetable. Read the complete supplied calendar before using the plan. The page contains only run inputs and visual recommendations; audit evidence remains available through the authenticated API for evaluation tools.
 
 `DASHBOARD_DATABASE_PATH` selects another compatible SQLite database. `PYTHON_BIN` selects the Python executable. `OPS_PLANNING_RUNS_DIR` selects the writable audit directory, which defaults to `apps/web/.ops-planning`.
 
@@ -27,7 +27,7 @@ Use the repository's Node and pnpm versions and Python 3 on a Unix-compatible ru
 
 The engine considers all 172 buses and 327 crew profiles for the preset day. A bounded search constructs 36 distinct complete allocations while checking resource availability, capacity, qualifications, task timing and retained commitments. This is not exhaustive allocation search.
 
-Decisions assesses each written requirement using the relevant facts. Release, qualification, capacity and availability checks operate on one resource at a time. Identical policy inputs reuse a verdict within the run. The UI reports policy calls separately from cached checks and distinct plans.
+Decisions assesses each written requirement using the relevant facts. Release, qualification, capacity and availability checks operate on one resource at a time. Identical policy inputs reuse a verdict within the run. The audit report records policy calls separately from cached checks and distinct plans.
 
 Eligible plans enter groups of three. One advances from each group, leaving 12 survivors and then four finalists. Decisions orders the finalists. With 36 eligible entrants, this makes 19 comparison calls. Singletons advance without an API call. The default objective minimizes changed crew assignments, then changed bus assignments. A custom objective receives the full comparison evidence.
 

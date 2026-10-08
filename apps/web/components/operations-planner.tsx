@@ -1,22 +1,9 @@
 "use client"
 
-import Link from "next/link"
 import { PlanningPlanTimeline } from "@/components/planning-plan-timeline"
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from "@workspace/ui/components/collapsible"
 import { useEffect, useRef, useState } from "react"
 import { z } from "zod"
-import {
-  ArrowLeft,
-  Download,
-  Loader2,
-  Play,
-  Square,
-  BusFront,
-} from "lucide-react"
+import { Loader2, Play, Square, ChevronRight } from "lucide-react"
 import { Button } from "@workspace/ui/components/button"
 import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
@@ -29,25 +16,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card"
+import { Pick, Notice } from "@/components/report-ui"
+import { DashboardSidebar } from "@/components/dashboard-sidebar"
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table"
-import { Pick, Metric, Notice } from "@/components/report-ui"
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@workspace/ui/components/sidebar"
+import { Separator } from "@workspace/ui/components/separator"
 import {
   planningEventSchema,
   planningRequestSchema,
-  type PlanningCatalog,
   type PlanningReport,
 } from "@/lib/planning-schema"
 
@@ -71,296 +50,47 @@ const descriptions: Record<string, string> = {
     "5 October 2026, 09:25. NW-C062 is sick before relief duty. Reallocate later trips across routes 231, 232, 235 and 238, including the uncovered route 232 duty.",
 }
 
-function clock(value: string | null) {
-  if (!value) return "Not established"
-  const date = new Date(value)
-  return Number.isNaN(date.valueOf())
-    ? value
-    : date.toLocaleTimeString("en-SG", {
-        timeZone: "Asia/Singapore",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      })
-}
-
-function Assignments({ rows }: { rows: PlanningReport["affectedTrips"] }) {
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Trip / route</TableHead>
-          <TableHead>Bus</TableHead>
-          <TableHead>Crew</TableHead>
-          <TableHead>Departure</TableHead>
-          <TableHead>Arrival</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {rows.map((row) => (
-          <TableRow key={row.trip}>
-            <TableCell>
-              <span className="block text-xs text-muted-foreground">
-                {row.trip}
-              </span>
-              {row.route}
-            </TableCell>
-            <TableCell>{row.bus}</TableCell>
-            <TableCell>{row.crew}</TableCell>
-            <TableCell>{clock(row.departure)}</TableCell>
-            <TableCell>{clock(row.arrival)}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-}
-
 function Result({ report }: { report: PlanningReport }) {
   return (
-    <section className="space-y-5" aria-label="Planning results">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-semibold">{report.title}</h2>
-          <p className="text-sm text-muted-foreground">
-            Decision at {report.decisionAt.replace("T", " ")} · Draft proposals
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          nativeButton={false}
-          render={<a href={`/api/planning?run=${report.runId}`} />}
-        >
-          <Download />
-          Download run evidence
-        </Button>
-      </div>
-      <Notice>
-        {report.message}
-        {report.search.searchLimited && (
-          <p className="mt-2 font-medium">
-            The combination search reached its limit. This shortlist is not
-            exhaustive.
-          </p>
-        )}
-      </Notice>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric
-          title="Proposals considered"
-          value={report.search.candidateCount.toLocaleString()}
-          detail="Generated from the supplied resources"
-        />
-        <Metric
-          title="Availability exclusions"
-          value={report.physicalExclusions.length.toLocaleString()}
-          detail="Deterministic checks before model calls"
-        />
-        <Metric
-          title="Plans screened"
-          value={report.assessments.length.toLocaleString()}
-          detail={
-            report.policyEvaluation
-              ? `${report.policyEvaluation.apiCalls} policy calls; ${report.policyEvaluation.reusedChecks} identical checks reused`
-              : "Written requirements assessed by Decisions"
-          }
-        />
-        <Metric
-          title="Tournament entrants"
-          value={report.assessments
-            .filter((a) => a.status === "eligible")
-            .length.toLocaleString()}
-          detail="Distinct complete plans approved for comparison"
-        />
-        <Metric
-          title="Comparison calls"
-          value={report.rounds.length.toLocaleString()}
-          detail="Lone survivors need no comparison"
-        />
-      </div>
-      <Tabs defaultValue="recommendations">
-        <TabsList className="flex-wrap group-data-horizontal/tabs:h-auto [&>[data-slot=tabs-trigger]]:h-7">
-          <TabsTrigger value="recommendations">Recommendations</TabsTrigger>
-          <TabsTrigger value="affected">Affected timetable</TabsTrigger>
-          <TabsTrigger value="checks">Availability & policies</TabsTrigger>
-          <TabsTrigger value="rounds">Comparison rounds</TabsTrigger>
-          <TabsTrigger value="sources">Sources</TabsTrigger>
-        </TabsList>
-        <TabsContent value="recommendations" className="space-y-4">
-          {report.recommendations.length === 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>No supported complete plan</CardTitle>
-                <CardDescription>
-                  Use the availability checks and source evidence to identify
-                  the next information or confirmed resource needed.
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          )}
-          {report.recommendations.map((plan, index) => (
-            <Card key={plan.id}>
-              <CardHeader>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline">{index + 1}</Badge>
-                  <CardTitle>{plan.title}</CardTitle>
-                  <Badge
-                    variant={
-                      plan.status === "conditional" ? "secondary" : "default"
-                    }
-                  >
-                    {plan.status === "conditional"
-                      ? "Conditional"
-                      : "Supported"}
-                  </Badge>
-                </div>
-                <CardDescription>{plan.summary}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <PlanningPlanTimeline
-                  calendars={plan.calendars}
-                  original={report.affectedTrips}
-                  decisionAt={report.decisionAt}
-                />
-                {plan.assignments.length > 0 && (
-                  <Collapsible>
-                    <CollapsibleTrigger render={<Button variant="outline" />}>
-                      View complete assignment table
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="pt-3">
-                      <Assignments rows={plan.assignments} />
-                    </CollapsibleContent>
-                  </Collapsible>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-        <TabsContent value="affected">
-          {report.affectedTrips.length ? (
-            <Assignments rows={report.affectedTrips} />
-          ) : (
-            <Notice>
-              The imported scenario's protected commitments are included in the
-              source evidence download.
-            </Notice>
-          )}
-        </TabsContent>
-        <TabsContent value="checks" className="space-y-4">
-          <Notice>
-            {report.search.scope} This run considered{" "}
-            {report.search.resourcesConsidered.buses} bus profiles and{" "}
-            {report.search.resourcesConsidered.crews} crew profiles.
-          </Notice>
-          {report.policies.map((policy) => (
-            <Card key={policy.id}>
-              <CardHeader>
-                <CardTitle className="text-sm">{policy.id}</CardTitle>
-                <CardDescription>{policy.requirement}</CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Proposal</TableHead>
-                <TableHead>Policy assessment</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {report.assessments.map((a) => (
-                <TableRow key={a.id}>
-                  <TableCell>{a.id}</TableCell>
-                  <TableCell>
-                    {a.status}
-                    {a.reason && (
-                      <span className="block text-xs text-muted-foreground">
-                        {a.reason}
-                      </span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <h3 className="font-medium">Availability exclusions</h3>
-          <p className="text-sm text-muted-foreground">
-            Showing the first 50 proposals. The evidence download retains every
-            exclusion.
-          </p>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Proposal</TableHead>
-                <TableHead>Source facts</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {report.physicalExclusions.slice(0, 50).map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.id}</TableCell>
-                  <TableCell>
-                    {Array.from(
-                      new Set(
-                        item.reasons.map((r) => `${r.resourceId}: ${r.message}`)
-                      )
-                    ).join("; ")}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TabsContent>
-        <TabsContent value="rounds">
-          {report.rounds.length ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Round</TableHead>
-                  <TableHead>Compared proposals</TableHead>
-                  <TableHead>Selected</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {report.rounds.map((round, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{round.phase}</TableCell>
-                    <TableCell>{round.inputIds.join(", ")}</TableCell>
-                    <TableCell>{round.selectedId}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <Notice>
-              There were fewer than two eligible survivors, so no comparison was
-              needed.
-            </Notice>
-          )}
-        </TabsContent>
-        <TabsContent value="sources">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Source</TableHead>
-                <TableHead>Rows</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {report.sources.map((source) => (
-                <TableRow key={source.id}>
-                  <TableCell>{source.title}</TableCell>
-                  <TableCell>{source.rowCount.toLocaleString()}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TabsContent>
-      </Tabs>
+    <section className="space-y-4" aria-label="Planning results">
+      <h2 className="text-xl font-semibold">Recommended plans</h2>
+      {report.recommendations.length === 0 ? (
+        <Notice>
+          No supported complete plan was found. Adjust the requirements or
+          choose another situation and try again.
+        </Notice>
+      ) : (
+        report.recommendations.map((plan, index) => (
+          <Card key={plan.id}>
+            <CardHeader>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline">{index + 1}</Badge>
+                <CardTitle>{plan.title}</CardTitle>
+                <Badge
+                  variant={
+                    plan.status === "conditional" ? "secondary" : "default"
+                  }
+                >
+                  {plan.status === "conditional" ? "Conditional" : "Supported"}
+                </Badge>
+              </div>
+              <CardDescription>{plan.summary}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PlanningPlanTimeline
+                calendars={plan.calendars}
+                original={report.affectedTrips}
+                decisionAt={report.decisionAt}
+              />
+            </CardContent>
+          </Card>
+        ))
+      )}
     </section>
   )
 }
 
-export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
+export function OperationsPlanner({ enabled }: { enabled: boolean }) {
   const [scenario, setScenario] = useState("toa_bus")
   const [accessKey, setAccessKey] = useState("")
   const [requirements, setRequirements] = useState("")
@@ -458,171 +188,144 @@ export function OperationsPlanner({ catalog }: { catalog: PlanningCatalog }) {
     }
   }
   return (
-    <main className="mx-auto max-w-7xl space-y-6 p-4 md:p-8">
-      <Button
-        nativeButton={false}
-        variant="ghost"
-        render={<Link href="/dashboard" />}
-      >
-        <ArrowLeft />
-        Fleet dashboard
-      </Button>
-      <header className="space-y-2">
-        <div className="flex items-center gap-3">
-          <BusFront className="size-7 text-primary" />
-          <h1 className="text-3xl font-semibold tracking-tight">
-            Operations planner
-          </h1>
-          <Badge variant="secondary">Draft planning</Badge>
-        </div>
-        <p className="max-w-3xl text-muted-foreground">
-          Compare recovery options using complete resource schedules and
-          plain-text operating requirements. Proposals do not change the source
-          roster or dispatch resources.
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {catalog.coverage.trips.toLocaleString()} trips ·{" "}
-          {catalog.coverage.vehicles} buses ·{" "}
-          {catalog.coverage.crewRecords.toLocaleString()} crew-day records ·{" "}
-          {catalog.dates.length} dates · {catalog.routes.length} route
-          directions · {catalog.coverage.handoutDatasets} imported datasets
-        </p>
-      </header>
-      {!catalog.keyConfigured && (
-        <Notice>
-          Configure OPENAI_API_KEY or OPENAI_ENV_FILE on the server to run live
-          Decisions comparisons.
-        </Notice>
-      )}
-      <form onSubmit={submit} onChange={reset}>
-        <fieldset disabled={busy} className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Planning situation</CardTitle>
-              <CardDescription>
-                All times are Singapore time. Compare complete route, bus and
-                crew allocations. These hypothetical disruptions use existing
-                SQLite resources without adding spares.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="space-y-2">
-                <Label>Situation</Label>
-                <Pick
-                  label="Situation"
-                  value={scenario}
-                  options={scenarios}
-                  onChange={(value) => {
-                    setScenario(value)
-                    reset()
-                  }}
+    <SidebarProvider className="[--sidebar-width:16.5rem]">
+      <DashboardSidebar
+        view="operations-planner"
+        workspace="planning"
+        search=""
+      />
+      <SidebarInset className="min-w-0 bg-muted/35">
+        <header className="flex h-16 items-center gap-3 border-b bg-background px-4 lg:px-8">
+          <SidebarTrigger />
+          <Separator orientation="vertical" className="h-4" />
+          <span className="hidden text-xs text-muted-foreground sm:inline">
+            Planning
+          </span>
+          <ChevronRight className="size-3 text-muted-foreground" />
+          <span className="text-xs font-medium">Operations planner</span>
+        </header>
+        <main className="mx-auto w-full max-w-400 space-y-6 p-4 lg:p-8">
+          <header className="space-y-2">
+            <h1 className="text-3xl font-semibold tracking-tight">
+              Operations planner
+            </h1>
+            <p className="max-w-3xl text-sm text-muted-foreground">
+              Compare recovery plans and see how route, bus and crew schedules
+              fit together. Recommendations are drafts; running the planner does
+              not change assignments.
+            </p>
+          </header>
+          {!enabled && (
+            <Notice>
+              The planner is not available yet. Contact your administrator to
+              enable it.
+            </Notice>
+          )}
+          <form onSubmit={submit} onChange={reset}>
+            <fieldset disabled={busy} className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Planning situation</CardTitle>
+                  <CardDescription>
+                    Choose a disruption to plan for. All times are Singapore
+                    time.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="space-y-2">
+                    <Label>Situation</Label>
+                    <Pick
+                      label="Situation"
+                      value={scenario}
+                      options={scenarios}
+                      onChange={(value) => {
+                        setScenario(value)
+                        reset()
+                      }}
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground sm:col-span-1 lg:col-span-3">
+                    {descriptions[scenario]}
+                  </p>
+                </CardContent>
+              </Card>
+              <div className="max-w-sm space-y-2">
+                <Label htmlFor="planner-access">Planner access key</Label>
+                <Input
+                  id="planner-access"
+                  type="password"
+                  autoComplete="off"
+                  value={accessKey}
+                  onChange={(e) => setAccessKey(e.target.value)}
+                  placeholder="Required for your first run in this browser"
                 />
               </div>
-              <p className="text-sm text-muted-foreground sm:col-span-1 lg:col-span-3">
-                {descriptions[scenario]}
-              </p>
-            </CardContent>
-          </Card>
-          <div className="max-w-sm space-y-2">
-            <Label htmlFor="planner-access">Planner access key</Label>
-            <Input
-              id="planner-access"
-              type="password"
-              autoComplete="off"
-              value={accessKey}
-              onChange={(e) => setAccessKey(e.target.value)}
-              placeholder="Required for your first run in this browser"
-            />
-          </div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Operating requirements</CardTitle>
-              <CardDescription>
-                The database requirements remain in force. Add scenario
-                requirements or change the comparison objective without editing
-                code.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 lg:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="requirements">Additional requirements</Label>
-                <Textarea
-                  id="requirements"
-                  rows={4}
-                  value={requirements}
-                  onChange={(e) => setRequirements(e.target.value)}
-                  placeholder="For example: Every affected trip must have at least two wheelchair spaces."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="objective">Ranking objective</Label>
-                <Textarea
-                  id="objective"
-                  rows={4}
-                  value={objective}
-                  onChange={(e) => setObjective(e.target.value)}
-                  placeholder="Default: minimize changed crew assignments, then changed bus assignments. You can change that priority here."
-                />
-              </div>
-              <div className="lg:col-span-2">
-                <Tabs defaultValue="summary">
-                  <TabsList>
-                    <TabsTrigger value="summary">
-                      Source policy scope
-                    </TabsTrigger>
-                    <TabsTrigger value="policies">
-                      Read source policies
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="summary">
-                    <p className="text-sm text-muted-foreground">
-                      Listed resources, complete route coverage, turnaround,
-                      qualifications, protected breaks, duty limits and
-                      information known at the decision time.
-                    </p>
-                  </TabsContent>
-                  <TabsContent value="policies" className="space-y-3">
-                    {catalog.policies.map((policy) => (
-                      <p key={policy.id} className="text-sm">
-                        <span className="font-medium">{policy.id}. </span>
-                        {policy.requirement}
-                      </p>
-                    ))}
-                  </TabsContent>
-                </Tabs>
-              </div>
-            </CardContent>
-          </Card>
-          <Button type="submit" disabled={!catalog.keyConfigured || !scenario}>
-            <Play />
-            Compare plans
-          </Button>
-        </fieldset>
-      </form>
-      {busy && (
-        <div
-          role="status"
-          className="flex flex-wrap items-center gap-3 rounded-lg border p-4"
-        >
-          <Loader2 className="size-4 animate-spin" />
-          <p className="flex-1 text-sm">{state.message}</p>
-          <Button variant="outline" onClick={() => abort.current?.abort()}>
-            <Square />
-            Cancel run
-          </Button>
-        </div>
-      )}
-      {state.kind === "error" && (
-        <div role="alert">
-          <Notice>{state.message}</Notice>
-        </div>
-      )}
-      {state.kind === "cancelled" && (
-        <Notice>
-          Planning was cancelled. The source database is unchanged.
-        </Notice>
-      )}
-      {state.kind === "complete" && <Result report={state.report} />}
-    </main>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Operating requirements</CardTitle>
+                  <CardDescription>
+                    The database requirements remain in force. Add scenario
+                    requirements or change the comparison objective without
+                    editing code.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-4 lg:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="requirements">
+                      Additional requirements
+                    </Label>
+                    <Textarea
+                      id="requirements"
+                      rows={4}
+                      value={requirements}
+                      onChange={(e) => setRequirements(e.target.value)}
+                      placeholder="For example: Every affected trip must have at least two wheelchair spaces."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="objective">Ranking objective</Label>
+                    <Textarea
+                      id="objective"
+                      rows={4}
+                      value={objective}
+                      onChange={(e) => setObjective(e.target.value)}
+                      placeholder="Default: minimize changed crew assignments, then changed bus assignments. You can change that priority here."
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+              <Button type="submit" disabled={!enabled || !scenario}>
+                <Play />
+                Compare plans
+              </Button>
+            </fieldset>
+          </form>
+          {busy && (
+            <div
+              role="status"
+              className="flex flex-wrap items-center gap-3 rounded-lg border p-4"
+            >
+              <Loader2 className="size-4 animate-spin" />
+              <p className="flex-1 text-sm">{state.message}</p>
+              <Button variant="outline" onClick={() => abort.current?.abort()}>
+                <Square />
+                Cancel run
+              </Button>
+            </div>
+          )}
+          {state.kind === "error" && (
+            <div role="alert">
+              <Notice>{state.message}</Notice>
+            </div>
+          )}
+          {state.kind === "cancelled" && (
+            <Notice>
+              Planning was cancelled. The source database is unchanged.
+            </Notice>
+          )}
+          {state.kind === "complete" && <Result report={state.report} />}
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

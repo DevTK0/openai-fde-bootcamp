@@ -32,7 +32,7 @@ export function DashboardSidebar({
   workspace,
   search,
 }: {
-  view: DashboardView
+  view: DashboardView | "operations-planner"
   workspace: string
   search: string
 }) {
@@ -106,6 +106,7 @@ export function DashboardSidebar({
                           className="h-8 data-active:bg-primary/10 data-active:font-medium data-active:text-primary"
                           onClick={(event) => {
                             if (
+                              view === "operations-planner" ||
                               event.button !== 0 ||
                               event.metaKey ||
                               event.ctrlKey ||
@@ -130,7 +131,14 @@ export function DashboardSidebar({
                     ))}
                     {group.id === "planning" && (
                       <SidebarMenuSubItem>
-                        <SidebarMenuSubButton href="/ops-planning">
+                        <SidebarMenuSubButton
+                          href="/ops-planning"
+                          isActive={view === "operations-planner"}
+                          aria-current={
+                            view === "operations-planner" ? "page" : undefined
+                          }
+                          className="h-8 data-active:bg-primary/10 data-active:font-medium data-active:text-primary"
+                        >
                           <span>Operations planner</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
