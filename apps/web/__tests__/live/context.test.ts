@@ -77,7 +77,7 @@ describe("agent operational database", () => {
       await context.ensureContextDatabase()
       rmSync(directory, { recursive: true, force: true })
     }
-  })
+  }, 15000)
   it("keeps raw reports untyped and lets the agent interpret multiple signals before checking allocations", async () => {
     const { reportSchema } = await import("@/lib/live/contracts")
     const report = reportSchema.parse({

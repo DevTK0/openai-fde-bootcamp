@@ -24,58 +24,31 @@ export default defineConfig({
       sidebar: [
         { label: "Overview", slug: "" },
         {
-          label: "Transcript workflow",
-          items: [
-            {
-              label: "From a transcript to a feature",
-              slug: "software-factory",
-            },
-            { label: "Workflow reference", slug: "software-factory-behavior" },
-            { label: "Develop a feature", slug: "evaluate-software-factory" },
-          ],
-        },
-        {
           label: "Tutorials",
           items: [
-            { label: "Read a maintenance comparison", slug: "getting-started" },
+            { label: "LionLink Web", items: [] },
+            {
+              label: "Fieldnotes",
+              items: [
+                {
+                  label: "Create a product brief",
+                  slug: "fieldnotes-tutorial",
+                },
+              ],
+            },
           ],
         },
         {
           label: "How-to guides",
-          items: [
-            { label: "Compare report periods", slug: "compare-reports" },
-            {
-              label: "Trace a finding to its records",
-              slug: "explore-records",
-            },
-          ],
+          items: [],
         },
         {
           label: "Reference",
-          items: [
-            { label: "Evidence sources", slug: "applications" },
-            { label: "Measures and coverage", slug: "measures" },
-          ],
+          items: [],
         },
         {
           label: "Explanation",
-          items: [
-            {
-              label: "Problems and solutions",
-              items: [
-                { autogenerate: { directory: "explanations/opportunities" } },
-              ],
-            },
-            {
-              label: "Repair spending and distance",
-              slug: "maintenance-findings",
-            },
-            { label: "Journey reliability", slug: "reliability-findings" },
-            { label: "Queues and bus capacity", slug: "crowding-findings" },
-            { label: "Workshop capacity", slug: "workshop-findings" },
-            { label: "Passenger accounts", slug: "passenger-findings" },
-            { label: "Comparing proposed costs", slug: "cost-findings" },
-          ],
+          items: [],
         },
       ],
     }),

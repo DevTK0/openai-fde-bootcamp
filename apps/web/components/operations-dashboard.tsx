@@ -1,6 +1,7 @@
 "use client"
 
-import { DatasetTabs } from "./dataset-tabs"
+import { PassengerQueueObservations } from "./passenger-queue-observations"
+import { DatasetPicker } from "./dataset-picker"
 import { DatasetTable } from "./dataset-table"
 import { useDashboard } from "@/components/dashboard-provider"
 
@@ -9,14 +10,9 @@ import { Plot } from "@workspace/ui/components/report-chart"
 import { useEffect, useState } from "react"
 import { Button } from "@workspace/ui/components/button"
 import { Skeleton } from "@workspace/ui/components/skeleton"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@workspace/ui/components/tabs"
 import { Metric, Notice, Pick } from "@/components/report-ui"
 import { type OperationsReport } from "@/lib/operations"
+import { planningSelectionSchema } from "@/lib/service-planning"
 import { fmt } from "@/lib/fleet"
 
 function useReport<T>(url: string) {
@@ -71,11 +67,29 @@ function Pending({ error, retry }: { error?: string; retry: () => void }) {
     </div>
   )
 }
-export function OperationsDashboard() {
+export function OperationsDashboard({
+  view,
+  initialQuery = "",
+}: {
+  initialQuery?: string
+  view: "reliability" | "crowding"
+}) {
   const { operationsManifest: manifest } = useDashboard()
+  const parsed = planningSelectionSchema.safeParse(
+    Object.fromEntries(new URLSearchParams(initialQuery))
+  )
+  const linkedSelection =
+    parsed.success &&
+    manifest.dates.includes(parsed.data.date) &&
+    manifest.services.includes(parsed.data.service)
+      ? parsed.data
+      : undefined
   const [service, setService] = useState("all"),
-    [date, setDate] = useState("all"),
-    [tab, setTab] = useState("reliability")
+    [date, setDate] = useState(
+      view === "crowding"
+        ? (linkedSelection?.date ?? manifest.dates.at(-1) ?? "")
+        : "all"
+    )
   const request = useReport<OperationsReport>(
     `/api/operations?service=${encodeURIComponent(service)}&date=${encodeURIComponent(date)}`
   )
@@ -83,53 +97,40 @@ export function OperationsDashboard() {
     m = report?.metrics
   return (
     <div className="space-y-6">
-      <Tabs
-        value={tab}
-        onValueChange={(value) => setTab(String(value))}
-        className="gap-5"
-      >
-        <TabsList className="h-auto! flex-wrap">
-          <TabsTrigger value="reliability">Reliability</TabsTrigger>
-          <TabsTrigger value="crowding">Crowding</TabsTrigger>
-          <TabsTrigger value="resources">Resources</TabsTrigger>
-          <TabsTrigger value="records">Records</TabsTrigger>
-        </TabsList>
-        {(tab === "reliability" || tab === "crowding") && (
-          <div className="flex flex-wrap gap-3">
-            <Pick
-              label="Operating service"
-              value={service}
-              onChange={setService}
-              options={[
-                {
-                  value: "all",
-                  label: `All ${manifest.services.length} services`,
-                },
-                ...manifest.services.map((s) => ({
-                  value: s,
-                  label: `Service ${s}`,
-                })),
-              ]}
-            />
-            <Pick
-              label="Operating date"
-              value={date}
-              onChange={setDate}
-              options={[
-                { value: "all", label: `All ${manifest.dates.length} dates` },
-                ...manifest.dates.map((d) => ({ value: d, label: d })),
-              ]}
-            />
-          </div>
-        )}
-        <TabsContent value="records">
-          <OperationsSources />
-        </TabsContent>
-        {tab === "records" ? null : !report || !m ? (
-          <Pending error={request.error} retry={request.retry} />
-        ) : (
-          <>
-            <TabsContent value="reliability" className="space-y-6">
+      <div className="flex flex-wrap gap-3">
+        <Pick
+          label="Operating service"
+          value={service}
+          onChange={setService}
+          options={[
+            {
+              value: "all",
+              label: `All ${manifest.services.length} services`,
+            },
+            ...manifest.services.map((s) => ({
+              value: s,
+              label: `Service ${s}`,
+            })),
+          ]}
+        />
+        <Pick
+          label="Operating date"
+          value={date}
+          onChange={setDate}
+          options={[
+            ...(view === "reliability"
+              ? [{ value: "all", label: `All ${manifest.dates.length} dates` }]
+              : []),
+            ...manifest.dates.map((d) => ({ value: d, label: d })),
+          ]}
+        />
+      </div>
+      {!report || !m ? (
+        <Pending error={request.error} retry={request.retry} />
+      ) : (
+        <>
+          {view === "reliability" && (
+            <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Supplied trips"
@@ -218,8 +219,10 @@ export function OperationsDashboard() {
                   })),
                 }}
               />
-            </TabsContent>
-            <TabsContent value="crowding" className="space-y-6">
+            </div>
+          )}
+          {view === "crowding" && (
+            <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <Metric
                   title="Recorded boardings"
@@ -253,71 +256,16 @@ export function OperationsDashboard() {
                   series={[{ key: "boardings", label: "Boarding events" }]}
                 />
               </div>
-              <DatasetTable
-                source={{
-                  kind: "report",
-                  table: {
-                    id: "queue-hotspots",
-                    title: "Where queues remain at observation end",
-                    file: "Top 20 route-position cohorts · dates summed when all dates are selected · queue_windows.csv + routes.csv + stops.csv",
-                    columns: [
-                      "Service / route",
-                      "Stop position",
-                      "Stop code",
-                      "Location",
-                      "Arrivals",
-                      "Boarded",
-                      "Final remaining",
-                    ],
-                  },
-                  rows: report.hotspots.map((r) => ({
-                    "Service / route": `${r.service} / ${r.route}`,
-                    "Stop position": r.order,
-                    "Stop code": r.stop,
-                    Location: r.name,
-                    Arrivals: r.arrivals,
-                    Boarded: r.boardings,
-                    "Final remaining": r.remaining,
-                  })),
-                }}
-              />
-            </TabsContent>
-            <TabsContent value="resources" className="space-y-6">
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <Metric
-                  title="Operating vehicles"
-                  value={String(manifest.coverage.vehicles)}
-                  detail="Operating fleet"
-                />
-                <Metric
-                  title="Additional workshop vehicles"
-                  value={String(manifest.coverage.workshopVehicles)}
-                  detail="Workshop fleet"
-                />
-                <Metric
-                  title="Crew-duty records"
-                  value={fmt(
-                    manifest.tables.find((t) => t.id === "crew_duties")!.count
-                  )}
-                  detail="Duty records"
-                />
-                <Metric
-                  title="Control instructions"
-                  value={String(
-                    manifest.tables.find((t) => t.id === "control_actions")!
-                      .count
-                  )}
-                  detail={`${manifest.tables.find((t) => t.id === "resource_updates")!.count} resource updates`}
-                />
-              </div>
-              <OperationsSources
-                initialTable="workshop_work_orders"
-                allowedTables={["workshop_work_orders"]}
-              />
-            </TabsContent>
-          </>
-        )}
-      </Tabs>
+            </div>
+          )}
+        </>
+      )}
+      {view === "crowding" && (
+        <PassengerQueueObservations
+          date={date}
+          initialSelection={linkedSelection}
+        />
+      )}
     </div>
   )
 }
@@ -368,5 +316,5 @@ export function OperationsSources({
     ]
   })
   if (items.length === 1) return items[0]?.content
-  return <DatasetTabs items={items} defaultValue={initialTable} />
+  return <DatasetPicker items={items} defaultValue={initialTable} />
 }

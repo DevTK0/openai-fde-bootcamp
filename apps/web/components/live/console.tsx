@@ -56,7 +56,6 @@ import type {
 } from "@/lib/live/contracts"
 import { RepairPanel } from "./repair-panel"
 import { VisualExplorer } from "./visual-explorer"
-import "./console.css"
 
 const kindLabels = {
   observation: "Unclassified report",
@@ -107,7 +106,7 @@ async function post(url: string, input: unknown) {
   return body
 }
 
-export function LiveConsole() {
+export function LiveConsole({ embedded = false }: { embedded?: boolean }) {
   const [snapshot, setSnapshot] = useState<LiveSnapshot | null>(null)
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState("")
@@ -249,68 +248,87 @@ export function LiveConsole() {
       setBusy(false)
     }
   }
+  const Content = embedded ? "div" : "main"
   return (
-    <div className="live-console min-h-screen bg-background text-foreground">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4 px-5 py-4 lg:px-8">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              aria-label="Back to fleet dashboard"
-              className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground"
-            >
-              <Activity className="size-5" />
-            </Link>
-            <div>
-              <div className="flex items-baseline gap-3">
-                <span className="text-xl font-semibold tracking-tight">
-                  LionLink
-                </span>
-                <span className="border-l pl-3 text-sm text-muted-foreground">
-                  Operations room
-                </span>
+    <div
+      className={cn(
+        "live-console text-foreground",
+        embedded ? "live-console-embedded" : "min-h-screen bg-background"
+      )}
+    >
+      {!embedded && (
+        <header className="border-b bg-card">
+          <div className="mx-auto flex max-w-[1800px] flex-wrap items-center justify-between gap-4 px-5 py-4 lg:px-8">
+            <div className="flex items-center gap-4">
+              <Link
+                href="/dashboard"
+                aria-label="Back to fleet dashboard"
+                className="flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground"
+              >
+                <Activity className="size-5" />
+              </Link>
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-xl font-semibold tracking-tight">
+                    LionLink
+                  </span>
+                  <span className="border-l pl-3 text-sm text-muted-foreground">
+                    Operations room
+                  </span>
+                </div>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Observe. Evaluate. Decide.
+                </p>
               </div>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                Observe. Evaluate. Decide.
+            </div>
+            <nav
+              className="flex items-center gap-2"
+              aria-label="Operations navigation"
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/dashboard" />}
+              >
+                <ArrowLeft />
+                Fleet reports
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/planner" />}
+              >
+                <GitBranch />
+                Planning desk
+              </Button>
+            </nav>
+          </div>
+        </header>
+      )}
+      <Content
+        className={cn(
+          embedded ? "w-full pb-8" : "mx-auto max-w-[1800px] px-5 pb-8 lg:px-8"
+        )}
+      >
+        <section
+          className={cn(
+            "flex flex-wrap items-end justify-between gap-5",
+            embedded ? "pb-4" : "py-7"
+          )}
+        >
+          {!embedded && (
+            <div>
+              <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">
+                Live operations
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                New signals become recommendations with a record of every check.
+                You stay in control of what happens next.
               </p>
             </div>
-          </div>
-          <nav
-            className="flex items-center gap-2"
-            aria-label="Operations navigation"
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              nativeButton={false}
-              render={<Link href="/dashboard" />}
-            >
-              <ArrowLeft />
-              Fleet reports
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              nativeButton={false}
-              render={<Link href="/planner" />}
-            >
-              <GitBranch />
-              Planning desk
-            </Button>
-          </nav>
-        </div>
-      </header>
-      <main className="mx-auto max-w-[1800px] px-5 pb-8 lg:px-8">
-        <section className="flex flex-wrap items-end justify-between gap-5 py-7">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight lg:text-4xl">
-              Live operations
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-              New signals become recommendations with a record of every check.
-              You stay in control of what happens next.
-            </p>
-          </div>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
@@ -1236,7 +1254,7 @@ export function LiveConsole() {
             Live browser updates
           </span>
         </footer>
-      </main>
+      </Content>
       <Dialog open={aiDialog} onOpenChange={setAiDialog}>
         <DialogContent className="live-console">
           <DialogHeader>

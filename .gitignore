@@ -56,3 +56,6 @@ apps/web/.local/
 
 # Astro generated types
 .astro/
+
+# Fieldnotes runtime database
+.fieldnotes/

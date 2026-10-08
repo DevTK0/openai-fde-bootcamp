@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@workspace/ui/lib/utils"
 import { PARTS } from "./bus-parts"
+import { cameraDistanceScale } from "./bus-camera"
 export function BusModel({
   partIds,
   vehicleId,
@@ -189,7 +190,9 @@ export function BusModel({
             right: [-10, 5, -13],
             roof: [-10, 19, 13],
           }
-          camera.position.set(...(views[part?.view ?? "doors"] ?? views.doors!))
+          camera.position
+            .set(...(views[part?.view ?? "doors"] ?? views.doors!))
+            .multiplyScalar(cameraDistanceScale(camera.aspect))
           controls.update()
           render()
         }
