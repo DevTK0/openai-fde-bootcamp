@@ -112,6 +112,14 @@ Before finishing any change, make sure `pnpm check` passes.
 - Co-locate tests as `*.test.ts(x)` next to the code in `packages/ui/src`; put app tests in `apps/web/__tests__`.
 - Query by role and accessible name; avoid snapshot tests.
 
+## Cursor Cloud specific instructions
+
+The environment install puts Node.js 24.21.0 and pnpm 12.9.1 on `PATH` via `/usr/local/bin`.
+
+This VM has no Tailscale. Start previews with `PORTLESS_TAILSCALE=0`, for example `PORTLESS_TAILSCALE=0 pnpm dev`. If a `*.localhost` name does not resolve, open the `127.0.0.1` URL from that app's dev log.
+
+The dashboard reads `data/operations/lionlink-network.sqlite`. `OPENAI_API_KEY` is only required for repair analysis and field-notes AI features.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
